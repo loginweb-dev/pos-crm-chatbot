@@ -377,9 +377,9 @@
         async function list_inbox() {
             var miinbox = await axios("{{ setting('admin.url') }}api/chatbot/inbox")
             var listchats = ''
-            // active_chat
             for (let index = 0; index < miinbox.data.length; index++) {
-                listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>FECHA</span></h5></div></a></div></div>`
+                var aux_chat = await axios("{{ setting('admin.url') }}api/chatbots"+miinbox.data[index].phone)
+                listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div></div>`
             }
             $("#miinbox").html(listchats)
         }

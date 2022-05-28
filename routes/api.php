@@ -1367,4 +1367,8 @@ Route::get('chatbot/inbox',function(){
             ->get(['phone']);
     return $inbox;
 });
+Route::get('chatbots/{phone}',function($phone){
+    return Chatbot::where('phone', $phone)->first();
+});
+
 
