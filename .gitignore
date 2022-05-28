@@ -1,6 +1,9 @@
 /node_modules
 /public/hot
 /public/storage
+/public/chatbot/node_modules
+/public/chatbot/.wwebjs_auth
+/public/chatbot/json
 /storage/*.key
 /vendor
 .env

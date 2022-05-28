@@ -4,10 +4,10 @@
 
 @section('page_header')
     <div class="container-fluid">
-        <h1 class="page-title">
+        {{-- <h1 class="page-title">
             <i class="{{ $dataType->icon }}"></i> {{ $dataType->getTranslatedAttribute('display_name_plural') }}
-        </h1>
-        @can('add', app($dataType->model_name))
+        </h1> --}}
+        {{-- @can('add', app($dataType->model_name))
             <a href="{{ route('voyager.'.$dataType->slug.'.create') }}" class="btn btn-success btn-add-new">
                 <i class="voyager-plus"></i> <span>{{ __('voyager::generic.add_new') }}</span>
             </a>
@@ -31,17 +31,14 @@
             @if (method_exists($action, 'massAction'))
                 @include('voyager::bread.partials.actions', ['action' => $action, 'data' => null])
             @endif
-        @endforeach
-        @include('voyager::multilingual.language-selector')
+        @endforeach --}}
+        {{-- @include('voyager::multilingual.language-selector') --}}
     </div>
 @stop
 
 @section('content')
 
     <div class="container-fluid">
-        @php
-            $chats = App\Chatbot::distinct()->get(['phone']);
-        @endphp
         <div class="messaging">
             <div class="inbox_msg">
               <div class="inbox_people">
@@ -49,328 +46,31 @@
                   <div class="recent_heading">
                     <h4>Chats</h4>
                   </div>
-                  <div class="">
+                  <div class="srch_bar">
                     <div class="stylish-input-group">
                         <input type="text" class="srch_bar form-control"  placeholder="Buscar">
                     </div>
                   </div>
                 </div>
                 <div class="inbox_chat">
-                    @foreach ($chats as $item)
-                        <div class="chat_list active_chat">
-                            <div class="chat_people">
-                                <a href="#" onclick="chat_set()">
-                                    <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                                    <div class="chat_ib">
-                                        <h5> {{ $item->phone }} <span class="chat_date">Dec 25</span></h5>
-                                        <p>Test, which is a new approach to have all solutions
-                                        astrology under one roof.</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
+                    <div id="miinbox"></div>
                 </div>
               </div>
               <div class="mesgs">
                 <div class="msg_history">
-                  <div class="incoming_msg">
-                    <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                    <div class="received_msg">
-                      <div class="received_withd_msg">
-                        <p>Test which is a new approach to have all
-                          solutions</p>
-                        <span class="time_date"> 11:01 AM    |    June 9</span></div>
-                    </div>
-                  </div>
-                  <div class="outgoing_msg">
-                    <div class="sent_msg">
-                      <p>Test which is a new approach to have all
-                        solutions</p>
-                      <span class="time_date"> 11:01 AM    |    June 9</span> </div>
-                  </div>
-                  <div class="incoming_msg">
-                    <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                    <div class="received_msg">
-                      <div class="received_withd_msg">
-                        <p>Test, which is a new approach to have</p>
-                        <span class="time_date"> 11:01 AM    |    Yesterday</span></div>
-                    </div>
-                  </div>
-                  <div class="outgoing_msg">
-                    <div class="sent_msg">
-                      <p>Apollo University, Delhi, India Test</p>
-                      <span class="time_date"> 11:01 AM    |    Today</span> </div>
-                  </div>
-                  <div class="incoming_msg">
-                    <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                    <div class="received_msg">
-                      <div class="received_withd_msg">
-                        <p>We work directly with our designers and suppliers,
-                          and sell direct to you, which means quality, exclusive
-                          products, at a price anyone can afford.</p>
-                        <span class="time_date"> 11:01 AM    |    Today</span></div>
-                    </div>
-                  </div>
+                    <div id="listchats"></div>
                 </div>
                 <div class="type_msg">
                   <div class="input_msg_write">
-                    <input type="text" class="write_msg" placeholder="Escribe el mensaje" />
-                    <button class="msg_send_btn" type="button" onclick="message_send()"><i class="voyager-rocket" aria-hidden="true"></i></button>
+                        <input type="text" id="client_phone" placeholder="phone" hidden>
+                        <input id="mimessage" type="text" class="write_msg" placeholder="Escribe el mensaje" />
+                        <button class="msg_send_btn" type="button" onclick="message_send()"><i class="voyager-rocket" aria-hidden="true"></i></button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
         @include('voyager::alerts')
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-bordered">
-                    <div class="panel-body">
-                        @if ($isServerSide)
-                            <form method="get" class="form-search">
-                                <div id="search-input">
-                                    <div class="col-2">
-                                        <select id="search_key" name="key">
-                                            @foreach($searchNames as $key => $name)
-                                                <option value="{{ $key }}" @if($search->key == $key || (empty($search->key) && $key == $defaultSearchKey)) selected @endif>{{ $name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-2">
-                                        <select id="filter" name="filter">
-                                            <option value="contains" @if($search->filter == "contains") selected @endif>contains</option>
-                                            <option value="equals" @if($search->filter == "equals") selected @endif>=</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-group col-md-12">
-                                        <input type="text" class="form-control" placeholder="{{ __('voyager::generic.search') }}" name="s" value="{{ $search->value }}">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-info btn-lg" type="submit">
-                                                <i class="voyager-search"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
-                                @if (Request::has('sort_order') && Request::has('order_by'))
-                                    <input type="hidden" name="sort_order" value="{{ Request::get('sort_order') }}">
-                                    <input type="hidden" name="order_by" value="{{ Request::get('order_by') }}">
-                                @endif
-                            </form>
-                        @endif
-                        <div class="table-responsive">
-                            <table id="dataTable" class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        @if($showCheckboxColumn)
-                                            <th class="dt-not-orderable">
-                                                <input type="checkbox" class="select_all">
-                                            </th>
-                                        @endif
-                                        @foreach($dataType->browseRows as $row)
-                                        <th>
-                                            @if ($isServerSide && in_array($row->field, $sortableColumns))
-                                                <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
-                                            @endif
-                                            {{ $row->getTranslatedAttribute('display_name') }}
-                                            @if ($isServerSide)
-                                                @if ($row->isCurrentSortField($orderBy))
-                                                    @if ($sortOrder == 'asc')
-                                                        <i class="voyager-angle-up pull-right"></i>
-                                                    @else
-                                                        <i class="voyager-angle-down pull-right"></i>
-                                                    @endif
-                                                @endif
-                                                </a>
-                                            @endif
-                                        </th>
-                                        @endforeach
-                                        <th class="actions text-right dt-not-orderable">{{ __('voyager::generic.actions') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($dataTypeContent as $data)
-                                    <tr>
-                                        @if($showCheckboxColumn)
-                                            <td>
-                                                <input type="checkbox" name="row_id" id="checkbox_{{ $data->getKey() }}" value="{{ $data->getKey() }}">
-                                            </td>
-                                        @endif
-                                        @foreach($dataType->browseRows as $row)
-                                            @php
-                                            if ($data->{$row->field.'_browse'}) {
-                                                $data->{$row->field} = $data->{$row->field.'_browse'};
-                                            }
-                                            @endphp
-                                            <td>
-                                                @if (isset($row->details->view))
-                                                    @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field}, 'action' => 'browse', 'view' => 'browse', 'options' => $row->details])
-                                                @elseif($row->type == 'image')
-                                                    <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="width:100px">
-                                                @elseif($row->type == 'relationship')
-                                                    @include('voyager::formfields.relationship', ['view' => 'browse','options' => $row->details])
-                                                @elseif($row->type == 'select_multiple')
-                                                    @if(property_exists($row->details, 'relationship'))
-
-                                                        @foreach($data->{$row->field} as $item)
-                                                            {{ $item->{$row->field} }}
-                                                        @endforeach
-
-                                                    @elseif(property_exists($row->details, 'options'))
-                                                        @if (!empty(json_decode($data->{$row->field})))
-                                                            @foreach(json_decode($data->{$row->field}) as $item)
-                                                                @if (@$row->details->options->{$item})
-                                                                    {{ $row->details->options->{$item} . (!$loop->last ? ', ' : '') }}
-                                                                @endif
-                                                            @endforeach
-                                                        @else
-                                                            {{ __('voyager::generic.none') }}
-                                                        @endif
-                                                    @endif
-
-                                                    @elseif($row->type == 'multiple_checkbox' && property_exists($row->details, 'options'))
-                                                        @if (@count(json_decode($data->{$row->field})) > 0)
-                                                            @foreach(json_decode($data->{$row->field}) as $item)
-                                                                @if (@$row->details->options->{$item})
-                                                                    {{ $row->details->options->{$item} . (!$loop->last ? ', ' : '') }}
-                                                                @endif
-                                                            @endforeach
-                                                        @else
-                                                            {{ __('voyager::generic.none') }}
-                                                        @endif
-
-                                                @elseif(($row->type == 'select_dropdown' || $row->type == 'radio_btn') && property_exists($row->details, 'options'))
-
-                                                    {!! $row->details->options->{$data->{$row->field}} ?? '' !!}
-
-                                                @elseif($row->type == 'date' || $row->type == 'timestamp')
-                                                    @if ( property_exists($row->details, 'format') && !is_null($data->{$row->field}) )
-                                                        {{ \Carbon\Carbon::parse($data->{$row->field})->formatLocalized($row->details->format) }}
-                                                    @else
-                                                        {{ $data->{$row->field} }}
-                                                    @endif
-                                                @elseif($row->type == 'checkbox')
-                                                    @if(property_exists($row->details, 'on') && property_exists($row->details, 'off'))
-                                                        @if($data->{$row->field})
-                                                            <span class="label label-info">{{ $row->details->on }}</span>
-                                                        @else
-                                                            <span class="label label-primary">{{ $row->details->off }}</span>
-                                                        @endif
-                                                    @else
-                                                    {{ $data->{$row->field} }}
-                                                    @endif
-                                                @elseif($row->type == 'color')
-                                                    <span class="badge badge-lg" style="background-color: {{ $data->{$row->field} }}">{{ $data->{$row->field} }}</span>
-                                                @elseif($row->type == 'text')
-                                                    @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
-                                                @elseif($row->type == 'text_area')
-                                                    @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
-                                                @elseif($row->type == 'file' && !empty($data->{$row->field}) )
-                                                    @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    @if(json_decode($data->{$row->field}) !== null)
-                                                        @foreach(json_decode($data->{$row->field}) as $file)
-                                                            <a href="{{ Storage::disk(config('voyager.storage.disk'))->url($file->download_link) ?: '' }}" target="_blank">
-                                                                {{ $file->original_name ?: '' }}
-                                                            </a>
-                                                            <br/>
-                                                        @endforeach
-                                                    @else
-                                                        <a href="{{ Storage::disk(config('voyager.storage.disk'))->url($data->{$row->field}) }}" target="_blank">
-                                                            Download
-                                                        </a>
-                                                    @endif
-                                                @elseif($row->type == 'rich_text_box')
-                                                    @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    <div>{{ mb_strlen( strip_tags($data->{$row->field}, '<b><i><u>') ) > 200 ? mb_substr(strip_tags($data->{$row->field}, '<b><i><u>'), 0, 200) . ' ...' : strip_tags($data->{$row->field}, '<b><i><u>') }}</div>
-                                                @elseif($row->type == 'coordinates')
-                                                    @include('voyager::partials.coordinates-static-image')
-                                                @elseif($row->type == 'multiple_images')
-                                                    @php $images = json_decode($data->{$row->field}); @endphp
-                                                    @if($images)
-                                                        @php $images = array_slice($images, 0, 3); @endphp
-                                                        @foreach($images as $image)
-                                                            <img src="@if( !filter_var($image, FILTER_VALIDATE_URL)){{ Voyager::image( $image ) }}@else{{ $image }}@endif" style="width:50px">
-                                                        @endforeach
-                                                    @endif
-                                                @elseif($row->type == 'media_picker')
-                                                    @php
-                                                        if (is_array($data->{$row->field})) {
-                                                            $files = $data->{$row->field};
-                                                        } else {
-                                                            $files = json_decode($data->{$row->field});
-                                                        }
-                                                    @endphp
-                                                    @if ($files)
-                                                        @if (property_exists($row->details, 'show_as_images') && $row->details->show_as_images)
-                                                            @foreach (array_slice($files, 0, 3) as $file)
-                                                            <img src="@if( !filter_var($file, FILTER_VALIDATE_URL)){{ Voyager::image( $file ) }}@else{{ $file }}@endif" style="width:50px">
-                                                            @endforeach
-                                                        @else
-                                                            <ul>
-                                                            @foreach (array_slice($files, 0, 3) as $file)
-                                                                <li>{{ $file }}</li>
-                                                            @endforeach
-                                                            </ul>
-                                                        @endif
-                                                        @if (count($files) > 3)
-                                                            {{ __('voyager::media.files_more', ['count' => (count($files) - 3)]) }}
-                                                        @endif
-                                                    @elseif (is_array($files) && count($files) == 0)
-                                                        {{ trans_choice('voyager::media.files', 0) }}
-                                                    @elseif ($data->{$row->field} != '')
-                                                        @if (property_exists($row->details, 'show_as_images') && $row->details->show_as_images)
-                                                            <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="width:50px">
-                                                        @else
-                                                            {{ $data->{$row->field} }}
-                                                        @endif
-                                                    @else
-                                                        {{ trans_choice('voyager::media.files', 0) }}
-                                                    @endif
-                                                @else
-                                                    @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    <span>{{ $data->{$row->field} }}</span>
-                                                @endif
-                                            </td>
-                                        @endforeach
-                                        <td class="no-sort no-click bread-actions">
-                                            @foreach($actions as $action)
-                                                @if (!method_exists($action, 'massAction'))
-                                                    @include('voyager::bread.partials.actions', ['action' => $action])
-                                                @endif
-                                            @endforeach
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @if ($isServerSide)
-                            <div class="pull-left">
-                                <div role="status" class="show-res" aria-live="polite">{{ trans_choice(
-                                    'voyager::generic.showing_entries', $dataTypeContent->total(), [
-                                        'from' => $dataTypeContent->firstItem(),
-                                        'to' => $dataTypeContent->lastItem(),
-                                        'all' => $dataTypeContent->total()
-                                    ]) }}</div>
-                            </div>
-                            <div class="pull-right">
-                                {{ $dataTypeContent->appends([
-                                    's' => $search->value,
-                                    'filter' => $search->filter,
-                                    'key' => $search->key,
-                                    'order_by' => $orderBy,
-                                    'sort_order' => $sortOrder,
-                                    'showSoftDeleted' => $showSoftDeleted,
-                                ])->links() }}
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     {{-- Single delete modal --}}
@@ -399,7 +99,6 @@
         <link rel="stylesheet" href="{{ voyager_asset('lib/css/responsive.dataTables.min.css') }}">
     @endif
     <style>
-        .container-fluid{max-width:1170px; margin:auto;}
         img{ max-width:100%;}
         .inbox_people {
         background: #f8f8f8 none repeat scroll 0 0;
@@ -542,7 +241,7 @@
 
         .messaging { padding: 0 0 50px 0;}
         .msg_history {
-        height: 516px;
+        height: 700px;
         overflow-y: auto;
         }
     </style>
@@ -553,11 +252,15 @@
     @if(!$dataType->server_side && config('dashboard.data_tables.responsive'))
         <script src="{{ voyager_asset('lib/js/dataTables.responsive.min.js') }}"></script>
     @endif
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
     <script>
         const socket = io('https://socket.loginweb.dev')
         socket.on('chatbot', (msg) =>{
-            location.reload()
+            $("#client_phone").val(msg)
+            list_inbox()
+            chat_set(msg)
+            toastr.info('Nuevo mensaje de: '+msg)
         })
         $(document).ready(function () {
             @if (!$dataType->server_side)
@@ -587,8 +290,8 @@
             $('.select_all').on('click', function(e) {
                 $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change');
             });
+            list_inbox()
         });
-
 
         var deleteFormAction;
         $('td').on('click', '.delete', function (e) {
@@ -628,8 +331,57 @@
             $('.selected_ids').val(ids);
         });
 
-        function chat_set() {
+        async function chat_set(phone) {
+            var messages = await axios("{{ setting('admin.url') }}api/chatbot/chats/"+phone)
+            var listchats = ''
+            for (let index = 0; index < messages.data.length; index++) {
+                if (messages.data[index].type == 'input') {
+                    listchats = listchats + "<div class='incoming_msg'><div class='incoming_msg_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='received_msg'><div class='received_withd_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span></div></div></div>"
+                } else {
+                    listchats = listchats + "<div class='outgoing_msg'><div class='sent_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span> </div></div>"
+                }
+            }
+            $("#client_phone").val(phone)
+            $("#listchats").html(listchats)
+            $("#mimessage").val('')
+            $(".msg_history").animate({ scrollTop: $('.msg_history').prop("scrollHeight")}, 1000)
+        }
 
+        async function message_send() {
+            var phone = $("#client_phone").val()
+            var message = $("#mimessage").val()
+            var midata = {
+                phone: phone,
+                message: message
+            }
+            toastr.success('Mensaje enviado a: '+phone)
+            await axios.post("{{ setting('admin.url') }}api/chatbot/save/out", midata)
+
+            var datapost = {
+                phone: phone,
+                type: 'text',
+                message: message
+            }
+            await axios.post("https://chatbot.loginweb.dev/chat", datapost)
+            chat_set(phone)
+        }
+        $("#mimessage").keyup(function(e)
+        {
+            if (e.keyCode == 13)
+            {
+                message_send()
+            }
+        });
+
+        //list inbox
+        async function list_inbox() {
+            var miinbox = await axios("{{ setting('admin.url') }}api/chatbot/inbox")
+            var listchats = ''
+            // active_chat
+            for (let index = 0; index < miinbox.data.length; index++) {
+                listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>FECHA</span></h5></div></a></div></div>`
+            }
+            $("#miinbox").html(listchats)
         }
     </script>
 @stop

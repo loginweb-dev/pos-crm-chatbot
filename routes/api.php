@@ -187,7 +187,11 @@ Route::get('search/{criterio}/{sucursal}', function ($criterio, $sucursal) {
 });
 
 Route::get('filtros/{categoria_id}', function ($categoria_id) {
-    $result = Producto::where('categoria_id', $categoria_id )->orderBy('name', 'desc')->get();
+    $result = Producto::where('categoria_id', $categoria_id )->orderBy('name', 'desc')->with('categoria','laboratorio')->get();
+    return $result;
+});
+Route::get('filtros2/{laboratorio_id}', function ($laboratorio_id) {
+    $result = Producto::where('laboratorio_id', $laboratorio_id )->orderBy('name', 'desc')->with('categoria','laboratorio')->get();
     return $result;
 });
 
@@ -1329,23 +1333,38 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 
 
 //CHATBOS CAHTS INPUT
-Route::get('chatbot/save/{midata}',function($midata){
-    $midata2=json_decode($midata);
+Route::post('chatbot/save', function(Request $request){
+    // $midata2=json_decode($midata);
     $chat = Chatbot::create([
-        'phone' => $midata2->phone,
-        'message_in' => $midata2->message,
-        'message_out' => null
+        'phone' => $request->phone,
+        'message' => $request->message,
+        'type' => 'input'
     ]);
     return $chat;
 });
 
 //CHATS OUPUT
-Route::get('chatbot/save/out/{midata}',function($midata){
-    $midata2=json_decode($midata);
+Route::post('chatbot/save/out',function(Request $request){
+    // $midata2=json_decode($midata);
     $chat = Chatbot::create([
-        'phone' => $midata2->phone,
-        'message_in' => null,
-        'message_out' => $midata2->message
+        'phone' => $request->phone,
+        'message' => $request->message,
+        'type' => 'output'
     ]);
     return $chat;
 });
+
+// GET MESSAGE
+Route::get('chatbot/chats/{phone}',function($phone){
+    $messages = Chatbot::where('phone', $phone)->get();
+    return $messages;
+});
+
+// GET list inbox
+Route::get('chatbot/inbox',function(){
+    $inbox = DB::table('chatbots')
+            ->distinct()
+            ->get(['phone']);
+    return $inbox;
+});
+

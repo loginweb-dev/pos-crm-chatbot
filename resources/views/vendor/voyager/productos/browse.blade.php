@@ -46,26 +46,18 @@
                         @if ($isServerSide)
                             <form method="get" class="form-search">
                                 <div id="search-input">
-<<<<<<< HEAD
                                     <div class="col-4">
                                         <select id="search_key" name="key" style="width: 200px" class="">
                                                 <option value="name"> N. COMERCIAL </option>
                                                 <option value="title"> N. GENERICO </option>
                                                 <option value="etiqueta"> ETIQUETAS </option>
+                                                <option value="filtros"> FILTROS </option>
                                                 <option value="capital_productos">CAPITAL EN PRODUCTOS</option>
                                                 <option value="vencimiento_productos">VENCIMIENTO PRODUCTOS</option>
-=======
-                                    <div class="col-2">
-                                        <select id="search_key" name="key">
-                                            @foreach($searchNames as $key => $name)
-                                                <option value="{{ $key }}" @if($search->key == $key || (empty($search->key) && $key == $defaultSearchKey)) selected @endif>{{ $name }}</option>
-                                            @endforeach
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
                                         </select>
                                     </div>
                                     <div class="col-2">
                                         <select id="filter" name="filter">
-<<<<<<< HEAD
                                                 {{-- <option value="equals"> = </option> --}}
                                                 <option value="contains">LIKE</option>
                                         </select>
@@ -74,25 +66,6 @@
                                         <input type="search" class="form-control" id="s" name="s" onchange="this.form.submit()" value="{{ $search->value }}">
                                     </div>
                                 </div>
-=======
-                                            <option value="contains" @if($search->filter == "contains") selected @endif>contains</option>
-                                            <option value="equals" @if($search->filter == "equals") selected @endif>=</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-group col-md-12">
-                                        <input type="text" class="form-control" placeholder="{{ __('voyager::generic.search') }}" name="s" value="{{ $search->value }}">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-info btn-lg" type="submit">
-                                                <i class="voyager-search"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
-                                @if (Request::has('sort_order') && Request::has('order_by'))
-                                    <input type="hidden" name="sort_order" value="{{ Request::get('sort_order') }}">
-                                    <input type="hidden" name="order_by" value="{{ Request::get('order_by') }}">
-                                @endif
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
                             </form>
                         @endif
                         <div class="table-responsive">
@@ -328,7 +301,6 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-<<<<<<< HEAD
 
     <div class="modal modal-primary fade" tabindex="-1" id="modal_capital" role="dialog">
         <div class="modal-dialog">
@@ -405,8 +377,65 @@
         </div>
     </div>
 
-=======
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
+    <div class="modal modal-primary fade" tabindex="-1" id="modal_filtros" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                   <h4>Filtros</h4>
+                </div>
+                <div class="modal-body">
+                    {{-- <div class="row">
+
+                    </div> --}}
+                    @php
+                        $categorias = App\Categoria::all();
+                        $laboratorios = App\Laboratorio::all();
+                    @endphp
+                    <div class="form-group">
+                        <label for="">Categorias</label>
+                        <select class="form-control" name="" id="categoria_id">
+                            <option value="">Elije un Opcion</option>
+                            @foreach ($categorias as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Laboratorio</label>
+                        <select class="form-control" name="" id="laboratorio_id">
+                            <option value="">Elije un Opcion</option>
+                            @foreach ($laboratorios as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <div id="text_filtros"></div>
+                        <table class="table" id="filtros_productos">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                    <th>P. Venta</th>
+                                    <th>P. Compra</th>
+                                    <th>Vencimiento</th>
+                                    <th>Categoria</th>
+                                    <th>Laboratorio</th>
+                                    <th>Editar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @stop
 
 @section('css')
@@ -420,10 +449,7 @@
     @if(!$dataType->server_side && config('dashboard.data_tables.responsive'))
         <script src="{{ voyager_asset('lib/js/dataTables.responsive.min.js') }}"></script>
     @endif
-<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-=======
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
     <script>
         $(document).ready(function () {
             @if (!$dataType->server_side)
@@ -493,29 +519,9 @@
             });
             $('.selected_ids').val(ids);
         });
-<<<<<<< HEAD
 
         $('#search_key').on('change', function() {
             switch (this.value) {
-                case ('name'):
-                    $('#s').find('option').remove().end();
-                    $.ajax({
-                        url: "{{ setting('admin.url') }}api/pos/productos",
-                        dataType: "json",
-                        success: function (response) {
-                            $('#s').append($('<option>', {
-                                value: null,
-                                text: 'Elige un Producto'
-                            }));
-                            for (let index = 0; index < response.length; index++) {
-                                $('#s').append($('<option>', {
-                                    value: response[index].id,
-                                    text: response[index].name
-                                }));
-                            }
-                        }
-                    });
-                    break;
                 case('capital_productos'):
                     Sucursales()
                     $('#table-capital-productos tbody tr').remove();
@@ -523,8 +529,10 @@
                     break;
                 case('vencimiento_productos'):
                     SucursalesVencimiento()
-                    // $('#table-vencimiento_productos tbody tr').remove();
                     $('#modal_vencimiento_productos').modal();
+                    break;
+                case('filtros'):
+                    $('#modal_filtros').modal();
                     break;
                 default:
                 break
@@ -631,15 +639,12 @@
         }
 
         async function CalcularCapitalDefault(sucursal) {
-
             $('#table-capital-productos tbody tr').remove();
-
             var table= await axios.get("{{setting('admin.url')}}api/pos/productos_sucursal/"+sucursal)
             var num_productos=table.data.length;
             var num_total_stock_productos=0;
             var promedio_prod=0;
             var capital=0;
-
             for(let index=0;index<table.data.length;index++){
                 if(table.data[index].stock!=null){
                     promedio_prod+=(table.data[index].precio-table.data[index].precio_compra);
@@ -647,15 +652,44 @@
                     num_total_stock_productos+=table.data[index].stock;
                 }
             }
-
             promedio_prod=promedio_prod/num_productos;
-
             $('#table-capital-productos').append("<tr><td><h5>"+num_productos+"</h5></td><td><h5>"+num_total_stock_productos+"</h5></td><td><h5>"+promedio_prod.toFixed(2)+"</h5></td><td><h4>"+capital+"</h4></td></tr>");
-
-
         }
 
-=======
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
+        $('#categoria_id').on('change', async function() {
+            var table = await axios("{{setting('admin.url')}}api/filtros/"+this.value)
+            $('#filtros_productos tbody tr').remove();
+            total = 0
+            for(let index=0; index<table.data.length; index++){
+                var categoria = table.data[index].categoria ? table.data[index].categoria.name : 'Sin categoria'
+                var laboratorio = table.data[index].laboratorio ? table.data[index].laboratorio.name : 'Sin laboratorio'
+                total +=table.data[index].stock * table.data[index].precio
+                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td>{{ route('voyager.productos.edit', "+table.data[index].id+") }}</td></tr>")
+            }
+            $("#text_filtros").html("<h6> Cantidad (stock): "+table.data.length+" - Total(stock*p.venta): "+total+"</h6>")
+        });
+
+        $('#laboratorio_id').on('change', async function() {
+            var table = await axios("{{setting('admin.url')}}api/filtros2/"+this.value)
+            $('#filtros_productos tbody tr').remove();
+            total = 0
+            for(let index=0; index<table.data.length; index++){
+                var categoria = table.data[index].categoria ? table.data[index].categoria.name : 'Sin categoria'
+                var laboratorio = table.data[index].laboratorio ? table.data[index].laboratorio.name : 'Sin laboratorio'
+                total +=table.data[index].stock * table.data[index].precio
+                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td>{{ route('voyager.productos.edit', "+table.data[index].id+") }}</td></tr>")
+            }
+            $("#text_filtros").html("<h6> Cantidad (stock): "+table.data.length+" - Total(stock*p.venta): "+total+"</h6>")
+        });
+
+        // // filtros_productos
+        // <th>ID</th>
+        // <th>Producto</th>
+        // <th>P. Venta</th>
+        // <th>P. Compra</th>
+        // <th>Vencimiento</th>
+        // <th>Categoria</th>
+        // <th>Laboratorio</th>
+        // <th>Editar</th>
     </script>
 @stop

@@ -1,6 +1,4 @@
 @extends('layouts.master')
-
-
 @section('content')
 <br>
 <div class="container-fluid mt-5">

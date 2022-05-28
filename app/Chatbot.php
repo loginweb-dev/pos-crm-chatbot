@@ -12,8 +12,9 @@ class Chatbot extends Model
 
     protected $fillable = [
 		'phone',
-		'message_in',
-        'message_out'
+		'message',
+        'type',
+        'created_at'
 	];
 
     protected $appends=['published'];

@@ -299,13 +299,7 @@
                                         <table class="table" id="mitableresult">
                                             <thead>
                                                 <tr>
-<<<<<<< HEAD
                                                     <th>Accion</th>
-=======
-                                                    {{-- <th>#</th> --}}
-                                                    <th>Accion</th>
-                                                    {{-- <th>Imagen</th> --}}
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
                                                     <th>Categoria</th>
                                                     <th>N. Comercial</th>
                                                     <th>N. Genérico</th>
@@ -378,22 +372,24 @@
                                             <a onclick="addmixta()" class="btn btn-sm btn-primary">Agregar</a>
                                         </div>
                                     </div>
-                                    <table class="table table-striped table-inverse table-responsive" id="micart">
-                                        <thead class="thead-inverse">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Image</th>
-                                                <th>Producto</th>
-                                                <th>Observación</th>
-                                                <th>Extra</th>
-                                                <th>Precio</th>
-                                                <th>Cantidad</th>
-                                                <th>Total</th>
-                                                <th>Quitar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-inverse" id="micart">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Image</th>
+                                                    <th>Producto</th>
+                                                    <th>Observación</th>
+                                                    <th>Extra</th>
+                                                    <th>Precio</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Total</th>
+                                                    <th>Quitar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="form-group col-lg-3 col-md-4 text-center">
                                     <form class="form-horizontal" role="form">
@@ -972,14 +968,9 @@
         </div>
     </div>
 @stop
-
-
-
-
 @section('javascript')
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
-
     <script>
         var params = {};
         var $file;
