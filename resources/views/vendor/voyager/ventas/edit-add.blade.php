@@ -139,7 +139,7 @@
                                     </div>
                                     <div class="col-md-4 col-sm-12">
                                         <div class="form-group">
-                                            <label for="option_id">Cupnes</label>
+                                            <label for="cupon_id">Cupones</label>
                                             <select name="cupon_id" id="cupon_id" class="form-control js-example-basic-single">
                                                 @foreach ($cupones as $item)
                                                     <option value="{{ $item->id }}" @if($venta->cupon_id == $item->id)selected @endif>{{ $item->title.' - Bs '.$item->valor }}</option>
@@ -315,44 +315,44 @@
                                         <a onclick="return $('#miresult').attr('hidden', true)" class="btn btn-sm btn-default">Cerrar</a>
                                         <a href="#" data-toggle="modal" data-target="#modal_producto" class="btn btn-sm btn-dark">Crear nuevo producto</a>
                                     </div>
-                                        @if(setting("empresa.type_negocio")=="Restaurente")
-                                        <div style="cursor: pointer;">
-                                            <ul class="nav nav-tabs" role="tablist">
-                                                @foreach($categorias as $item)
-                                                    <li role="presentation"><a href="#{{ $item->id }}" aria-controls="home" role="tab" data-toggle="tab">{{ $item->name}}</a></li>
-                                                @endforeach
-                                                <li role="presentation"><a href="#vacio" aria-controls="home" role="tab" data-toggle="tab">Vacio</a></li>
-                                            </ul>
-                                            <div class="tab-content">
-                                                @foreach($categorias as $item)
-                                                    <div role="tabpanel" class="tab-pane" id="{{ $item->id }}">
-                                                        @php
-                                                            $products = App\Producto::where('categoria_id', $item->id )->orderBy('name', 'desc')->get();
-                                                        @endphp
-                                                        <div class="row">
-                                                            @foreach($products as $item)
-                                                                <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                                                                    <a href="#micart" onclick="addproduct('{{$item->id}}')" class="thumbnail">
-                                                                        @php
-                                                                            $miimage =$item->image ? $item->image :  setting('productos.imagen_default') ;
-                                                                            $stock = $item->stock ? $item->stock : " ";
-                                                                        @endphp
-                                                                        <img src="{{setting('admin.url')}}storage/{{ $miimage }}">
-                                                                    </a>
-                                                                    @if(setting('ventas.stock'))
-                                                                        <strong>{{ $item->name }} - {{$stock}}</strong>
-                                                                    @else
-                                                                        <strong>{{ $item->name }}</strong>
-                                                                    @endif
-                                                                </div>
-                                                            @endforeach
+                                        @if(setting("empresa.type_negocio")=="Restaurante")
+                                            <div style="cursor: pointer;">
+                                                <ul class="nav nav-tabs" role="tablist">
+                                                    @foreach($categorias as $item)
+                                                        <li role="presentation"><a href="#{{ $item->id }}" aria-controls="home" role="tab" data-toggle="tab">{{ $item->name}}</a></li>
+                                                    @endforeach
+                                                    <li role="presentation"><a href="#vacio" aria-controls="home" role="tab" data-toggle="tab">Vacio</a></li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                    @foreach($categorias as $item)
+                                                        <div role="tabpanel" class="tab-pane" id="{{ $item->id }}">
+                                                            @php
+                                                                $products = App\Producto::where('categoria_id', $item->id )->orderBy('name', 'desc')->get();
+                                                            @endphp
+                                                            <div class="row">
+                                                                @foreach($products as $item)
+                                                                    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                                                        <a href="#micart" onclick="addproduct('{{$item->id}}')" class="thumbnail">
+                                                                            @php
+                                                                                $miimage =$item->image ? $item->image :  setting('productos.imagen_default') ;
+                                                                                $stock = $item->stock ? $item->stock : " ";
+                                                                            @endphp
+                                                                            <img src="{{setting('admin.url')}}storage/{{ $miimage }}">
+                                                                        </a>
+                                                                        @if(setting('ventas.stock'))
+                                                                            <strong>{{ $item->name }} - {{$stock}}</strong>
+                                                                        @else
+                                                                            <strong>{{ $item->name }}</strong>
+                                                                        @endif
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
+                                                    @endforeach
+                                                    <div role="tabpanel" class="tab-pane" id="vacio">
                                                     </div>
-                                                @endforeach
-                                                <div role="tabpanel" class="tab-pane" id="vacio">
                                                 </div>
                                             </div>
-                                        </div>
                                         @endif
                                     </div>
                                     <div hidden>
@@ -444,16 +444,16 @@
                                         <select class="form-control js-example-basic-single" id="mipagos"> </select>
                                     </div>
 
-                                    {{-- <div class="form-group col-sm-12">
+                                    <div class="form-group col-sm-12">
                                         <strong>Tipo</strong>
                                         <select class="form-control js-example-basic-single" id="venta_type"> </select>
-                                    </div> --}}
-                                    {{-- @if(setting('empresa.type_negocio')=="Restaurante")
+                                    </div>
+                                    @if(setting('empresa.type_negocio')=="Restaurante")
                                         <div class="form-group col-sm-12">
                                             <strong>Pensionado</strong>
                                             <select class="form-control js-example-basic-single" id="mipensionado"> </select>
                                         </div>
-                                    @endif --}}
+                                    @endif
 
                                     <div class="form-group col-md-12">
                                         <strong>Cupon</strong>
@@ -1326,12 +1326,16 @@
         else{
             ClientePorPensionado($('#mipensionado').val());
         }
+
+        $('input[name="pensionado_id"]').val(this.value)
+        toastr.success('Cambio de Pensionado')
+
+        if(( $('input[name="pensionado_id"]').val(this.value))!=0){
+            $("input[name='total']").val(0)
+        }
     });
 
-    $('#mipensionado').on('change', function() {
-        $('input[name="pensionado_id"]').val(this.value);
-        toastr.success('Cambio de Pensionado');
-    });
+
 
     async function ClientePorPensionado(id){
         var table = await axios.get("{{setting('admin.url')}}api/pos/cliente/pensionado/"+id);
@@ -1363,6 +1367,10 @@
                 }));
             }
         }
+        if($('#mipensionado').val()==0){
+            mitotal()
+        }
+
     }
     // Extras
     async function addextra(extras , producto_id, code) {
@@ -2203,7 +2211,6 @@
     });
 
     function mitotal() {
-
         var milist = JSON.parse(localStorage.getItem('micart'));
         var cant = milist.length;
         var des = $("input[name='descuento']").val();
@@ -2358,7 +2365,7 @@
                         // var newname = response.name
                         // newname = newname.replace('%', '')
                         // newname = newname.replace('#', '')
-                        var temp = {'code': newcode, 'id': response.id, 'image': miimage, 'name': newname, 'precio': response.name, 'precio_inicial':nuevoprecio, 'cant': 1, 'total': nuevoprecio, 'description': '', 'extra':response.extra, 'extras':response.extras, 'extra_name':'', 'observacion':''}
+                        var temp = {'code': newcode, 'id': response.id, 'image': miimage, 'name': response.name, 'precio': nuevoprecio, 'precio_inicial':nuevoprecio, 'cant': 1, 'total': nuevoprecio, 'description': '', 'extra':response.extra, 'extras':response.extras, 'extra_name':'', 'observacion':''}
                         micart_temp.push(temp);
                         localStorage.setItem('micart', JSON.stringify(micart_temp))
                         micart()

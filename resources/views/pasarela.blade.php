@@ -315,7 +315,6 @@
                 if (miuser.data.message) {
                     $('#nombres').val('')
                     $('#apellidos').val('')
-                    $('#telefono').val('')
                     $('#ci_nit').val('')
                     toastr.error('Cliente NO encontrado')
                 } else {

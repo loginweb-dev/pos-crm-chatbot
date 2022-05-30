@@ -33,13 +33,6 @@
             @endif
         @endforeach
         @include('voyager::multilingual.language-selector')
-
-        <a href="{{ url('admin/productos') }}" class="btn btn-default btn-add-new" title="">
-            <i class="voyager-helm"></i> <span>Productos</span>
-        </a>
-        <a href="{{ url('admin/cajas') }}" class="btn btn-default btn-add-new" title="">
-            <i class="voyager-helm"></i> <span>Cajas</span>
-        </a>
     </div>
 @stop
 

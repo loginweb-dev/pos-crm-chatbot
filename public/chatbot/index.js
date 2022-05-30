@@ -32,8 +32,8 @@ client.on("qr", (qr) => {
 });
 
 client.on('ready', () => {
-	app.listen(3000, () => {
-		console.log('CHATBOT ESTA LISTO');
+	app.listen(3001, () => {
+		console.log('CHATBOT ESTA LISTO EN: 3001');
 	});
 });
 
@@ -51,7 +51,7 @@ client.on('message', async msg => {
         phone: msg.from,
         message: msg.body
     }
-    await axios.post('https://pos.loginweb.dev/api/chatbot/save', midata)
+    await axios.post('https://demo.loginweb.dev/api/chatbot/save', midata)
     socket.emit("chatbot", msg.from)
     switch (true) {
         case (msg.body === 'hola') || (msg.body === 'HOLA') || (msg.body === 'Hola') || (msg.body === 'Buenas')|| (msg.body === 'buenas')|| (msg.body === 'BUENAS'):
@@ -72,11 +72,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'A') || (msg.body === 'a'):
-            var miresponse = await axios('https://pos.loginweb.dev/api/pos/categorias_all')
+            var miresponse = await axios('https://demo.loginweb.dev/api/pos/categorias_all')
             var list = '*CATEGORIAS* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*A'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
@@ -92,13 +92,13 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
 
             break;
             //GET CATEGORY
         case categorias.has(msg.body.toUpperCase()):
-            var miresponse = await axios('https://pos.loginweb.dev/api/filtros/'+categorias.get(msg.body.toUpperCase()))
+            var miresponse = await axios('https://demo.loginweb.dev/api/filtros/'+categorias.get(msg.body.toUpperCase()))
             var list = '*PRODUCTOS POR CATEGORIA* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
@@ -114,16 +114,16 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'B') || (msg.body === 'b'):
-            var miresponse = await axios('https://pos.loginweb.dev/api/pos/productos')
+            var miresponse = await axios('https://demo.loginweb.dev/api/pos/productos')
             var list = '*PRODUCTOS* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
                 productos.set('B'+miresponse.data[index].id, miresponse.data[index].id)
-                searchs.set(miresponse.data[index].name, miresponse.data[index].id)
+                // searchs.set(miresponse.data[index].name, miresponse.data[index].id)
             }
             list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
@@ -135,11 +135,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case productos.has(msg.body.toUpperCase()):
-                var miresponse = await axios('https://pos.loginweb.dev/api/pos/producto/'+productos.get(msg.body.toUpperCase()))
+                var miresponse = await axios('https://demo.loginweb.dev/api/pos/producto/'+productos.get(msg.body.toUpperCase()))
                 const media = MessageMedia.fromFilePath('imgs/default.png');
                 var list = '*CODIGO* B'+miresponse.data.id+' \n'
                 list += '*NOMBRE* .- '+miresponse.data.name+' \n'
@@ -154,11 +154,11 @@ client.on('message', async msg => {
                     phone: msg.from,
                     message: list
                 }
-                await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+                await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
                 socket.emit("chatbot", msg.from)
                 break;
         case (msg.body === 'C') || (msg.body === 'c'):
-            var miresponse = await axios('https://pos.loginweb.dev/api/pos/cupones')
+            var miresponse = await axios('https://demo.loginweb.dev/api/pos/cupones')
             var list = '*CUPONES* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += miresponse.data[index].id+'.-'+miresponse.data[index].title+'\n'
@@ -172,11 +172,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'D') || (msg.body === 'd'):
-                var miresponse = await axios('https://pos.loginweb.dev/api/pos/sucursales')
+                var miresponse = await axios('https://demo.loginweb.dev/api/pos/sucursales')
                 var list = '*SUCURSALES* \n'
                 for (let index = 0; index < miresponse.data.length; index++) {
                     list += miresponse.data[index].id+'.-'+miresponse.data[index].name+'\n'
@@ -190,12 +190,12 @@ client.on('message', async msg => {
                     phone: msg.from,
                     message: list
                 }
-                await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+                await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
                 socket.emit("chatbot", msg.from)
                 break;
         case (msg.body === 'E') || (msg.body === 'e'):
             var list = '*INGRESA EN EL SGTE LINK* para realizar tu pedido.* \n'
-            list += 'https://pos.loginweb.dev/page/catalogo'
+            list += 'https://demo.loginweb.dev/page/catalogo'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -205,7 +205,7 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
 
@@ -221,12 +221,12 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body.substring(0, 2) === 's-') || (msg.body.substring(0, 2) === 'S-'):
             var misearch = msg.body.substring(2, 99)
-            var miresponse = await axios.post('https://pos.loginweb.dev/api/chatbot/search', {misearch: misearch})
+            var miresponse = await axios.post('https://demo.loginweb.dev/api/chatbot/search', {misearch: misearch})
             var list = ''
             if (miresponse.data.length === 0) {
                 list += 'No se encontraron coincidencias, prueba con otro criterio de busqueda.'
@@ -259,7 +259,7 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://pos.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         default:
