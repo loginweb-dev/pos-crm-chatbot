@@ -292,7 +292,7 @@
 
                             @else
                                 <div class="form-group col-lg-9 col-md-8 col-sm-12">
-                                    <strong> en el criterio de busqueda, NO ingresar caracteres especiales como ser: #, %</strong>
+                                    {{-- <strong> en el criterio de busqueda, NO ingresar caracteres especiales como ser: #, %</strong> --}}
                                     <input type="search" id="misearch" class="form-control" placeholder="Ingresa un criterio de busqueda, QR o codigo de barra">
                                     <div>
                                     <div id="miresult" class="table-responsive" hidden>
@@ -308,12 +308,12 @@
                                                     <th>Vencimiento</th>
                                                     <th>Precio</th>
                                                     <th>Laboratorio</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
                                         </table>
                                         <a onclick="return $('#miresult').attr('hidden', true)" class="btn btn-sm btn-default">Cerrar</a>
+                                        <a href="#" data-toggle="modal" data-target="#modal_producto" class="btn btn-sm btn-dark">Crear nuevo producto</a>
                                     </div>
                                         @if(setting("empresa.type_negocio")=="Restaurente")
                                         <div style="cursor: pointer;">
@@ -517,12 +517,13 @@
             </div>
         </div>
     </div>
+
     <!-- End Delete File Modal -->
     <div class="modal fade modal-primary" id="micaja">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="voyager-info"></i> Abrir Caja</h4>
+                    <h4 class="modal-title"><i class="voyager-info"></i> Debes de abrir una caja para empezar a vender</h4>
                 </div>
                 <div class="modal-body">
                     <table class="table table-responsive">
@@ -574,7 +575,7 @@
                                         <td>
                                             <input class="form-control" type="number" value="0" name="" id="importe_{{$caja->id }}">
                                         </td>
-                                        <td> <button onclick="abrir_caja('{{ $caja->id }}', '{{ $caja->title }}', '{{ $tienda->name }}', '{{ $caja->sucursal_id }}' )" class="btn btn-sm btn-success"> Abrir </button> </td>
+                                        <td> <button onclick="abrir_caja('{{ $caja->id }}', '{{ $caja->title }}', '{{ $tienda->name }}', '{{ $caja->sucursal_id }}' )" class="btn btn-sm btn-dark"> Abrir </button> </td>
                                     </tr>
                                 @endif
                             @endforeach
@@ -582,11 +583,12 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a href="/admin/ventas" type="button" class="btn btn-default">{{ __('voyager::generic.cancel') }}</a>
+                    <a href="/admin/ventas" type="button" class="btn btn-dark">{{ __('voyager::generic.cancel') }}</a>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="modal fade modal-primary" id="venta_caja">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -632,6 +634,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade modal-primary" id="cerrar_caja">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -782,6 +785,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal modal-primary fade" tabindex="-1" id="modal-lista_extras" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -816,23 +820,23 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade modal-primary" id="modal_cliente">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"><i class="voyager-info"></i> Nuevo Cliente</h4>
+                    <h4 class="modal-title"><i class="voyager-info"></i> Clientes </h4>
                 </div>
                 <div class="modal-body">
-
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Nuevo</a></li>
                         <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Buscar</a></li>
 
                     </ul>
                     <div class="tab-content">
-                        <h4>al ingresar los datos del nuevo cliente, NO ingresar caracteres espieciales como ser: #, %</h4>
+                        {{-- <h4>al ingresar los datos del nuevo cliente, NO ingresar caracteres espieciales como ser: #, %</h4> --}}
                         <div role="tabpanel" class="tab-pane active" id="home">
                             <div class="form-group col-sm-6">
                                 <label for="">Nombres</label>
@@ -862,7 +866,7 @@
 
                             </div>
                             <div class="form-group col-sm-3">
-                                <button type="button" class="btn btn-sm btn-dark" onclick="savecliente()" >Agregar</button>
+                                <button type="button" class="btn btn-sm btn-dark" onclick="savecliente()" >Enviar</button>
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="profile">
@@ -873,7 +877,8 @@
                                     <th>#</th>
                                     <th>Cliente</th>
                                     <th>CI - NIT</th>
-                                    <th>Opciones</th>
+                                    <th>Telefono</th>
+                                    <th>Asignar</th>
                                 </thead>
                                 <tbody>
                                 </tbody>
@@ -886,6 +891,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade modal-primary" id="modal_save_venta">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -898,6 +904,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade modal-primary" id="modal_asientos">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -922,30 +929,24 @@
                                     <option value="Ingresos">Ingresos</option>
                                 </select>
                             </div>
-                            <div class="form-group col-sm-4"><br>
-                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="0" checked> Bany Pay </label> <br>
-                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="1"> En Efectivo </label>
-                            </div>
                             <div class="form-group col-sm-4">
                                 <label for="">Monto</label>
                                 <input type="number" class="form-control" id="monto" value="0">
                             </div>
-                            <div class="form-group col-sm-12">
+                            <div class="form-group col-sm-4"><br>
+                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="0"> Bany Pay </label> <br>
+                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="1" checked> En Efectivo </label>
+                            </div>
+                            <div class="form-group col-sm-9">
                                 <label for="">Concepto</label>
                                 <textarea class="form-control" name="" id="concepto"></textarea>
                             </div>
-                            <div class="form-group col-sm-6">
-
-                            </div>
                             <div class="form-group col-sm-3">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                            </div>
-                            <div class="form-group col-sm-3">
-                                <button type="button" class="btn btn-primary" onclick="save_asiento()">Enviar</button>
+                                <label for="">Accion</label>
+                                <button type="button" class="btn btn-dark" onclick="save_asiento()">Enviar</button>
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="profile1">
-
                             <table class="table" id="asiento_list">
                                 <thead>
                                     <th>#</th>
@@ -962,7 +963,46 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal fade modal-primary" id="modal_producto">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4>Nuevo Producto</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group col-sm-6">
+                        <label for="">Nombre Principal</label>
+                        <input class="form-control" type="text" name="name" id="name">
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label for="">Precio</label>
+                        <input class="form-control" type="text" name="name" id="precio">
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label for="">Stock</label>
+                        <input class="form-control" type="text" name="name" id="stock">
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label for="">Categoria</label>
+                        @php
+                            $categorias = App\Categoria::all();
+                        @endphp
+                        <select name="" class="form-control" id="categoria_id">
+                            @foreach ($categorias as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" onclick="saveproducto()" class="btn btn-sm btn-dark">Enviar</a>
                 </div>
             </div>
         </div>
@@ -1044,7 +1084,6 @@
                         toastr.error("Error removing file.");
                     }
                 });
-
                 $('#confirm_delete_modal').modal('hide');
             });
             $('[data-toggle="tooltip"]').tooltip();
@@ -1063,36 +1102,20 @@
             $("#micaja").modal();
         }
 
-        // TODOS LOS CATEGORIAS
-        Categorias();
-
-        // get Deliverys
-        Deliverys();
-
-        //ClienteDefault();
-        Cliente();
-
-        Cupones();
-
-        Pasarelas();
-
-        Estados();
-
-        // venta_type
-
-        Opciones();
-        //PensionadoDefault();
-        Pensionados();
+        Categorias()
+        Deliverys()
+        Cliente()
+        Cupones()
+        Pasarelas()
+        Estados()
+        Opciones()
+        Pensionados()
         //DesactivarPensionados();
-
-        //-----------------------
         if (localStorage.getItem('micart')) {
             micart();
-
         } else {
             localStorage.setItem('micart', JSON.stringify([]));
         }
-
         });
 
     function CalculoDiasRestantes(fecha_final){
@@ -1113,7 +1136,7 @@
     }
 
     async function micliente() {
-        var miphone = Math.floor(Math.random() * 100000000);
+        var miphone = Math.floor(Math.random() * 1000000000);
         $('#phone').val(miphone)
     }
 
@@ -1127,18 +1150,6 @@
             Pensionados();
         }
     }
-
-    // function CalculoDiasRestantes(fecha_final){
-    //     var today=new Date();
-    //     var fechaInicio =   today.toISOString().split('T')[0];
-    //     var fechaFin    = fecha_final;
-    //     var fi=fechaInicio.toString();
-    //     var ff=fechaFin.toString();
-    //     var fechai = new Date(fi).getTime();
-    //     var fechaf    = new Date(ff).getTime();
-    //     var diff = fechaf - fechai;
-    //     return (diff/(1000*60*60*24));
-    // }
 
     async function Categorias() {
         $('#category').find('option').remove().end();
@@ -1246,12 +1257,8 @@
     }
 
     async function Opciones() {
-
         $('#venta_type').find('option').remove().end();
-
-
         var table= await axios.get("{{ setting('admin.url') }}api/pos/options");
-
         for (let index = 0; index < table.data.length; index++) {
             if (table.data[index].id == 1) {
                 $('#venta_type').append($('<option>', {
@@ -1269,27 +1276,15 @@
         }
     }
 
-    // async function PensionadoDefault(){
-    //     $('#mipensionado').append($('<option>', {
-    //         value: 0,
-    //         text: 'Elige un Pensionado'
-    //     }));
-    //     $('input[name="pensionado_id"]').val(0);
-
-    // }
-
     async function Pensionados(){
         $('#mipensionado').find('option').remove().end();
-
         var table= await axios.get("{{setting('admin.url')}}api/pos/pensionados");
         $('#mipensionado').append($('<option>', {
             value: 0,
             text: 'Elige un Pensionado'
         }));
         $('input[name="pensionado_id"]').val(0);
-
         if(table.data.length>0){
-
             for (let index = 0; index < table.data.length; index++) {
                 const element = table.data[index];
                 $('#mipensionado').append($('<option>', {
@@ -1298,39 +1293,27 @@
                 }));
             }
         }
-
     }
 
     $('#misearch').keypress(async function(event) {
         if ( event.which == 13 ) {
             event.preventDefault();
-            toastr.info('buscando '+this.value)
+
+            toastr.info('Buscando.. '+this.value)
             var micaja = JSON.parse(localStorage.getItem('micaja'));
-            var minew = this.value
-            minew = minew.replace('%', '')
-            minew = minew.replace('#', '')
-            var miresult = await axios.get("{{setting('admin.url')}}api/search/"+minew+"/"+micaja.sucursal_id)
+            var midata = {
+                criterio: this.value,
+                sucursal_id: micaja.sucursal_id
+            }
+            var miresult = await axios.post("{{setting('admin.url')}}api/producto/search", midata)
             $("#mitableresult tbody tr").remove()
             $("#miresult").attr("hidden", false)
             for(let index=0; index < miresult.data.length; index++){
-                // var mipresentacion= miresult.data[index].presentacion_id ? miresult.data[index].presentacion_id :" "
-                // if(mipresentacion!= " "||mipresentacion!=null){
-                //     var presentacion= await axios("{{setting('admin.url')}}api/pos/presentacion/"+presentacion_id)
-                // }
-                // else{
-                //     var presentacion = " "
-                // }
                 var img = miresult.data[index].image ? miresult.data[index].image : "{{ setting('productos.imagen_default') }}"
                 var nombre_genérico= miresult.data[index].title ? miresult.data[index].title : " "
                 var vencimiento = miresult.data[index].vencimiento ? miresult.data[index].vencimiento : " "
                 var laboratorio= miresult.data[index].laboratorio_id ? miresult.data[index].laboratorio.name : " "
-<<<<<<< HEAD
-                // $('#mitableresult').append("<tr><td>"+miresult.data[index].id+"</td><td><img class='img-thumbnail img-sm img-responsive' src={{ setting('admin.url') }}storage/"+img+"></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td><td><a class='btn btn-sm btn-success' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td></tr>")
                 $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td></tr>")
-
-=======
-                $('#mitableresult').append("<tr><td><a class='btn btn-xs btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td></tr>")
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
             }
         }
     });
@@ -1338,22 +1321,10 @@
     $('#mipensionado').on('change', function() {
         if($('#mipensionado').val()==0){
             $('#micliente').find('option').remove().end();
-            //ClienteDefault();
             Cliente();
         }
         else{
             ClientePorPensionado($('#mipensionado').val());
-
-            // var cliente=$('#mipensionado option:selected').val();
-            // var cltext=$('#mipensionado option:selected').text();
-
-            // $('#micliente').find('option').remove().end();
-
-            // $('#micliente').append($('<option>', {
-            //     value: cliente,
-            //     text: cltext
-            // }));
-            // $("input[name='cliente_id']").val(cliente);
         }
     });
 
@@ -1375,37 +1346,24 @@
     }
 
     async function Cliente(){
-
         $('#micliente').find('option').remove().end();
         var table= await axios("{{ setting('admin.url') }}api/pos/cliente/default/get");
         $("input[name='cliente_id']").val(table.data.id);
         $('#micliente').append($('<option>', {
             value: table.data.id,
-            text: table.data.display+' - '+table.data.ci_nit
+            text: table.data.display+' - '+table.data.ci_nit+' - '+table.data.phone,
+            selected: true
         }));
-
-
         var tabla= await axios.get("{{ setting('admin.url') }}api/pos/clientes");
         for (let index = 0; index < tabla.data.length; index++) {
             if(tabla.data[index].default==0){
                 $('#micliente').append($('<option>', {
                 value: tabla.data[index].id,
-                text: tabla.data[index].display+' - '+tabla.data[index].ci_nit
+                text: tabla.data[index].display+' - '+tabla.data[index].ci_nit +' - '+tabla.data[index].phone
                 }));
             }
         }
     }
-
-    // async function ClienteDefault(){
-    //     var tabla= await axios("{{ setting('admin.url') }}api/pos/cliente/default/get");
-    //     $("input[name='cliente_id']").val(tabla.data.id);
-    //     $('#micliente').append($('<option>', {
-    //         value: tabla.data.id,
-    //         text: tabla.data.display+' - '+tabla.data.ci_nit
-    //     }));
-    // }
-
-
     // Extras
     async function addextra(extras , producto_id, code) {
         $("#table-extras tbody tr").remove();
@@ -1667,19 +1625,12 @@
         var caja_id = micaja.caja_id;
         var editor_id = '{{ Auth::user()->id }}';
 
-<<<<<<< HEAD
         var newconcepto = concepto
         newconcepto = newconcepto.replace('#', '')
         newconcepto = newconcepto.replace('%', '')
 
         var midata = JSON.stringify({caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: newconcepto, pago:pago});
         console.log(midata);
-=======
-        var midata = JSON.stringify({caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: micon, pago:pago});
-        // console.log(midata);
-        var miurl = "{{ setting('admin.url') }}api/pos/asiento/save/"+midata
-        console.log(miurl)
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
         $.ajax({
             url: miurl,
             dataType: "json",
@@ -1833,7 +1784,7 @@
                     } else {
                         toastr.success('Clintes Encontrados');
                         for (let index = 0; index < response.length; index++) {
-                            mitable = mitable + "<tr><td>"+response[index].id+"</td><td>"+response[index].display+"</td><td>"+response[index].ci_nit+"</td><td><a class='btn btn-sm btn-success' onclick='cliente_get("+response[index].id+")'>Elegir</a></td></tr>";
+                            mitable = mitable + "<tr><td>"+response[index].id+"</td><td>"+response[index].display+"</td><td>"+response[index].ci_nit+"</td><td>"+response[index].phone+"</td><td><a class='btn btn-xs btn-dark' onclick='cliente_get("+response[index].id+")'>...</a></td></tr>";
                         }
                         $('#cliente_list').append(mitable);
                     }
@@ -1844,29 +1795,29 @@
 
     // cliente_get
     function cliente_get(id) {
-        $.ajax({
-            url: "{{ setting('admin.url') }}api/pos/cliente/"+id,
-            dataType: "json",
-            success: function (response) {
-                $("input[name='cliente_id']").val(id);
-                $('#micliente').val(id);
-                $('#micliente').text(response.display + ' - ' + response.ci_nit);
+        // $.ajax({
+        //     url: "{{ setting('admin.url') }}api/pos/cliente/"+id,
+        //     dataType: "json",
+        //     success: function (response) {
+        //         $("input[name='cliente_id']").val(id);
+        //         $('#micliente').val(id);
+        //         $('#micliente').text(response.display + ' - ' + response.ci_nit);
                 $('#modal_cliente').modal('hide');
-            }
-        });
+        //     }
+        // });
     }
 
     // ADD DISPLAY
     $('#first_name').keyup(function (e) {
         e.preventDefault();
         $('#display').val(this.value+' '+$('#last_name').val());
-        $('#email').val(this.value+'.'+$('#last_name').val()+'@loginweb.dev');
+        $('#email').val(this.value.toLowerCase()+'.'+$('#last_name').val().toLowerCase()+'@loginweb.dev');
     });
 
     $('#last_name').keyup(function (e) {
         e.preventDefault();
         $('#display').val($('#first_name').val()+' '+this.value);
-        $('#email').val($('#first_name').val()+'.'+this.value+'@loginweb.dev');
+        $('#email').val($('#first_name').val().toLowerCase()+'.'+this.value.toLowerCase()+'@loginweb.dev');
     });
 
     function cerrar_caja() {
@@ -1933,7 +1884,6 @@
                 total_efectivo+=misventas.data[index].total;
             }
             if(misventas.data[index].option_id=="{{ setting('ventas.pedido_domicilio_id') }}"||misventas.data[index].option_id=="{{ setting('ventas.delivery_zona1') }}"||misventas.data[index].option_id=="{{ setting('ventas.delivery_zona2') }}"){
-
                 $("#productos_caja").append("<tr><td>"+nombres+"</td><td>"+misventas.data[index].ticket+"</td><td>"+misventas.data[index].pasarela.title+"</td><td>"+misventas.data[index].cliente.display+"</td><td>"+misventas.data[index].delivery.name+"</td><td>"+misventas.data[index].chofer.name+"</td><td>"+misventas.data[index].factura+"</td><td>"+misventas.data[index].total+"</td><td>"+misventas.data[index].published+"</td><td><a href='#deliverys' aria-controls='deliverys' role='tab' data-toggle='tab' class='btn btn-sm btn-primary' onclick='set_chofer("+misventas.data[index].id+")'>Chofer</a></td></tr>");
             }
             else{
@@ -1941,10 +1891,8 @@
             }
         }
         if('{{setting('ventas.fila_totales')}}'){
-            $("#productos_caja").append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-            $("#productos_caja").append("<tr><td><h4>Total Ventas Efectivo: </h4></td><td><h4>"+total_efectivo+"</h4></td><td></td><td><h4>Total Ventas Tarjeta: </h4></td><td><h4>"+total_tarjeta+"</h4></td><td></td><td><h4>Total Ventas QR: </h4></td><td><h4>"+total_qr+"</h4></td><td></td><td><h4>Total Ventas Banipay: </h4></td><td><h4>"+total_banipay+"</h4></td></tr>");
-            $("#productos_caja").append("<tr><td><h4>Importe Inicial: </h4></td><td><h4>"+micaja.importe+"</h4></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-
+            $("#productos_caja").append("<tr><td colpsan='10'><hr></td></tr>")
+            $("#productos_caja").append("<tr><td><h4>Importe Inicial: </h4></td><td><h4>"+micaja.importe+"</h4></td><td><h4>Total Efectivo: </h4></td><td><h4>"+total_efectivo+"</h4></td><td><h4>Total Tarjeta: </h4></td><td><h4>"+total_tarjeta+"</h4></td><td><h4>Total QR: </h4></td><td><h4>"+total_qr+"</h4></td><td><h4>Total Banipay: </h4></td><td><h4>"+total_banipay+"</h4></td></tr>");
         }
     }
 
@@ -2017,36 +1965,39 @@
     });
 
     //save cliente
-    function savecliente() {
-        var first = $('#first_name').val();
-        var last = $('#last_name').val();
-        var phone = $('#phone').val();
-        var nit = $('#nit').val();
-        var display = $('#display').val();
-        var email = $('#email').val();
-
-        var newfirst = first
-        newfirst = newname.replace('%', '')
-        newfirst = newname.replace('#', '')
-
-        var newlast = last
-        newlast = newname.replace('%', '')
-        newlast = newname.replace('#', '')
-
-        var midata = JSON.stringify({first_name: newfirst, last_name: newlast, phone: phone, nit: nit, display: display, email: email});
-        $.ajax({
-            url: "{{ setting('admin.url') }}api/pos/savacliente/"+midata,
-            success: function (response){
-                toastr.success('Cliente Creado');
-                $('#micliente').append($('<option>', {
-                    value: response.id,
-                    text: response.display,
-                    selected: true
-                }));
-                $("input[name='cliente_id']").val(response.id);
-                $('#modal_cliente').modal('hide');
-            }
-        });
+    async function savecliente() {
+        var first = $('#first_name').val()
+        var last = $('#last_name').val()
+        var phone = $('#phone').val()
+        var nit = $('#nit').val()
+        var display = $('#display').val()
+        var email = $('#email').val()
+        var midata ={
+            first_name: first,
+            last_name: last,
+            phone: phone,
+            nit: nit,
+            display: display,
+            email: email
+        };
+        var newcliente = await axios.post("{{ setting('admin.url') }}api/pos/cliente/save", midata).
+            catch(function (error) {
+                // console.log(error.toJSON());
+                $('#first_name').val('')
+                $('#last_name').val('')
+                $('#display').val('')
+                $('#email').val('')
+                toastr.error('Error en el registro')
+                return false
+            });
+        toastr.success('Cliente registrad@: '+newcliente.data.display)
+        $('#micliente').append($('<option>', {
+            value: newcliente.data.id,
+            text: newcliente.data.display+' - '+newcliente.data.ci_nit+' - '+newcliente.data.phone,
+            selected: true
+        }));
+        $("input[name='cliente_id']").val(newcliente.data.id)
+        $('#modal_cliente').modal('hide')
     }
 
     $('#micupon').on('change', function() {
@@ -2164,17 +2115,10 @@
                 default:
 
                     for (let index = 0; index < micart.length; index++) {
-<<<<<<< HEAD
                         var newname = micart[index].name
                         newname = newname.replace('%', '')
                         newname = newname.replace('#', '')
                         var midata2 = JSON.stringify({'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': newname, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion})
-=======
-                        var minew = micart[index].name
-                        minew = minew.replace('%', '')
-                        minew = minew.replace('#', '')
-                        var midata2 = JSON.stringify({'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': minew, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion});
->>>>>>> b6a4504ac060cb734dbe86c99abfb05e5ba6f304
                         var impresion="{{ setting('admin.url') }}api/pos/ventas/save/detalle/"+midata2
                         //console.log(impresion)
                         var venta_detalle = await axios.get(impresion)
@@ -2441,15 +2385,10 @@
         mitotal();
     }
     async function CrearCredito(venta, cliente){
-        //console.log(venta);
         var table=await axios("{{setting('admin.url')}}api/pos/venta/"+venta);
-
-
-            //console.log(table.data);
             var venta_id=venta;
             var cliente_id=cliente;
             var deuda=table.data.subtotal+table.data.adicional-table.data.descuento;
-            //console.log(deuda);
             var cuota=table.data.total;
             var restante=parseFloat(deuda).toFixed(2)-parseFloat(cuota).toFixed(2);
             if(restante<=0){
@@ -2458,9 +2397,7 @@
             else{
                 var status=0;
             }
-
             var midata = JSON.stringify({'venta_id':venta_id,'cliente_id':cliente_id,'deuda':deuda,'cuota':cuota,'restante':restante,'status':status});
-
             var table= await axios("{{setting('admin.url')}}api/pos/cobrar-credito/"+midata);
     }
 
@@ -2516,7 +2453,7 @@
                     $("#micart").append("<tr id="+milist[index].code+"><td>"+milist[index].id+"</td><td> <img class='img-thumbnail img-sm img-responsive' src={{ setting('admin.url') }}storage/"+milist[index].image+"></td><td>"+milist[index].name+"<br>"+milist[index].description+"<br>"+milist[index].extra_name+"</td><td><input class='form-control' type='text' onchange='updateobservacion("+milist[index].id+","+milist[index].code+")' value='"+milist[index].observacion+"' id='observacion_"+milist[index].code+"'></td><td><a  class='btn btn-sm btn-success'  data-toggle='modal' data-target='#modal-lista_extras' onclick='addextra("+milist[index].extras+", "+milist[index].id+","+milist[index].code+")'><i class='voyager-plus'></i></a></td><td><input class='form-control' type='number' value='"+milist[index].precio+"' id='precio_"+milist[index].code+"' onchange='updateprice("+milist[index].id+","+milist[index].code+")'></td><td><input class='form-control' type='number' onchange='updatecant("+milist[index].id+","+milist[index].code+")' onclick='updatecant("+milist[index].id+","+milist[index].code+")' value='"+milist[index].cant+"' id='cant_"+milist[index].code+"'></td><td><input class='form-control' type='number' value='"+milist[index].total+"' id='total_"+milist[index].code+"' readonly></td><td><a class='btn btn-sm btn-danger' onclick='midelete("+milist[index].code+")'><i class='voyager-trash'></i></a></td></tr>");
                 }
                 else{
-                        $("#micart").append("<tr id="+milist[index].code+"><td>"+milist[index].id+"</td><td> <img class='img-thumbnail img-sm img-responsive' src={{ setting('admin.url') }}storage/"+milist[index].image+"></td><td>"+milist[index].name+"<br>"+milist[index].description+"<br>"+milist[index].extra_name+"</td><td><input class='form-control' type='text' onchange='updateobservacion("+milist[index].id+","+milist[index].code+")' value='"+milist[index].observacion+"' id='observacion_"+milist[index].code+"'></td><td></td><td><input class='form-control' type='number' value='"+milist[index].precio+"' id='precio_"+milist[index].code+"' onchange='updateprice("+milist[index].id+","+milist[index].code+")'></td><td><input class='form-control' type='number'  onchange='updatecant("+milist[index].id+","+milist[index].code+")' onclick='updatecant("+milist[index].id+","+milist[index].code+")' value='"+milist[index].cant+"' id='cant_"+milist[index].code+"'></td><td><input class='form-control' type='number' value='"+milist[index].total+"' id='total_"+milist[index].code+"' readonly></td><td><a class='btn btn-sm btn-danger' onclick='midelete("+milist[index].code+")'><i class='voyager-trash'></i></a></td></tr>");
+                    $("#micart").append("<tr id="+milist[index].code+"><td>"+milist[index].id+"</td><td> <img class='img-thumbnail img-sm img-responsive' src={{ setting('admin.url') }}storage/"+milist[index].image+"></td><td>"+milist[index].name+"<br>"+milist[index].description+"<br>"+milist[index].extra_name+"</td><td><input class='form-control' type='text' onchange='updateobservacion("+milist[index].id+","+milist[index].code+")' value='"+milist[index].observacion+"' id='observacion_"+milist[index].code+"'></td><td></td><td><input class='form-control' type='number' value='"+milist[index].precio+"' id='precio_"+milist[index].code+"' onchange='updateprice("+milist[index].id+","+milist[index].code+")'></td><td><input class='form-control' type='number'  onchange='updatecant("+milist[index].id+","+milist[index].code+")' onclick='updatecant("+milist[index].id+","+milist[index].code+")' value='"+milist[index].cant+"' id='cant_"+milist[index].code+"'></td><td><input class='form-control' type='number' value='"+milist[index].total+"' id='total_"+milist[index].code+"' readonly></td><td><a class='btn btn-sm btn-danger' onclick='midelete("+milist[index].code+")'><i class='voyager-trash'></i></a></td></tr>");
                 }
             }
             mitotal();
@@ -2528,5 +2465,25 @@
            saveventas()
         }
     });
+
+    async function saveproducto() {
+        var micaja = JSON.parse(localStorage.getItem('micaja'));
+        var midata = {
+            name: $("#name").val(),
+            precio: $("#precio").val(),
+            stock: $("#stock").val(),
+            categoria_id: $("#categoria_id").val(),
+            sucursal_id: micaja.sucursal_id
+        }
+        // console.log(midata)
+        var newpproduct = await axios.post("{{setting('admin.url')}}api/pos/producto/simple", midata).
+            catch(function (error) {
+                toastr.error('Error en el registro')
+                return false
+            });
+        toastr.success('Registro exitoso: '+newpproduct.data.name)
+        addproduct(newpproduct.data.id)
+        $('#modal_producto').modal('hide')
+    }
 </script>
 @stop

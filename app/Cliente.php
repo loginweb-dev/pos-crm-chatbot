@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Carbon\Carbon;
 class Cliente extends Model
 {
 	use SoftDeletes;
@@ -16,7 +16,12 @@ class Cliente extends Model
 		'phone',
 		'ci_nit',
 		'email',
-		'default'
+		'default',
+        'chatbot_id'
 	];
 
+    protected $appends=['published'];
+	public function getPublishedAttribute(){
+		return Carbon::createFromTimeStamp(strtotime($this->attributes['created_at']) )->diffForHumans();
+	}
 }

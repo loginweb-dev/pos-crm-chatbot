@@ -48,7 +48,7 @@
                   </div>
                   <div class="srch_bar">
                     <div class="stylish-input-group">
-                        <input type="text" class="srch_bar form-control"  placeholder="Buscar">
+                        <input type="text" class="srch_bar form-control"  placeholder="Buscar" id="misearch">
                     </div>
                   </div>
                 </div>
@@ -89,9 +89,35 @@
                     </form>
                     <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-primary fade" tabindex="-1" id="cliente_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-helm"></i> Relacion el Chatbot con un Cliente </h4>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="chatbot_id" hidden>
+                    <input id="search_cliente" type="text" class="form-control" placeholder="buscar cliente">
+                    <table class="table" id="table_cliente">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>display</th>
+                                <th>Registro</th>
+                                <th>Asignar</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @stop
 
 @section('css')
@@ -316,7 +342,6 @@
                     }else{
                         $('#dataTable').before('<a id="redir" href="{{ (route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 0]), true)) }}"></a>');
                     }
-
                     $('#redir')[0].click();
                 })
             })
@@ -336,11 +361,12 @@
             var listchats = ''
             for (let index = 0; index < messages.data.length; index++) {
                 if (messages.data[index].type == 'input') {
-                    listchats = listchats + "<div class='incoming_msg'><div class='incoming_msg_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='received_msg'><div class='received_withd_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span></div></div></div>"
+                    listchats = listchats + "<div class='incoming_msg'><div class='incoming_msg_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='received_msg'><div class='received_withd_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span></div></div></div>"
                 } else {
                     listchats = listchats + "<div class='outgoing_msg'><div class='sent_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span> </div></div>"
                 }
             }
+            $("#misearch").val(phone)
             $("#client_phone").val(phone)
             $("#listchats").html(listchats)
             $("#mimessage").val('')
@@ -365,6 +391,7 @@
             await axios.post("https://chatbot.loginweb.dev/chat", datapost)
             chat_set(phone)
         }
+
         $("#mimessage").keyup(function(e)
         {
             if (e.keyCode == 13)
@@ -378,10 +405,40 @@
             var miinbox = await axios("{{ setting('admin.url') }}api/chatbot/inbox")
             var listchats = ''
             for (let index = 0; index < miinbox.data.length; index++) {
-                var aux_chat = await axios("{{ setting('admin.url') }}api/chatbots"+miinbox.data[index].phone)
-                listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://ptetutorials.com/images/user-profile.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div></div>`
+                var aux_chat = await axios("{{ setting('admin.url') }}api/chatbots/"+miinbox.data[index].phone)
+                var aux_cliente = await axios("{{ setting('admin.url') }}api/chatbot/cliente/get/"+miinbox.data[index].phone)
+                if (aux_cliente.data) {
+                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display}</div>`
+                } else {
+                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
+                }
             }
             $("#miinbox").html(listchats)
+        }
+
+        function cliente_relacion(chatbot_id) {
+            $('#chatbot_id').val(chatbot_id);
+            $('#cliente_modal').modal('show');
+        }
+
+        $("#search_cliente").keyup(async function(e)
+        {
+            if (e.keyCode == 13)
+            {
+                $('#table_cliente tbody tr').remove();
+                var clientes = await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/search", {criterio: this.value})
+                console.log(clientes.data)
+                for (let index = 0; index < clientes.data.length; index++) {
+                    $('#table_cliente').append("<tr><td>"+clientes.data[index].id+"</td><td>"+clientes.data[index].display+"</td><td>"+clientes.data[index].published+"</td><td><a href='#' class='btn btn-xs btn-dark' onclick='cliente_set("+clientes.data[index].id+", "+clientes.data[index].id+")'>OK</a></td></tr>")
+                }
+            }
+        });
+
+        async function cliente_set(cliente_id) {
+            var chatbot_id =  $('#chatbot_id').val()
+            await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/relacion", {cliente_id: cliente_id, chatbot_id: chatbot_id})
+            toastr.info('Chat Realacionado')
+            $('#cliente_modal').modal('toggle');
         }
     </script>
 @stop

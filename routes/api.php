@@ -181,8 +181,9 @@ Route::get('option/{id}', function ($id) {
     return $midata;
 });
 
-Route::get('search/{criterio}/{sucursal}', function ($criterio, $sucursal) {
-    $result = Producto::where('sucursal_id',$sucursal)->where('name', 'like', '%'.$criterio.'%')->orWhere('title', 'like', '%'.$criterio.'%')->orWhere('etiqueta', 'like', '%'.$criterio.'%')->orderBy('name', 'desc')->with('categoria','laboratorio')->get();
+//prodcuto buscar
+Route::post('producto/search', function (Request $request) {
+    $result = Producto::where('sucursal_id', $request->sucursal_id)->where('name', 'like', '%'.$request->criterio.'%')->orWhere('title', 'like', '%'.$request->criterio.'%')->orWhere('etiqueta', 'like', '%'.$request->criterio.'%')->orderBy('name', 'desc')->with('categoria','laboratorio')->get();
     return $result;
 });
 
@@ -533,32 +534,28 @@ Route::get('pos/compras/save/{midata}', function($midata) {
 });
 
 // SAVE CLIENTE
-Route::get('pos/savacliente/{midata}', function ($midata) {
-    $cliente = json_decode($midata);
+Route::post('pos/cliente/save', function (Request $request) {
     $cliente = Cliente::create([
-        'first_name' => $cliente->first_name,
-        'last_name' => $cliente->last_name,
-        'phone' => $cliente->phone,
-        'ci_nit' => $cliente->nit,
-        'display' => $cliente->display,
-        'email' => $cliente->email,
-        'default' => 0
+        'first_name' => $request->first_name,
+        'last_name' => $request->last_name,
+        'phone' => $request->phone,
+        'ci_nit' => $request->nit,
+        'display' => $request->display,
+        'email' => $request->email,
+        'default' => false,
+        'chatbot_id' => null
     ]);
     return $cliente;
 });
 
 Route::get('pos/clientes/search/{criterio}', function ($criterio) {
-    // $clientes = Cliente::where('display', 'like', '%'.$criterio.'%')->where('ci_nit','like','%'.$criterio.'%')->orderBy('display', 'desc')->get();
     $clientes = Cliente::where('display', 'like', '%'.$criterio.'%')->get();
-
     return $clientes;
 });
 
 //Busqueda Cliente CI
 Route::get('pos/clientes/search_ci/{criterio}', function ($criterio) {
-    // $clientes = Cliente::where('display', 'like', '%'.$criterio.'%')->where('ci_nit','like','%'.$criterio.'%')->orderBy('display', 'desc')->get();
     $clientes = Cliente::where('ci_nit', 'like', '%'.$criterio.'%')->get();
-
     return $clientes;
 });
 
@@ -648,6 +645,19 @@ Route::get('pos/producto/{id}', function ($id) {
 Route::get('pos/producto/mixto/{id}/{category}', function ($id, $category) {
     return  Producto::where('mixta', $id)->where('categoria_id', $category)->get();
 });
+
+//PRODUCT SIMPLE
+Route::post('pos/producto/simple', function (Request $request) {
+    $product = Producto::create([
+        'name' => $request->name,
+        'precio' => $request->precio,
+        'stock' => $request->stock,
+        'categoria_id' => $request->categoria_id,
+        'sucursal_id' => $request->sucursal_id
+    ]);
+    return  $product;
+});
+
 
 //--  TODAS LAS CATEGORY PRODUCTOS
 Route::get('pos/categorias', function () {
@@ -1332,7 +1342,7 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 });
 
 
-//CHATBOS CAHTS INPUT
+//-------------------- CHATBOS CAHTS INPUT ------------------------------------------
 Route::post('chatbot/save', function(Request $request){
     // $midata2=json_decode($midata);
     $chat = Chatbot::create([
@@ -1370,5 +1380,23 @@ Route::get('chatbot/inbox',function(){
 Route::get('chatbots/{phone}',function($phone){
     return Chatbot::where('phone', $phone)->first();
 });
+// SEARCH PRODUCTO
+Route::post('chatbot/search', function (Request $request) {
+    $result = Producto::where('name', 'like', '%'.$request->misearch.'%')->orWhere('title', 'like', '%'.$request->misearch.'%')->orWhere('etiqueta', 'like', '%'.$request->misearch.'%')->orderBy('name', 'desc')->with('categoria','laboratorio')->get();
+    return $result;
+});
 
+Route::post('chatbot/cliente/search', function (Request $request) {
+    return Cliente::where('display', 'like', '%'.$request->criterio.'%')->get();
+});
 
+Route::post('chatbot/cliente/relacion', function (Request $request) {
+    $cliente = Cliente::find($request->cliente_id);
+    $cliente->chatbot_id = $request->chatbot_id;
+    $cliente->save();
+    return true;
+});
+
+Route::get('chatbot/cliente/get/{chatbot_id}', function ($chatbot_id) {
+    return Cliente::where('chatbot_id', $chatbot_id)->first();
+});
