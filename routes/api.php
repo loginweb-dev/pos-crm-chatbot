@@ -40,6 +40,7 @@ use App\Marca;
 use App\ComprasProducto;
 use App\Dosificacione;
 use App\Chatbot;
+use App\Cart;
 
 use Illuminate\Support\Facades\DB;
 use App\Micodigo\CodigoControlV7;
@@ -637,7 +638,7 @@ Route::get('pos/producto/search/{midata}', function ($midata) {
 
 // UN PRODUCT
 Route::get('pos/producto/{id}', function ($id) {
-    return  Producto::where('id', $id)->with('categoria')->first();
+    return  Producto::where('id', $id)->with('categoria','marca')->first();
 });
 
 // UN PRODUCT MIXTAS
@@ -1398,4 +1399,14 @@ Route::post('chatbot/cliente/relacion', function (Request $request) {
 
 Route::get('chatbot/cliente/get/{chatbot_id}', function ($chatbot_id) {
     return Cliente::where('chatbot_id', $chatbot_id)->first();
+});
+
+
+//cart
+Route::post('chatbot/cart/add', function (Request $request) {
+    $cart = Cart::create([
+        'product_id' => $request->product_id,
+        'chatbot_id' => $request->chatbot_id
+    ]);
+    return $cart;
 });

@@ -7,12 +7,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @stop
 @section('page_title', __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular'))
-
 @php
     $miuser = TCG\Voyager\Models\User::find(Auth::user()->id);
     $micajas = App\Caja::all();
 @endphp
-
 @section('page_header')
     <br>
     <div class="col-sm-2 col-md-2 col-lg-2">
@@ -21,17 +19,6 @@
             {{ __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular') }}
         </h4>
     </div>
-
-        {{-- <a href="{{ route('voyager.'.$dataType->slug.'.restore', $dataTypeContent->getKey()) }}" title="{{ __('voyager::generic.restore') }}" class="btn btn-default restore" data-id="{{ $dataTypeContent->getKey() }}" id="restore-{{ $dataTypeContent->getKey() }}">
-            <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">{{ __('voyager::generic.restore') }}</span>
-        </a>
-
-        <a href="javascript:;" title="{{ __('voyager::generic.delete') }}" class="btn btn-danger delete" data-id="{{ $dataTypeContent->getKey() }}" id="delete-{{ $dataTypeContent->getKey() }}">
-            <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">{{ __('voyager::generic.delete') }}</span>
-        </a> --}}
-        {{-- <div class="col-sm-6 col-md-6 col-lg-6"> --}}
-
-        {{-- </div> --}}
     @if ($edit)
         <a href="{{ route('voyager.'.$dataType->slug.'.index') }}" class="btn btn-warning">
             <i class="glyphicon glyphicon-list"></i> <span class="hidden-xs hidden-sm">{{ __('voyager::generic.return_to_list') }}</span>
@@ -43,16 +30,13 @@
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#venta_caja" onclick="venta_caja()">Ventas</button>
                 <button onclick="micliente()" type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_cliente">Cliente</button>
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_asientos" onclick="cargar_asientos()">Asientos</button>
-                {{-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_save_venta" onclick="get_cambio()">Vender</button> --}}
                 <a href="#mitop" type="button" class="btn btn-primary"  onclick="saveventas()">Vender</a>
-
             </div>
         </div>
         <div class="col-sm-4 col-md-4 col-lg-4">
             <div id="info_caja"></div>
         </div>
     @endif
-
 @stop
 @section('content')
     <div class="page-content edit-add container-fluid">
@@ -1097,7 +1081,7 @@
             var micaja = JSON.parse(localStorage.getItem('micaja'));
             $("input[name='caja_id']").val(micaja.caja_id);
             $('input[name="sucursal_id"]').val(micaja.sucursal_id);
-            $("#info_caja").html("<h4>"+micaja.title+" - "+micaja.sucursal+" - "+micaja.importe+" Bs. - <a onclick='reset()'>Reset</a></h4>");
+            $("#info_caja").html("<h4>"+micaja.title+" - "+micaja.sucursal+" - "+micaja.importe+" Bs. - <a href='#' onclick='reset()'>Reset</a> <span class='badge badge-dark'> FATCOM v3.0 </span></h4>");
         }else{
             $("#micaja").modal();
         }
@@ -2082,7 +2066,6 @@
             var adicional=$("input[name='adicional']").val();
             var pensionado_id=$("input[name='pensionado_id']").val();
             var nro_factura=null;
-
             if($("input[name='factura']:checked").val()=="Factura"){
                 nrofactura =await axios("{{setting('admin.url')}}api/pos/nro_factura")
                 nro_factura=nrofactura.data;
@@ -2135,15 +2118,9 @@
                 default:
 
                     for (let index = 0; index < micart.length; index++) {
-                        var newname = micart[index].name
-                        newname = newname.replace('%', '')
-                        newname = newname.replace('#', '')
-                        var midata2 = {'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': newname, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion}
-                        //var impresion="{{ setting('admin.url') }}api/pos/ventas/save/detalle/"+midata2
-                        //console.log(impresion)
-                        var venta_detalle = await axios.post("{{ setting('admin.url') }}api/pos/ventas/save/detalle/",midata2)
+                        var midata2 = {'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': micart[index].name, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion}
+                        var venta_detalle = await axios.post("{{ setting('admin.url') }}api/pos/ventas/save/detalle", midata2)
                         mitotal()
-
                     }
                     if(venta.data.credito=="Credito"){
                        CrearCredito(venta.data.id, venta.data.cliente_id);

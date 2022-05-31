@@ -10,7 +10,8 @@ const socket = io("https://socket.loginweb.dev");
 const JSONdb = require('simple-json-db');
 const categorias = new JSONdb('json/categorias.json');
 const productos = new JSONdb('json/productos.json');
-const searchs = new JSONdb('json/searchs.json');
+
+require('dotenv').config({ path: '../../.env' })
 
 const app = express();
 app.use(cors())
@@ -32,8 +33,8 @@ client.on("qr", (qr) => {
 });
 
 client.on('ready', () => {
-	app.listen(3001, () => {
-		console.log('CHATBOT ESTA LISTO EN: 3001');
+	app.listen(process.env.CHATBOT_PORT, () => {
+		console.log('CHATBOT ESTA LISTO EN EL PUERTO: '+process.env.CHATBOT_PORT);
 	});
 });
 
@@ -51,18 +52,19 @@ client.on('message', async msg => {
         phone: msg.from,
         message: msg.body
     }
-    await axios.post('https://demo.loginweb.dev/api/chatbot/save', midata)
+    await axios.post(process.env.APP_URL+'api/chatbot/save', midata)
     socket.emit("chatbot", msg.from)
     switch (true) {
-        case (msg.body === 'hola') || (msg.body === 'HOLA') || (msg.body === 'Hola') || (msg.body === 'Buenas')|| (msg.body === 'buenas')|| (msg.body === 'BUENAS'):
-            var list = '*MENU PRINCIPAL* \n'
-            list += '*A* .- TODAS LAS CATEGORIAS \n',
-            list += '*B* .- TODOS LOS PRODUCTOS \n',
-            list += '*C* .- CUPONES \n',
-            list += '*D* .- SUCURSALES \n',
-            list += '*E* .- REALIZAR UN PEDIDO \n',
-            list += '*F* .- BUSCAR PRODUCTO \n',
-            list += '*ENVIA UNA OPCION DEL MENU*',
+        case (msg.body === 'hola') || (msg.body === 'HOLA') || (msg.body === 'Hola') || (msg.body === 'Buenas')|| (msg.body === 'buenas') || (msg.body === 'BUENAS') || (msg.body === '0'):
+            var list = '*Hola*, soy el 🤖chatbot🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
+            list += '*MENU PRINCIPAL* \n'
+            list += '*A* .- TODAS LAS CATEGORIAS \n'
+            list += '*B* .- TODOS LOS PRODUCTOS \n'
+            list += '*C* .- CUPONES \n'
+            list += '*D* .- SUCURSALES \n'
+            list += '*E* .- BUSCAR PRODUCTO \n'
+            list += '*F* .- MI CARRITO \n \n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -72,11 +74,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'A') || (msg.body === 'a'):
-            var miresponse = await axios('https://demo.loginweb.dev/api/pos/categorias_all')
+            var miresponse = await axios(process.env.APP_URL+'api/pos/categorias_all')
             var list = '*CATEGORIAS* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*A'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
@@ -92,13 +94,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
-
             break;
-            //GET CATEGORY
         case categorias.has(msg.body.toUpperCase()):
-            var miresponse = await axios('https://demo.loginweb.dev/api/filtros/'+categorias.get(msg.body.toUpperCase()))
+            var miresponse = await axios(process.env.APP_URL+'api/filtros/'+categorias.get(msg.body.toUpperCase()))
             var list = '*PRODUCTOS POR CATEGORIA* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
@@ -114,18 +114,17 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'B') || (msg.body === 'b'):
-            var miresponse = await axios('https://demo.loginweb.dev/api/pos/productos')
+            var miresponse = await axios(process.env.APP_URL+'api/pos/productos')
             var list = '*PRODUCTOS* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
                 productos.set('B'+miresponse.data[index].id, miresponse.data[index].id)
-                // searchs.set(miresponse.data[index].name, miresponse.data[index].id)
             }
-            list += '*ENVIA UNA OPCION DEL MENU*'
+            list += '\n*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -135,33 +134,54 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case productos.has(msg.body.toUpperCase()):
-                var miresponse = await axios('https://demo.loginweb.dev/api/pos/producto/'+productos.get(msg.body.toUpperCase()))
-                const media = MessageMedia.fromFilePath('imgs/default.png');
+                var miresponse = await axios(process.env.APP_URL+'api/pos/producto/'+productos.get(msg.body.toUpperCase()))
+                let media = ''
+                if (miresponse.data.image) {
+                    media = MessageMedia.fromFilePath('../../storage/app/public/'+miresponse.data.image)
+                } else {
+                    media = MessageMedia.fromFilePath('imgs/default.png');
+                }
+                var categoria = miresponse.data.categoria ? miresponse.data.categoria.name : 'categoria no registrada'
+                var marca = miresponse.data.marca ? miresponse.data.marca.name : 'marca no registrada'
                 var list = '*CODIGO* B'+miresponse.data.id+' \n'
                 list += '*NOMBRE* .- '+miresponse.data.name+' \n'
+                list += '*CATEGORIA* .- '+categoria+' \n'
+                list += '*MARCA* .- '+marca+' \n'
                 list += '*PRECIO* .- '+miresponse.data.precio+' \n'
-                list += '*STOCK* .- '+miresponse.data.stock
-                client.sendMessage(msg.from, media, {caption: list}).then((response) => {
-                    if (response.id.fromMe) {
-                        console.log("text fue enviado!");
-                    }
-                })
+                list += '*STOCK* .- '+miresponse.data.stock+' \n'
+                list += '--------------------------'+' \n'
+                list += '*F* .- MI CARRITO \n',
+                list += '*0* .- VOLVER A INICIAR \n'
+
                 var midata = {
+                    product_id: miresponse.data.id,
+                    chatbot_id: msg.from
+                }
+                var midata2 = {
                     phone: msg.from,
                     message: list
                 }
-                await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+                await axios.post(process.env.APP_URL+'api/chatbot/cart/add', midata)
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata2)
                 socket.emit("chatbot", msg.from)
+                client.sendMessage(msg.from, 'Producto Agredo a tu Carrito').then((response) => {
+                    if (response.id.fromMe) {console.log("text fue enviado!")
+                    }
+                })
+                client.sendMessage(msg.from, media, {caption: list}).then((response) => {
+                    if (response.id.fromMe) {console.log("text fue enviado!")
+                    }
+                })
                 break;
         case (msg.body === 'C') || (msg.body === 'c'):
-            var miresponse = await axios('https://demo.loginweb.dev/api/pos/cupones')
+            var miresponse = await axios(process.env.APP_URL+'api/pos/cupones')
             var list = '*CUPONES* \n'
             for (let index = 0; index < miresponse.data.length; index++) {
-                list += miresponse.data[index].id+'.-'+miresponse.data[index].title+'\n'
+                list += miresponse.data[index].id+' .- '+miresponse.data[index].title+'\n'
             }
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
@@ -172,11 +192,11 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'D') || (msg.body === 'd'):
-                var miresponse = await axios('https://demo.loginweb.dev/api/pos/sucursales')
+                var miresponse = await axios(process.env.APP_URL+'api/pos/sucursales')
                 var list = '*SUCURSALES* \n'
                 for (let index = 0; index < miresponse.data.length; index++) {
                     list += miresponse.data[index].id+'.-'+miresponse.data[index].name+'\n'
@@ -190,29 +210,14 @@ client.on('message', async msg => {
                     phone: msg.from,
                     message: list
                 }
-                await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
                 socket.emit("chatbot", msg.from)
                 break;
         case (msg.body === 'E') || (msg.body === 'e'):
-            var list = '*INGRESA EN EL SGTE LINK* para realizar tu pedido.* \n'
-            list += 'https://demo.loginweb.dev/page/catalogo'
-            client.sendMessage(msg.from, list).then((response) => {
-                if (response.id.fromMe) {
-                    console.log("text fue enviado!");
-                }
-            })
-            var midata = {
-                phone: msg.from,
-                message: list
-            }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
-            socket.emit("chatbot", msg.from)
-            break;
-
-        case (msg.body === 'F') || (msg.body === 'f'):
             var list = '*INGRESA UN CRITERIO DE BUSQUEDA* \n'
-            list += 'con el siguiente formato S-criterio'
-            client.sendMessage(msg.from, list).then((response) => {
+            list += 'con el siguiente formato: (*s-mi busqueda*)'
+            let media3 = MessageMedia.fromFilePath('imgs/search.gif')
+            client.sendMessage(msg.from, media3, {caption: list}).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
                 }
@@ -221,12 +226,19 @@ client.on('message', async msg => {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
+                // let media3 = MessageMedia.fromFilePath('imgs/SEARCH.GIF')
+                // let mitext = '*'+miresponse.data.length+' productos encontrados, envia el codigo para ver mas informacion.*'
+                // client.sendMessage(msg.from, media3, {caption: mitext}).then((response) => {
+                //     if (response.id.fromMe) {
+                //         console.log("text fue enviado!");
+                //     }
+                // })
             break;
         case (msg.body.substring(0, 2) === 's-') || (msg.body.substring(0, 2) === 'S-'):
             var misearch = msg.body.substring(2, 99)
-            var miresponse = await axios.post('https://demo.loginweb.dev/api/chatbot/search', {misearch: misearch})
+            var miresponse = await axios.post(process.env.APP_URL+'api/chatbot/search', {misearch: misearch})
             var list = ''
             if (miresponse.data.length === 0) {
                 list += 'No se encontraron coincidencias, prueba con otro criterio de busqueda.'
@@ -249,20 +261,53 @@ client.on('message', async msg => {
                         console.log("text fue enviado!");
                     }
                 })
-                client.sendMessage(msg.from, '*'+miresponse.data.length+' productos encontrados, envia el codigo para ver mas informacion.*').then((response) => {
-                    if (response.id.fromMe) {
-                        console.log("text fue enviado!");
-                    }
-                })
+                // let media3 = MessageMedia.fromFilePath('imgs/SEARCH.GIF')
+                // let mitext = '*'+miresponse.data.length+' productos encontrados, envia el codigo para ver mas informacion.*'
+                // client.sendMessage(msg.from, media3, {caption: mitext}).then((response) => {
+                //     if (response.id.fromMe) {
+                //         console.log("text fue enviado!");
+                //     }
+                // })
             }
             var midata = {
                 phone: msg.from,
                 message: list
             }
-            await axios.post('https://demo.loginweb.dev/api/chatbot/save/out', midata)
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
+        case (msg.body === 'F') || (msg.body === 'f'):
+            client.sendMessage(msg.from, 'CARRITO').then((response) => {
+                if (response.id.fromMe) {
+                    console.log("text fue enviado!");
+                }
+            })
+            break;
+        case (msg.body === 'ADD') || (msg.body === 'add'):
+            var list = 'Item agregado correctamente \n'
+            list += '*F* .- Mi CARRITO \n'
+            client.sendMessage(msg.from, list).then((response) => {
+                if (response.id.fromMe) {
+                    console.log("text fue enviado!");
+                }
+            })
+            break;
         default:
+            // let media2 = MessageMedia.fromFilePath('imgs/chatbot.png')
+            var list = '*Hola*, soy el 🤖chatbot🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
+            list += '*MENU PRINCIPAL* \n'
+            list += '*A* .- TODAS LAS CATEGORIAS \n'
+            list += '*B* .- TODOS LOS PRODUCTOS \n'
+            list += '*C* .- CUPONES \n'
+            list += '*D* .- SUCURSALES \n'
+            list += '*E* .- BUSCAR PRODUCTO \n'
+            list += '*F* .- MI CARRITO \n \n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
+            client.sendMessage(msg.from, list).then((response) => {
+                if (response.id.fromMe) {
+                    console.log("text fue enviado!");
+                }
+            })
             break;
     }
 });
