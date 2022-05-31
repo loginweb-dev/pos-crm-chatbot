@@ -458,39 +458,38 @@ Route::get('pos/ventas/save/{midata}', function($midata) {
     return $venta;
 });
 
-Route::get('pos/ventas/save/detalle/{micart}', function($micart) {
-    $micart2 = json_decode($micart);
-    $miproducto = Producto::find($micart2->producto_id);
+Route::post('pos/ventas/save/detalle', function(Request $request) {
+    $miproducto = Producto::find($request->producto_id);
     if (setting('ventas.stock')) {
         $cant_a = $miproducto->stock;
-        $cant_b = $micart2->cantidad;
+        $cant_b = $request->cantidad;
         $cant_c = $cant_a - $cant_b;
         $miproducto->stock = $cant_c;
         $miproducto->save();
         DetalleVenta::create([
-            'producto_id' => $micart2->producto_id,
-            'venta_id' => $micart2->venta_id,
-            'precio' => $micart2->precio,
-            'cantidad' => $micart2->cantidad,
-            'total' => $micart2->total,
+            'producto_id' => $request->producto_id,
+            'venta_id' => $request->venta_id,
+            'precio' => $request->precio,
+            'cantidad' => $request->cantidad,
+            'total' => $request->total,
             'foto' => $miproducto->image ? $miproducto->image : null,
             'name' => $miproducto->name,
-            'description' => $micart2->description,
-            'extra_name'=>$micart2->extra_name,
-            'observacion'=>$micart2->observacion
+            'description' => $request->description,
+            'extra_name'=>$request->extra_name,
+            'observacion'=>$request->observacion
         ]);
     } else {
         DetalleVenta::create([
-            'producto_id' => $micart2->producto_id,
-            'venta_id' => $micart2->venta_id,
-            'precio' => $micart2->precio,
-            'cantidad' => $micart2->cantidad,
-            'total' => $micart2->total,
+            'producto_id' => $request->producto_id,
+            'venta_id' => $request->venta_id,
+            'precio' => $request->precio,
+            'cantidad' => $request->cantidad,
+            'total' => $request->total,
             'foto' => $miproducto->image ? $miproducto->image : null,
             'name' => $miproducto->name,
-            'description' => $micart2->description,
-            'extra_name'=>$micart2->extra_name,
-            'observacion'=>$micart2->observacion
+            'description' => $request->description,
+            'extra_name'=>$request->extra_name,
+            'observacion'=>$request->observacion
         ]);
     }
     return true;

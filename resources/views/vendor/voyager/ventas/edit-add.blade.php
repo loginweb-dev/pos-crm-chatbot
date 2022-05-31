@@ -1116,6 +1116,8 @@
         } else {
             localStorage.setItem('micart', JSON.stringify([]));
         }
+        // const numeroDia = new Date().getDay();
+        // console.log(numeroDia)
         });
 
     function CalculoDiasRestantes(fecha_final){
@@ -1305,6 +1307,7 @@
                 criterio: this.value,
                 sucursal_id: micaja.sucursal_id
             }
+            console.log(midata)
             var miresult = await axios.post("{{setting('admin.url')}}api/producto/search", midata)
             $("#mitableresult tbody tr").remove()
             $("#miresult").attr("hidden", false)
@@ -1452,7 +1455,7 @@
        });
 
        for(let index=0;index<precio.length;index++){
-        nombre_extras+=cantidad[index]+' '+name[index]+' ';
+        nombre_extras+=cantidad[index]+' '+name[index]+" <br>";
         //console.log(nombre_extras)
         precio_extras+=parseFloat(cantidad[index])*parseFloat(precio[index]);
        }
@@ -1757,6 +1760,15 @@
         }
         else{
             var newprecio = (miresponse1.data.precio > miresponse2.data.precio) ?  miresponse1.data.precio : miresponse2.data.precio
+            const numeroDia = new Date().getDay();
+            //const numeroDia=2
+            var nuevoprecio=0
+            if (numeroDia == 2) {
+                nuevoprecio=Math.ceil(newprecio*(1-parseFloat("{{setting('ventas.promo_martes')}}")))
+            }
+            else {
+                nuevoprecio=newprecio
+            }
             var micart_t = JSON.parse(localStorage.getItem('micart'));
             var miproduct = JSON.parse(localStorage.getItem('miproduct'));
             var description = $('#mixta1 :selected').text() + ' - ' + $('#mixta2 :selected').text();
@@ -1766,7 +1778,7 @@
                 success: function (response) {
                     var miimage =response.image ? response.image : "{{ setting('productos.imagen_default') }}";
                     $('#mixtos').attr("hidden", true);
-                    var temp = {'code': newcode, 'id': response.id, 'image': miimage, 'name': response.name, 'precio': newprecio, 'precio_inicial': newprecio, 'cant': 1, 'total': newprecio, 'description': description, 'extra': response.extra, 'extras':response.extras, 'extra_name':'', 'observacion':''};
+                    var temp = {'code': newcode, 'id': response.id, 'image': miimage, 'name': response.name, 'precio': nuevoprecio, 'precio_inicial': nuevoprecio, 'cant': 1, 'total': nuevoprecio, 'description': description, 'extra': response.extra, 'extras':response.extras, 'extra_name':'', 'observacion':''};
                     micart_t.push(temp);
                     localStorage.setItem('micart', JSON.stringify(micart_t));
                     micart();
@@ -2089,9 +2101,9 @@
                         var minew = micart[index].name
                         minew = minew.replace('#', '')
                         minew = minew.replace('%', '')
-                        var midata2 = JSON.stringify({'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': minew, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion});
+                        var midata2 = {'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': minew, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion}
 
-                        var venta_detalle = await axios.get("{{ setting('admin.url') }}api/pos/ventas/save/detalle/"+midata2)
+                        var venta_detalle = await axios.post("{{ setting('admin.url') }}api/pos/ventas/save/detalle",midata2)
                         $("#micart tr#"+micart[index].id).remove();
                         mitotal();
                     }
@@ -2126,10 +2138,10 @@
                         var newname = micart[index].name
                         newname = newname.replace('%', '')
                         newname = newname.replace('#', '')
-                        var midata2 = JSON.stringify({'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': newname, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion})
-                        var impresion="{{ setting('admin.url') }}api/pos/ventas/save/detalle/"+midata2
+                        var midata2 = {'producto_id': micart[index].id, 'venta_id': venta.data.id, 'precio': micart[index].precio, 'cantidad': micart[index].cant, 'total': micart[index].total, 'name': newname, 'foto':micart[index].foto, 'description': micart[index].description, 'extra_name':micart[index].extra_name, 'observacion':micart[index].observacion}
+                        //var impresion="{{ setting('admin.url') }}api/pos/ventas/save/detalle/"+midata2
                         //console.log(impresion)
-                        var venta_detalle = await axios.get(impresion)
+                        var venta_detalle = await axios.post("{{ setting('admin.url') }}api/pos/ventas/save/detalle/",midata2)
                         mitotal()
 
                     }
@@ -2355,16 +2367,15 @@
                     } else {
                         $('#mixtos').attr("hidden",true);
                         var nuevoprecio=0;
-                        if((response.categoria_id==8)||(response.categoria_id==1)){
+
+                        // descuento MARTES
+                        const numeroDia = new Date().getDay();
+                       //const numeroDia=2
+                        if ((numeroDia == 2)&&((response.categoria_id==1)||(response.categoria_id==8))) {
                             nuevoprecio=Math.ceil(response.precio*(1-parseFloat("{{setting('ventas.promo_martes')}}")))
-                        }
-                        else{
+                        } else {
                             nuevoprecio=response.precio
                         }
-                        // console.log(response.categoria_id)
-                        // var newname = response.name
-                        // newname = newname.replace('%', '')
-                        // newname = newname.replace('#', '')
                         var temp = {'code': newcode, 'id': response.id, 'image': miimage, 'name': response.name, 'precio': nuevoprecio, 'precio_inicial':nuevoprecio, 'cant': 1, 'total': nuevoprecio, 'description': '', 'extra':response.extra, 'extras':response.extras, 'extra_name':'', 'observacion':''}
                         micart_temp.push(temp);
                         localStorage.setItem('micart', JSON.stringify(micart_temp))
