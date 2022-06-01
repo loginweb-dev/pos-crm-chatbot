@@ -14,6 +14,7 @@ use App\Imports\ProductsImport;
 use App\Imports\VentaImport;
 use App\DetalleCaja;
 use App\Caja;
+use App\Categoria;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Cliente;
@@ -61,6 +62,20 @@ class PosController extends Controller
             $pdf->loadHTML($vista)->setPaper('legal');
             return $pdf->stream();
         }
+    }
+
+    //Imprimir Platos por Tipo de Venta (option_id)
+    public function imprimirOpcion($data){
+        $midata2=json_decode($data);
+        $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('option_id',$midata2->option_id)->where('caja_status', false)->get();
+        $option=Option::find($midata2->option_id);
+        $categoria_id=setting('productos.categoria_grupo');
+        $categoria=Categoria::find($categoria_id);
+        $vista = view('ventas.opciones', compact('ventas','option','categoria'));
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($vista)->setPaper('legal');
+        return $pdf->stream();
+        // echo('Hola');
     }
 
        // PARA IMPRIMIR CIERRE CAJA

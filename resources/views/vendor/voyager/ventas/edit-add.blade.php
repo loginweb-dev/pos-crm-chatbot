@@ -898,11 +898,9 @@
                     <h4>Ingresos & Egresos</h4>
                 </div>
                 <div class="modal-body">
-
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#home1" aria-controls="home1" role="tab" data-toggle="tab">Registrar</a></li>
                         <li role="presentation"><a href="#profile1" aria-controls="profile1" role="tab" data-toggle="tab">Historial</a></li>
-
                     </ul>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="home1">
@@ -917,9 +915,16 @@
                                 <label for="">Monto</label>
                                 <input type="number" class="form-control" id="monto" value="0">
                             </div>
-                            <div class="form-group col-sm-4"><br>
-                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="0"> Bany Pay </label> <br>
-                                <label class="radio-inline"> <input type="radio" name="pago" id="pago" value="1" checked> En Efectivo </label>
+                            <div class="form-group col-sm-4">
+                                <label for="">Pasarela</label>
+                                @php
+                                    $pasarelas = App\Pago::where('view', 'backend')->get();
+                                @endphp
+                                <select name="" class="form-control" id="pago_id">
+                                    @foreach ($pasarelas as $item)
+                                        <option value="{{ $item->id }}">{{ $item->title }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group col-sm-9">
                                 <label for="">Concepto</label>
@@ -933,7 +938,7 @@
                         <div role="tabpanel" class="tab-pane" id="profile1">
                             <table class="table" id="asiento_list">
                                 <thead>
-                                    <th>#</th>
+                                    {{-- <th>#</th> --}}
                                     <th>Tipo</th>
                                     <th>Pago</th>
                                     <th>Monto</th>
@@ -1291,7 +1296,7 @@
                 criterio: this.value,
                 sucursal_id: micaja.sucursal_id
             }
-            console.log(midata)
+            // console.log(midata)
             var miresult = await axios.post("{{setting('admin.url')}}api/producto/search", midata)
             $("#mitableresult tbody tr").remove()
             $("#miresult").attr("hidden", false)
@@ -1569,32 +1574,32 @@
                 if (response.length == 0 ) {
                     toastr.error('Sin Resultados.');
                 } else {
+                    console.log(response)
                     for (let index = 0; index < response.length; index++) {
-                        if (response[index].pago == 0) {
-                            var pagotext="En Linea";
-                            if(response[index].type=="Ingresos"){
-                                total_banipay_ingresos+=response[index].monto;
-                            }
-                            else{
-                                total_banipay_egresos+=response[index].monto;
-                            }
-                        }
-                        if (response[index].pago == 1){
-                            var pagotext="En Efectivo";
-                            if(response[index].type=="Ingresos"){
-                                total_efectivo_ingresos+=response[index].monto;
-                            }
-                            else{
-                                total_efectivo_egresos+=response[index].monto;
-
-                            }
-                        }
-                        mitable = mitable + "<tr><td>"+response[index].id+"</td><td>"+response[index].type+"</td><td>"+pagotext+"</td><td>"+response[index].monto+"</td><td>"+response[index].concepto+"</td><td>"+response[index].created_at+"</td></tr>";
+                        // if (response[index].pago == 0) {
+                        //     var pagotext="En Linea";
+                        //     if(response[index].type=="Ingresos"){
+                        //         total_banipay_ingresos+=response[index].monto;
+                        //     }
+                        //     else{
+                        //         total_banipay_egresos+=response[index].monto;
+                        //     }
+                        // }
+                        // if (response[index].pago == 1){
+                        //     var pagotext="En Efectivo";
+                        //     if(response[index].type=="Ingresos"){
+                        //         total_efectivo_ingresos+=response[index].monto;
+                        //     }
+                        //     else{
+                        //         total_efectivo_egresos+=response[index].monto;
+                        //     }
+                        // }
+                        mitable = mitable + "<tr><td>"+response[index].type+"</td><td>"+response[index].pago.title+"</td><td>"+response[index].monto+"</td><td>"+response[index].concepto+"</td><td>"+response[index].published+"</td></tr>";
                     }
                     $('#asiento_list').append(mitable);
                     if('{{setting('ventas.fila_totales')}}'){
-                        $('#asiento_list').append("<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-                        $('#asiento_list').append("<tr><td></td><td><h4>Total Efectivo: <h4></td><td><h4>"+(total_efectivo_ingresos-total_efectivo_egresos)+"</h4></td><td></td><td><h4>Total Banipay: </h4></td><td><h4>"+(total_banipay_ingresos-total_banipay_egresos)+"</h4></td></tr>");
+                        // $('#asiento_list').append("<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+                        // $('#asiento_list').append("<tr><td></td><td><h4>Total Efectivo: <h4></td><td><h4>"+(total_efectivo_ingresos-total_efectivo_egresos)+"</h4></td><td></td><td><h4>Total Banipay: </h4></td><td><h4>"+(total_banipay_ingresos-total_banipay_egresos)+"</h4></td></tr>");
                     }
                 }
             }
@@ -1602,39 +1607,18 @@
     }
 
     //SAVE ASIENTOS
-    function save_asiento() {
-        if ($("input[name='pago']:checked").val() == '0') {
-            var pagotext="En Linea";
-        }
-        if ($("input[name='pago']:checked").val() == '1'){
-            var pagotext="En Efectivo";
-        }
-        var pago=$("input[name='pago']:checked").val();
-        var micaja = JSON.parse(localStorage.getItem('micaja'));
-        var concepto = $('#concepto').val();
-        // var minew = micart[index].name
-        var micon = concepto.replace('#', '')
-        micon = micon.replace('%', '')
-        var monto = $('#monto').val();
-        var type = $('#type option:selected').val();
-        var caja_id = micaja.caja_id;
-        var editor_id = '{{ Auth::user()->id }}';
-
-        var newconcepto = concepto
-        newconcepto = newconcepto.replace('#', '')
-        newconcepto = newconcepto.replace('%', '')
-
-        var midata = JSON.stringify({caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: newconcepto, pago:pago});
-        console.log(midata);
-        $.ajax({
-            url: miurl,
-            dataType: "json",
-            success: function (response) {
-                // console.log(response);
-                toastr.success('Asiento registrado como: '+response.type);
-                $('#modal_asientos').modal('hide');
-            }
-        });
+    async function save_asiento() {
+        var micaja = JSON.parse(localStorage.getItem('micaja'))
+        var pago=$("#pago_id").val()
+        var concepto = $('#concepto').val()
+        var monto = $('#monto').val()
+        var type = $('#type option:selected').val()
+        var caja_id = micaja.caja_id
+        var editor_id = '{{ Auth::user()->id }}'
+        var midata = {caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: concepto, pago:pago}
+        var miresponse = await axios.post("{{ setting('admin.url') }}api/pos/asiento/save/", midata)
+        toastr.success('Asiento registrado como: '+miresponse.data.type)
+        $('#modal_asientos').modal('hide')
     }
 
     // GET CAMBIO
@@ -1647,7 +1631,6 @@
         if (e.keyCode == 13) {
             saveventas()
         }
-
     });
 
      // CAMBIO TPV
@@ -1655,14 +1638,14 @@
         var micart = JSON.parse(localStorage.getItem('micart'));
         if (micart.length == 0 ) {
             toastr.error('Tu Carrito esta Vacio');
-            // $('#modal_save_venta').modal('hide');
         } else {
-           $("input[name='recibido']").val(0);
-           $("input[name='cambio']").val(0);
+            $("input[name='recibido']").val(0);
+            $("input[name='cambio']").val(0);
             var total = 0;
-            for (let index = 0; index < micart.length; index++) {
-            total = total + micart[index].total;
-        }
+            for (let index = 0; index < micart.length; index++)
+            {
+                total = total + micart[index].total;
+            }
         }
     }
 

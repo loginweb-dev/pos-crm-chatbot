@@ -59,7 +59,8 @@
                                                 <option value="chofer_deudas"> Deudas de Choferes </option>
                                                 <option value="credito">Cobro Créditos</option>
                                                 <option value="reportes"> Reportes </option>
-                                                @if(setting('empresa.type_negocio')=="Restaurente")
+                                                <option value="pedidos">Can. Platos</option>
+                                                @if(setting('empresa.type_negocio')=="Restaurante")
                                                     <option value="pensionado_kardex"> Kardex Pensionados </option>
                                                 @endif
                                         </select>
@@ -671,6 +672,44 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-primary fade" tabindex="-1" id="modal_pedidos" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                   <h4 class="modal-title">Pedidos por Tipo</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <select name="" id="tipo_ventas" class="form-control"></select>
+                        </div>
+
+                        <div class="col-sm-7">
+                            <button type="button" class="btn btn-dark pull-right" onclick="TipoPedidos()"><i class="voyager-search"></i> Imprimir</button>
+                        </div>
+                        {{-- <div class="col-sm-12">
+                            <table class="table" id="table_deudas">
+                                <thead>
+                                    <tr>
+                                        <th>Venta</th>
+                                        <th>Cliente</th>
+                                        <th>Pasarela</th>
+                                        <th>Delivery</th>
+                                        <th>Subtotal</th>
+                                        <th>Creado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div> --}}
                     </div>
 
                 </div>
@@ -1509,6 +1548,11 @@
                                 Cajas_Deudas_Choferes();
                                 Choferes_Deudas();
                             break
+                        case 'pedidos':
+                                $('#modal_pedidos').modal();
+                                Opciones();
+
+                            break
                         case 'pensionado_kardex':
                             LimpiarKardex();
                             $('#modal_kardex').modal();
@@ -1574,6 +1618,35 @@
                             break
                     }
                 });
+
+                async function TipoPedidos() {
+                    var option_id=$('#tipo_ventas').val()
+                    var micaja = JSON.parse(localStorage.getItem('micaja'));
+                    var data= JSON.stringify({
+                        'user_id':micaja.user_id,
+                        'sucursal_id':micaja.sucursal_id,
+                        'option_id':option_id
+                    })
+                    //var impresion=await axios("{{setting('admin.url')}}admin/ventas/imprimir/opcion/"+data)
+                    //location.href='/admin/ventas/imprimir/opcion/'+data
+
+                    const myWindow = window.open( "{{ setting('admin.url') }}admin/ventas/imprimir/opcion/"+data, "Recibo o Factura", "width=600,height=900");
+                    setTimeout(function() {myWindow.close()}, {{ setting('impresion.tiempo_cierre') }});
+                }
+                async function Opciones() {
+                    $('#tipo_ventas').find('option').remove().end();
+                    var table= await axios.get("{{setting('admin.url')}}api/pos/options")
+                    $('#tipo_ventas').append($('<option>', {
+                        value: null,
+                        text: 'Elige una Opción'
+                    }));
+                    for (let index = 0; index < table.data.length; index++) {
+                        $('#tipo_ventas').append($('<option>', {
+                            value: table.data[index].id,
+                            text: table.data[index].title
+                        }));
+                    }
+                }
 
                 async function Cajas() {
                     var table= await axios.get("{{setting('admin.url')}}api/pos/cajas");

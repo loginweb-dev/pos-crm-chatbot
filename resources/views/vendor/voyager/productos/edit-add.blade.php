@@ -54,17 +54,17 @@
                             @php
                                 $dataTypeRows = $dataType->{($edit ? 'editRows' : 'addRows' )};
                             @endphp
-
+                            {{--
                             <div class="form-group col-md-6">
                                 <strong>Categoria</strong>
                                 <select class="form-control js-example-basic-single" name="micategory" id="micategory"></select>
-                            </div>
+                            </div> --}}
 
                             {{-- <div class="form-group col-md-6">
                                 <strong>Presentacion</strong>
                                 <select class="form-control js-example-basic-single" name="presentacion_producto" id="presentacion_producto"></select>
                             </div> --}}
-                            @if(setting('empresa.type_negocio')=="Restaurante")
+                            {{-- @if(setting('empresa.type_negocio')=="Restaurante")
                                 <div class="form-group col-md-6">
                                     <strong>Tipo Producto</strong>
                                     <select class="form-control js-example-basic-single" name="type_producto" id="type_producto"></select>
@@ -89,7 +89,7 @@
                             <div class="form-group col-md-6">
                                 <strong>Sucursal</strong>
                                 <select class="form-control js-example-basic-single" name="misucursal" id="misucursal"></select>
-                            </div>
+                            </div> --}}
 
                             @foreach($dataTypeRows as $row)
                                 <!-- GET THE DISPLAY OPTIONS -->
@@ -130,7 +130,6 @@
                             @endforeach
 
                         </div><!-- panel-body -->
-
                         <div class="panel-footer">
                             @section('submit-buttons')
                                 <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
@@ -138,7 +137,6 @@
                             @yield('submit-buttons')
                         </div>
                     </form>
-
                     <iframe id="form_target" name="form_target" style="display:none"></iframe>
                     <form id="my_form" action="{{ route('voyager.upload') }}" target="form_target" method="post"
                             enctype="multipart/form-data" style="width:0;height:0;overflow:hidden">
@@ -147,7 +145,6 @@
                         <input type="hidden" name="type_slug" id="type_slug" value="{{ $dataType->slug }}">
                         {{ csrf_field() }}
                     </form>
-
                 </div>
             </div>
         </div>

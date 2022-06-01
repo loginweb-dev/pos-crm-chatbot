@@ -127,6 +127,10 @@ return [
     'dashboard' => [
         // Add custom list items to navbar's dropdown
         'navbar_items' => [
+            'voyager::generic.logout' => [
+                'route'      => 'voyager.logout',
+                'icon_class' => 'voyager-power',
+            ],
             'voyager::generic.profile' => [
                 'route'      => 'voyager.profile',
                 'classes'    => 'class-full-of-rum',
@@ -136,6 +140,11 @@ return [
                 'route'        => '/',
                 'icon_class'   => 'voyager-home',
                 'target_blank' => true,
+            ],
+            'Media' => [
+                'route'      => 'voyager.media.index',
+                'icon_class' => 'voyager-images',
+                'target_blank' => false,
             ],
             'Parametros' => [
                 'route'      => 'voyager.settings.index',
@@ -177,19 +186,10 @@ return [
                 'icon_class' => 'voyager-browser',
                 'target_blank' => false,
             ],
-            'Media' => [
-                'route'      => 'voyager.media.index',
-                'icon_class' => 'voyager-images',
-                'target_blank' => false,
-            ],
             'Negocios' => [
                 'route'      => 'voyager.negocios.index',
                 'icon_class' => 'voyager-helm',
                 'target_blank' => false,
-            ],
-            'voyager::generic.logout' => [
-                'route'      => 'voyager.logout',
-                'icon_class' => 'voyager-power',
             ],
         ],
 

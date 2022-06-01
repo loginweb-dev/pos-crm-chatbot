@@ -13,7 +13,7 @@ FATCOM is a web application framework with expressive, elegant syntax. We believ
 - npm install (public/chatbot)
 - cp -r /var/www/origen/storage/app/public/ /var/www/destino/storage/app/
 
-## Chatobot
+## Chatbot
 
 - lsof -i tcp:3000
 - kill -9 PID

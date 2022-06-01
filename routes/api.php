@@ -224,22 +224,22 @@ Route::get('banipay/{venta_id}', function ($venta_id) {
 // --------------------------------------- VENTAS  ------------------------------------------
 
 //Asientos
-Route::get('pos/asiento/save/{midata}', function ($midata) {
-    $midata2 = json_decode($midata);
+Route::post('pos/asiento/save', function (Request $request) {
+    // $midata2 = json_decode($midata);
     $asiento = Asiento::create([
-        'caja_id' => $midata2->caja_id,
-        'type' => $midata2->type,
-        'monto' => $midata2->monto,
-        'concepto' => $midata2->concepto,
-        'editor_id' => $midata2->editor_id,
+        'caja_id' => $request->caja_id,
+        'type' => $request->type,
+        'monto' => $request->monto,
+        'concepto' => $request->concepto,
+        'editor_id' => $request->editor_id,
         'caja_status' => false,
-        'pago'=> $midata2->pago,
+        'pago'=> $request->pago,
     ]);
     return $asiento;
 });
 Route::get('pos/asientos/caja/editor/{midata}', function ($midata) {
     $midata2 = json_decode($midata);
-    $asientos = Asiento::where('caja_id', $midata2->caja_id)->where('editor_id', $midata2->editor_id)->where('caja_status', false)->get();
+    $asientos = Asiento::where('caja_id', $midata2->caja_id)->where('editor_id', $midata2->editor_id)->where('caja_status', false)->with('pago')->get();
     return $asientos;
 });
 
@@ -1404,9 +1404,54 @@ Route::get('chatbot/cliente/get/{chatbot_id}', function ($chatbot_id) {
 
 //cart
 Route::post('chatbot/cart/add', function (Request $request) {
-    $cart = Cart::create([
-        'product_id' => $request->product_id,
-        'chatbot_id' => $request->chatbot_id
+    $item = Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
+    $cant = 0;
+    // return $item;
+    if ($item) {
+        // $cant = $item->cantidad + 1;
+        $item->cantidad = $item->cantidad + 1;
+        $item->save();
+        return  Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
+    } else {
+        $cant = 1;
+        $cart = Cart::create([
+            'product_id' => $request->product_id,
+            'chatbot_id' => $request->chatbot_id,
+            'precio' => $request->precio,
+            'cantidad' => $cant,
+        ]);
+        return $cart;
+    }
+
+});
+Route::post('chatbot/cart/get', function (Request $request) {
+    return Cart::where('chatbot_id', $request->chatbot_id)->with('producto')->get();
+});
+Route::post('chatbot/cart/clean', function (Request $request) {
+    return Cart::where('chatbot_id', $request->chatbot_id)->delete();
+});
+
+// TODOS LOS PRODUCTOS
+Route::get('chatbot/productos', function () {
+    return  Producto::where('ecommerce', true)->get();
+});
+
+// VENTAS
+Route::post('chatbot/venta/save', function (Request $request) {
+    $carts = Cart::where('chatbot_id', $request->chatbot_id)->with('producto')->get();
+    $newventa = Venta::create([
+        'cliente_id' => 1,
+        'sucursal_id' => 1,
+        'register_id' => 23
     ]);
-    return $cart;
+    foreach ($carts as $item) {
+        DetalleVenta::create([
+            'producto_id' => $item->producto_id,
+            'venta_id' =>  $newventa->id,
+            'precio'=> 0,
+            'cantidad' => 0,
+            'name' => 0
+        ]);
+    }
+    return $newventa;
 });

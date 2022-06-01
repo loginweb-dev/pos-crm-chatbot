@@ -26,6 +26,8 @@ Route::get('/encola/{id}', function ($id) {
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 
+    Route::get('ventas/imprimir/opcion/{data}', 'App\Http\Controllers\PosController@imprimirOpcion')->name('venta_opcion.imprimir');
+
     Route::get('ventas/imprimir/{id}', 'App\Http\Controllers\PosController@imprimir')->name('venta.imprimir');
     Route::get('detalle_cajas/imprimir/{id}', 'App\Http\Controllers\PosController@cierre_caja')->name('cajas.cierre_caja');
     Route::get('catalogos/enviar/{id}', function($id){

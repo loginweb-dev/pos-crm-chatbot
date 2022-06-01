@@ -41,10 +41,10 @@
                     <label for="">Detalle de tu direccion *</label>
                     <input type="text" class="form-control" id="direccion" placeholder="escribe tu direccion">
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="">Mueve el marcador para mejorar tu ubicacion</label>
                     <div id="map"></div>
-                </div>
+                </div> --}}
                 <input type="text" id="latitud" hidden>
                 <input type="text" id="longitud" hidden>
             </div>
@@ -95,7 +95,7 @@
                     <div class="form-group">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch" id="switch_pensionado" />
-                            <label class="form-check-label" for="switch_pensionado">Es un pensionado?</label>
+                            <label class="form-check-label" for="switch_pensionado">Eres un pensionad@ ?</label>
                         </div>
                     </div>
                 @endif
@@ -121,21 +121,21 @@
         $('document').ready(function () {
             pagototal(null)
             var miuser = JSON.parse(localStorage.getItem('miuser'))
-            var milocation = JSON.parse(localStorage.getItem('milocation'))
-            var options = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-            if (miuser || milocation ) {
+            // var milocation = JSON.parse(localStorage.getItem('milocation'))
+            // var options = {
+            //     enableHighAccuracy: true,
+            //     timeout: 5000,
+            //     maximumAge: 0
+            // };
+            if (miuser ) {
                 getuser(miuser)
-                if (milocation) {
-                    // getlocation(milocation)
-                } else {
-                    navigator.geolocation.getCurrentPosition(initMap, error, options);
-                }
+                // if (milocation) {
+                //     // getlocation(milocation)
+                // } else {
+                //     navigator.geolocation.getCurrentPosition(initMap, error, options);
+                // }
             } else {
-                navigator.geolocation.getCurrentPosition(initMap, error, options);
+                // navigator.geolocation.getCurrentPosition(initMap, error, options);
             }
             $("#mireload").attr("hidden",true);
         });
