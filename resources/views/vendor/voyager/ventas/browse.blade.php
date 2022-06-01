@@ -1630,8 +1630,16 @@
                     //var impresion=await axios("{{setting('admin.url')}}admin/ventas/imprimir/opcion/"+data)
                     //location.href='/admin/ventas/imprimir/opcion/'+data
 
-                    const myWindow = window.open( "{{ setting('admin.url') }}admin/ventas/imprimir/opcion/"+data, "Recibo o Factura", "width=600,height=900");
-                    setTimeout(function() {myWindow.close()}, {{ setting('impresion.tiempo_cierre') }});
+                    var table= await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
+                    if(table.data){
+                        const myWindow = window.open( "{{ setting('admin.url') }}admin/ventas/imprimir/opcion/"+data, "Recibo o Factura", "width=600,height=900")
+                        setTimeout(function() {myWindow.close()}, {{ setting('impresion.tiempo_cierre') }})
+                    }
+                    else{
+                        toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())
+                    }
+
+
                 }
                 async function Opciones() {
                     $('#tipo_ventas').find('option').remove().end();

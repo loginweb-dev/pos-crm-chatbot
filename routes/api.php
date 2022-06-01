@@ -1031,12 +1031,10 @@ Route::get('pos/productions/savesemi/detalle/{miproduction}', function($miproduc
 //Guardar Producto Comprado
 Route::get('pos/addproducto/{midata}', function($midata){
     $midata2 = json_decode($midata);
-    // return $midata;
     $mimixta = 0;
     if ($midata2->mixta != null ) {
         $mimixta = $midata2->mixta;
     }
-
     $producto=Producto::create([
         'name'=>$midata2->name,
         'categoria_id'=>$midata2->categoria_id ? $midata2->categoria_id: null,
@@ -1342,7 +1340,8 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 });
 
 
-//-------------------- CHATBOS CAHTS INPUT ------------------------------------------
+//-------------------- CHATBOT ------------------------------------------
+//-----------------------------------------------------------------
 Route::post('chatbot/save', function(Request $request){
     // $midata2=json_decode($midata);
     $chat = Chatbot::create([
@@ -1406,9 +1405,7 @@ Route::get('chatbot/cliente/get/{chatbot_id}', function ($chatbot_id) {
 Route::post('chatbot/cart/add', function (Request $request) {
     $item = Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
     $cant = 0;
-    // return $item;
     if ($item) {
-        // $cant = $item->cantidad + 1;
         $item->cantidad = $item->cantidad + 1;
         $item->save();
         return  Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
@@ -1416,6 +1413,7 @@ Route::post('chatbot/cart/add', function (Request $request) {
         $cant = 1;
         $cart = Cart::create([
             'product_id' => $request->product_id,
+            'product_name' => $request->product_name,
             'chatbot_id' => $request->chatbot_id,
             'precio' => $request->precio,
             'cantidad' => $cant,
@@ -1441,17 +1439,44 @@ Route::post('chatbot/venta/save', function (Request $request) {
     $carts = Cart::where('chatbot_id', $request->chatbot_id)->with('producto')->get();
     $newventa = Venta::create([
         'cliente_id' => 1,
+        'caja_id' => 2,
         'sucursal_id' => 1,
-        'register_id' => 23
+        'status_id' => 1,
+        'option_id'=> 3,
+        'location'=> 1,
+        'delivery_id'=> 1,
+        'pago_id' => 1,
+        'cupon_id'=> 1,
+        'register_id' => 23,
+        'Credito' => 'Contado',
+        'Factura' => 'Recibo'
     ]);
+    $mitotal = 0;
     foreach ($carts as $item) {
         DetalleVenta::create([
-            'producto_id' => $item->producto_id,
+            'producto_id' => $item->producto_id, //falta
             'venta_id' =>  $newventa->id,
-            'precio'=> 0,
-            'cantidad' => 0,
-            'name' => 0
+            'precio'=> $item->precio,
+            'cantidad' => $item->cantidad,
+            'name' => $item->product_name,
+            'total' =>$item->precio * $item->cantidad
         ]);
+        $mitotal += $item->precio * $item->cantidad;
     }
+    $miupdate = Venta::find($newventa->id);
+    $miupdate->total = $mitotal;
+    $miupdate->save();
+    Cart::where('chatbot_id', $request->chatbot_id)->delete();
     return $newventa;
+});
+
+//categoria
+Route::get('chatbot/categorias', function () {
+    return  Categoria::orderBy('order', 'asc')->with('productos')->get();
+});
+
+Route::get('ventas/opcion/{data}',function($data){
+    $midata2=json_decode($data);
+    $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('option_id',$midata2->option_id)->where('caja_status', false)->first();
+    return $ventas;
 });
