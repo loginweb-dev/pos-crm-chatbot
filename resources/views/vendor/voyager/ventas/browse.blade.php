@@ -1108,33 +1108,28 @@
                         <label for="">Año</label>
                         <select name="year_reporte" id="year_reporte" class="form-control"></select>
                     </div>
-                    <div class="col-sm-2">
-                        {{-- <label for="">Acciones</label> --}}
+                    <div class="col-sm-4">
                         <button type="button" class="btn btn-sm btn-primary" onclick="GenerarListaFacturas()" >Generar</button>
                         <button type="button" class="btn btn-sm btn-dark" onclick="ExportarListaFacturas()" >Exportar</button>
                     </div>
-                    {{-- <div class="col-sm-2">
-                        <button type="button" class="btn btn-sm btn-success" onclick="ExportarListaFacturas()" >Exportar</button>
-                    </div> --}}
                     <div class="table-responsive">
-                    <table class="table" id="table_libro">
-                        <thead>
-                            <th>Número</th>
-                            <th>Fecha</th>
-                            <th>Nro. de Factura</th>
-                            <th>Nro. de Autorización</th>
-                            <th>CI/NIT</th>
-                            <th>Razón Social</th>
-                            <th>Subtotal</th>
-                            <th>Descuento</th>
-                            <th>Importe Base</th>
-                            <th>Débito Fiscal</th>
-                            <th>Código de Control</th>
-
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+                        <table class="table" id="table_libro">
+                            <thead>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Nro. de Factura</th>
+                                <th>Nro. de Autorización</th>
+                                <th>CI/NIT</th>
+                                <th>Razón Social</th>
+                                <th>Subtotal</th>
+                                <th>Descuento</th>
+                                <th>Importe Base</th>
+                                <th>Débito Fiscal</th>
+                                <th>Código de Control</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
