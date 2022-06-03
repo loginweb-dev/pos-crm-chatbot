@@ -1116,7 +1116,8 @@
                     {{-- <div class="col-sm-2">
                         <button type="button" class="btn btn-sm btn-success" onclick="ExportarListaFacturas()" >Exportar</button>
                     </div> --}}
-                    <table class="table table-responsive" id="table_libro">
+                    <div class="table-responsive">
+                    <table class="table" id="table_libro">
                         <thead>
                             <th>Número</th>
                             <th>Fecha</th>
@@ -1133,6 +1134,7 @@
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
                 </div>
             </div>
         </div>
@@ -1655,7 +1657,7 @@
                         var fecha_inicio_text=year+'-'+mes+'-01'
                         var fecha_final_text=year+'-'+mes+'-'+final
                     }
-                    location.href="{{ route('excel.ventas', ['2022-06-01', '2022-06-30']) }}"
+                    location.href="{{ route('excel.ventas', ['2022-05-01', '2022-05-31']) }}"
                 }
 
                 async function GenerarListaFacturas() {
