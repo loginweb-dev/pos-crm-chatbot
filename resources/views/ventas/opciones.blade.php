@@ -20,11 +20,32 @@
 
             <tr>
                 <td colspan="3" align="center">
+                    @if ($opcion_condicion==4)
+                        <h2 >Todos los Platos </h2>
 
-                    <h2 >Platos  {{$option->title}}</h2>
+                    @else
+                        <h2 >Platos  {{$option->title}}</h2>
+                    @endif
+
                 </td>
             </tr>
-            <br>
+            <table>
+                <tr>
+                    <tr>
+                        <td align="center"><strong>PRODUCTO</strong></td>
+                        <td align="center"><strong>CANT</strong></td>
+                        <td align="center"><strong>PRECIO</strong></td>
+                        <td align="center"><strong>SUBTOTAL</strong></td>
+
+                        @if (setting('ventas.stock_platos_totales'))
+                            <td align="center"><strong>STOCK RESTANTE</strong></td>
+                        @endif
+                    </tr>
+
+                 </tr>
+            </table>
+
+            <br><br>
 
             @php
                 $index=0;
@@ -49,6 +70,7 @@
                 $cant=array_count_values($producto);
                 $i=0;
                 $aux=0;
+                $total_venta=0;
             @endphp
             @foreach ($cant as $item)
                 @foreach ($prod as $item2)
@@ -64,8 +86,21 @@
                 <tr>
                     <td colspan="3" align="center">
                         <table>
+                            @php
+                                $total_venta+=(($prod[$i]->precio)*$aux);
+                            @endphp
+
                             <tr>
-                                <td><b>{{$aux}} {{$prod[$i]->name}}</b></td>
+                                <td align="center"><b>{{$prod[$i]->name}} </b></td>
+                                <td align="center"><b>{{$aux}}</b></td>
+                                <td align="center"><b>{{$prod[$i]->precio}}</b></td>
+                                <td align="center"><b>{{(($prod[$i]->precio)*$aux)}}</b></td>
+                                @if (setting('ventas.stock_platos_totales'))
+                                    @php
+                                        $producto_completo=App\Producto::find($prod[$i]->producto_id);
+                                    @endphp
+                                    <td align="center"><b>{{$producto_completo->stock}}</b></td>
+                                @endif
                             </tr>
                         </table>
                     </td>
@@ -78,6 +113,19 @@
                 @endphp
 
             @endforeach
+                <br>
+            <table>
+                <tr>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"><b>Total: {{$total_venta}}</b></td>
+                    @if (setting('ventas.stock_platos_totales'))
+                        <td align="center"></td>
+                    @endif
+
+                </tr>
+            </table>
 
 
                 <br>

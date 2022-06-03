@@ -72,11 +72,11 @@
                          </tr>
                          @foreach ($detalle_ventas as $item)
                              @php
-                                 $miproduct = App\Producto::find($item->producto_id);
+                                //  $miproduct = App\Producto::find($item->producto_id);
                                  $totalunit=($item->cantidad)*($item->precio);
                              @endphp
                              <tr>
-                                 <td><b>{{ $miproduct->name }} <br> </b><div style="font-size: {{ setting('impresion.text_secundario') }}">{!! $item->extra_name !!}</div></td>
+                                 <td><b>{{ $item->name }} <br> </b><div style="font-size: {{ setting('impresion.text_secundario') }}">{!! $item->extra_name !!}</div></td>
                                  <td><b> {{$item->description}}</b> <br> {{$item->observacion}} </td>
                                  {{-- <td><b>{{ $item->observacion }}</b></td> --}}
                                  <td align="center"><b>{{ $item->cantidad }}</b></td>
@@ -167,11 +167,11 @@
                              </tr>
                              @foreach ($detalle_ventas as $item)
                                  @php
-                                     $miproduct = App\Producto::find($item->producto_id);
+                                    //  $miproduct = App\Producto::find($item->producto_id);
                                      $totalunit=($item->cantidad)*($item->precio);
                                  @endphp
                                  <tr>
-                                    <td><b>{{ $miproduct->name }} <br> </b><div style="font-size: {{ setting('impresion.text_secundario') }}">{!! $item->extra_name !!}</div></td>
+                                    <td><b>{{ $item->name }} <br> </b><div style="font-size: {{ setting('impresion.text_secundario') }}">{!! $item->extra_name !!}</div></td>
 
                                     <td><b>  {{$item->description}}</b><br>{{$item->observacion}} </td>
                                     {{-- <td><b>{{ $item->observacion }}</b></td> --}}

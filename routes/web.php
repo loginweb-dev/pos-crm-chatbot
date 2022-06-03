@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\PosController;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\VentasExport;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -71,6 +73,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/block/order/{block_id}/{order}', 'BlockController@block_ordering');
     Route::get('/block/move_up/{block_id}', 'BlockController@move_up')->name('block_move_up');
     Route::get('/block/move_down/{block_id}', 'BlockController@move_down')->name('block_move_down');
+
+    Route::get('excel/ventas/{var1}/{var2}', function($var1, $var2){
+        return Excel::download(new VentasExport($var1, $var2), 'ventas.xlsx');
+    })->name('excel.ventas');
 
 });
 

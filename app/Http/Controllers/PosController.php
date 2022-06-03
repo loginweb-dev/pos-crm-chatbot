@@ -67,11 +67,19 @@ class PosController extends Controller
     //Imprimir Platos por Tipo de Venta (option_id)
     public function imprimirOpcion($data){
         $midata2=json_decode($data);
-        $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('option_id',$midata2->option_id)->where('caja_status', false)->get();
+        $ventas=[];
+        if ($midata2->option_id==4) {
+            $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('caja_status', false)->get();
+            $opcion_condicion=4;
+        }
+        else{
+            $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('option_id',$midata2->option_id)->where('caja_status', false)->get();
+            $opcion_condicion=0;
+        }
         $option=Option::find($midata2->option_id);
         $categoria_id=setting('productos.categoria_grupo');
         $categoria=Categoria::find($categoria_id);
-        $vista = view('ventas.opciones', compact('ventas','option','categoria'));
+        $vista = view('ventas.opciones', compact('ventas','option','categoria','opcion_condicion'));
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($vista)->setPaper('legal');
         return $pdf->stream();

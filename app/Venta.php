@@ -42,9 +42,12 @@ class Venta extends Model
         'nro_factura'
 	];
 
-	protected $appends=['published'];
+	protected $appends=['published', 'fecha'];
 	public function getPublishedAttribute(){
 		return Carbon::createFromTimeStamp(strtotime($this->attributes['created_at']) )->diffForHumans();
+	}
+	public function getFechaAttribute(){
+		return date('Y-m-d', strtotime($this->attributes['created_at']));
 	}
 	public function cliente()
     {
@@ -78,5 +81,10 @@ class Venta extends Model
     public function sucursal()
     {
         return $this->belongsTo(Sucursale::class, 'sucursal_id');
+    }
+
+    public function detalle_venta()
+    {
+        return $this->hasMany(DetalleVenta::class);
     }
 }

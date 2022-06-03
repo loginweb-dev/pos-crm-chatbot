@@ -237,9 +237,9 @@ Route::post('pos/asiento/save', function (Request $request) {
     ]);
     return $asiento;
 });
-Route::get('pos/asientos/caja/editor/{midata}', function ($midata) {
-    $midata2 = json_decode($midata);
-    $asientos = Asiento::where('caja_id', $midata2->caja_id)->where('editor_id', $midata2->editor_id)->where('caja_status', false)->with('pago')->get();
+Route::post('pos/asientos/caja/editor', function (Request $request) {
+    // $midata2 = json_decode($midata);
+    $asientos = Asiento::where('caja_id', $request->caja_id)->where('editor_id', $request->editor_id)->where('caja_status', false)->with('pago')->get();
     return $asientos;
 });
 
@@ -707,7 +707,7 @@ Route::get('pos/venta/{id}', function ($id) {
 
 // TODAS LAS VENTAS POR CAJA
 Route::get('pos/ventas/caja/{caja_id}/{user_id}', function ($caja_id, $user_id) {
-    return  Venta::where('register_id', $user_id)->where('caja_id', $caja_id)->where('caja_status', false)->with('cliente', 'delivery','chofer', 'pasarela')->orderBy('created_at','desc')->get();
+    return  Venta::where('register_id', $user_id)->where('caja_id', $caja_id)->where('caja_status', false)->with('cliente', 'delivery','chofer', 'pasarela','detalle_venta')->orderBy('created_at','desc')->get();
 });
 
 // TODAS LAS VENTAS POR CAJA DE TODOS
@@ -745,6 +745,10 @@ Route::get('pos/ventas/cajauser/{register_id}', function ($register_id) {
 //TODOS LOS CAJEROS
 Route::get('pos/cajeros', function () {
     return  User::where('role_id', 3)->get();
+});
+//TODOS LOS CAJEROS
+Route::get('pos/usuario/{id}', function ($id) {
+    return  User::find($id);
 });
 
 //TODOS LOS CUPONES
@@ -1404,19 +1408,19 @@ Route::get('chatbot/cliente/get/{chatbot_id}', function ($chatbot_id) {
 //cart
 Route::post('chatbot/cart/add', function (Request $request) {
     $item = Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
-    $cant = 0;
+    // $cant = 0;
     if ($item) {
-        $item->cantidad = $item->cantidad + 1;
+        $item->cantidad = $request->cantidad;
         $item->save();
         return  Cart::where('product_id', $request->product_id)->where('chatbot_id', $request->chatbot_id)->first();
     } else {
-        $cant = 1;
+        // $cant = 1;
         $cart = Cart::create([
             'product_id' => $request->product_id,
             'product_name' => $request->product_name,
             'chatbot_id' => $request->chatbot_id,
             'precio' => $request->precio,
-            'cantidad' => $cant,
+            'cantidad' => $request->cantidad,
         ]);
         return $cart;
     }
@@ -1445,16 +1449,16 @@ Route::post('chatbot/venta/save', function (Request $request) {
         'option_id'=> 3,
         'location'=> 1,
         'delivery_id'=> 1,
-        'pago_id' => 1,
+        'pago_id' => $request->pago_id,
         'cupon_id'=> 1,
         'register_id' => 23,
-        'Credito' => 'Contado',
-        'Factura' => 'Recibo'
+        'credito' => 'Contado',
+        'factura' => 'Recibo'
     ]);
     $mitotal = 0;
     foreach ($carts as $item) {
         DetalleVenta::create([
-            'producto_id' => $item->producto_id, //falta
+            'producto_id' => $item->product_id, //falta
             'venta_id' =>  $newventa->id,
             'precio'=> $item->precio,
             'cantidad' => $item->cantidad,
@@ -1480,3 +1484,18 @@ Route::get('ventas/opcion/{data}',function($data){
     $ventas=Venta::where('sucursal_id',$midata2->sucursal_id)->where('option_id',$midata2->option_id)->where('caja_status', false)->first();
     return $ventas;
 });
+
+Route::get('chatbot/pasarelas/get',function(){
+    return Pago::where('view', 'frontend')->get();
+
+});
+
+Route::post('reporte/ventas/facturas',function(Request $request){
+    return Venta::whereBetween('created_at', [$request->var1, $request->var2])->where('factura', 'Factura')->with('cliente')->get();
+
+});
+Route::get('dosificacion/activa',function(){
+    $dosificacion=Dosificacione::where('activa',1)->first();
+    return $dosificacion;
+});
+

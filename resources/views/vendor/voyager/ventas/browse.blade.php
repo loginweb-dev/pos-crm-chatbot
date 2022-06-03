@@ -48,18 +48,12 @@
                                 <div id="search-input">
                                     <div class="col-4">
                                         <select id="search_key" name="key" style="width: 300px" class="">
-                                                {{-- <option value=""> ---- Elige un Filtro ----</option> --}}
                                                 <option value="id">Buscar por ID</option>
-                                                {{-- <option value="caja_id"> Cajas </option> --}}
-                                                {{-- <option value="cliente_id"> Cliente </option> --}}
-                                                {{-- <option value="sucursal_id"> Sucursal </option> --}}
-                                                {{-- <option value="delivery_id"> Deliverys</option> --}}
-                                                {{-- <option value="chofer_id"> Choferes </option> --}}
-                                                {{-- <option value="register_id"> Editor </option> --}}
-                                                <option value="chofer_deudas"> Deudas de Choferes </option>
+                                                <option value="libro_venta">Libro de Ventas</option>
+                                                <option value="chofer_deudas">Deudas de Choferes</option>
                                                 <option value="credito">Cobro Créditos</option>
-                                                <option value="reportes"> Reportes </option>
-                                                <option value="pedidos">Can. Platos</option>
+                                                <option value="reportes">Reportes por Fechas</option>
+                                                <option value="pedidos">Cant. Platos</option>
                                                 @if(setting('empresa.type_negocio')=="Restaurante")
                                                     <option value="pensionado_kardex"> Kardex Pensionados </option>
                                                 @endif
@@ -70,8 +64,6 @@
                                                 <option value="equals"> = </option>
                                                 {{-- <option value="contains">LIKE</option> --}}
                                         </select>
-                                        {{-- <select class="js-example-basic-single" id="s" name="s" onchange="this.form.submit()" style="width: 350px"></select> --}}
-
                                     </div>
                                     <div class="col-4">
                                         <input class="form-control" type="search"  id="s" name="s" onchange="this.form.submit()">
@@ -966,10 +958,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <center><h4>Convertir Recibo a Factura</h4></center>
-
                 </div>
                 <div class="modal-body">
-
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#principal" aria-controls="principal" role="tab" data-toggle="tab">Datos Actuales</a></li>
                         <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Buscar</a></li>
@@ -980,8 +970,6 @@
                         <div role="tabpanel" class="tab-pane active" id="principal">
                             <input type="hidden" class="form-control" id="id_venta_conversion" >
                             <input type="hidden" class="form-control" id="cliente_id_conversion" >
-
-
                             <div class="col-sm-6">
                                 <label for="first_name_conversion">Nombre</label>
                                 <input type="text" class="form-control" placeholder="Nombres" id="first_name_conversion"  >
@@ -994,8 +982,6 @@
                                 <label for="ci_nit_conversion">NIT o CI</label>
                                 <input type="text" class="form-control" placeholder="NIT o CI" id="ci_nit_conversion"  >
                             </div>
-
-
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-dark" id="" onclick="ActualizarCliente()">Actualizar Cliente</button>
                             </div><br>
@@ -1029,7 +1015,6 @@
                             </table>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="create">
-
                             <div class="form-group col-sm-6">
                                 <label for="">Nombres</label>
                                 <input class="form-control" type="text" placeholder="Nombres" id="first_name">
@@ -1054,9 +1039,7 @@
                                 <label for="">Correo</label>
                                 <input class="form-control" type="text" placeholder="Email" id="email" hidden>
                             </div>
-
                             <div class="form-group col-sm-6">
-
                             </div>
                             <div class="form-group col-sm-3">
                                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
@@ -1064,13 +1047,10 @@
                             <div class="form-group col-sm-3">
                                 <button type="button" class="btn btn-sm btn-primary" onclick="savecliente()" >Agregar</button>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
                 <div class="modal-footer">
-
                 </div>
             </div>
         </div>
@@ -1102,18 +1082,61 @@
                             <label for="">Cajar@s</label>
                             <select name="register_id" id="register_id" class="form-control"></select>
                         </div>
-                        {{-- <div class="col-sm-12 text-center">
-                            <a href="#" onclick="mireport()" class="btn btn-sm btn-dark"> <i class="voyager-search"></i> Consultar</a>
-                        </div> --}}
                     </div>
-                        <table class="table table-responsive" id="report_table">
-                            <tbody></tbody>
-                        </table>
+                    <table class="table table-responsive" id="report_table">
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- //LIBRO DE VENTAS --}}
+    <div class="modal modal-primary fade" tabindex="-1" id="modal_libro" role="dialog">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Libro de Ventas</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-4">
+                        <label for="">Mes</label>
+                        <select name="mes_reporte" id="mes_reporte" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="">Año</label>
+                        <select name="year_reporte" id="year_reporte" class="form-control"></select>
+                    </div>
+                    <div class="col-sm-2">
+                        {{-- <label for="">Acciones</label> --}}
+                        <button type="button" class="btn btn-sm btn-primary" onclick="GenerarListaFacturas()" >Generar</button>
+                        <button type="button" class="btn btn-sm btn-dark" onclick="ExportarListaFacturas()" >Exportar</button>
+                    </div>
+                    {{-- <div class="col-sm-2">
+                        <button type="button" class="btn btn-sm btn-success" onclick="ExportarListaFacturas()" >Exportar</button>
+                    </div> --}}
+                    <table class="table table-responsive" id="table_libro">
+                        <thead>
+                            <th>Número</th>
+                            <th>Fecha</th>
+                            <th>Nro. de Factura</th>
+                            <th>Nro. de Autorización</th>
+                            <th>CI/NIT</th>
+                            <th>Razón Social</th>
+                            <th>Subtotal</th>
+                            <th>Descuento</th>
+                            <th>Importe Base</th>
+                            <th>Débito Fiscal</th>
+                            <th>Código de Control</th>
+
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -1151,14 +1174,13 @@
             @endif
 
             @if ($isModelTranslatable)
-                $('.side-body').multilingual();
-                //Reinitialise the multilingual features when they change tab
+                $('.side-body').multilingual()
                 $('#dataTable').on('draw.dt', function(){
-                    $('.side-body').data('multilingual').init();
+                    $('.side-body').data('multilingual').init()
                 })
             @endif
             $('.select_all').on('click', function(e) {
-                $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change');
+                $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change')
             });
         });
         async function DesactivarPensionados(){
@@ -1178,18 +1200,15 @@
             var fi=fechaInicio.toString();
             var ff=fechaFin.toString();
             var fechai = new Date(fi).getTime();
-            var fechaf    = new Date(ff).getTime();
+            var fechaf = new Date(ff).getTime();
             var diff = fechaf - fechai;
             return (diff/(1000*60*60*24));
         }
-
-
         var deleteFormAction;
         $('td').on('click', '.delete', function (e) {
             $('#delete_form')[0].action = '{{ route('voyager.'.$dataType->slug.'.destroy', '__id') }}'.replace('__id', $(this).data('id'));
             $('#delete_modal').modal('show');
         });
-
         @if($usesSoftDeletes)
             @php
                 $params = [
@@ -1245,7 +1264,6 @@
             if (e.keyCode == 13) {
                 $("#cliente_list tbody tr").remove();
                 var mitable = "";
-
                 var table= await axios.get("{{ setting('admin.url') }}api/pos/clientes/search/"+this.value)
                 if(table.data){
                     if (table.data.length == 0 ) {
@@ -1259,15 +1277,14 @@
                         $('#cliente_list').append(mitable);
                     }
                 }
-
             }
         });
+
         $('#cliente_busqueda_ci').keyup(async function (e) {
             e.preventDefault();
             if (e.keyCode == 13) {
                 $("#cliente_list tbody tr").remove();
                 var mitable = "";
-
                 var table= await axios.get("{{ setting('admin.url') }}api/pos/clientes/search_ci/"+this.value)
                 if(table.data){
                     if (table.data.length == 0 ) {
@@ -1281,12 +1298,10 @@
                         $('#cliente_list').append(mitable);
                     }
                 }
-
             }
         });
 
         async function savecliente() {
-
             var first = $('#first_name').val();
             var last = $('#last_name').val();
             var phone = $('#phone').val();
@@ -1294,7 +1309,6 @@
             var display = $('#display').val();
             var email = $('#email').val();
             var midata = JSON.stringify({first_name: first, last_name: last, phone: phone, nit: nit, display: display, email: email});
-
             var table= await axios("{{ setting('admin.url') }}api/pos/savacliente/"+midata)
             if(table.data){
                 toastr.success('Cliente Creado');
@@ -1304,8 +1318,6 @@
                 $('#cliente_id_conversion').val(table.data.id)
 
             }
-
-
         }
 
         // cliente_get
@@ -1334,23 +1346,18 @@
         });
 
          async function CargarClienteVenta(data){
-
             var table= await axios("{{setting('admin.url')}}api/pos/cliente/"+data.cliente_id)
-
             $('#first_name_conversion').val(table.data.first_name)
             $('#last_name_conversion').val(table.data.last_name)
             $('#ci_nit_conversion').val(table.data.ci_nit)
             $('#id_venta_conversion').val(data.id)
             $('#cliente_id_conversion').val(data.cliente_id)
-
-
         }
 
         async function modal_conversion() {
             var id=$('#id_venta_conversion').val()
             var table=await axios("{{setting('admin.url')}}api/pos/venta/"+id)
             var cliente_id=$('#cliente_id_conversion').val()
-            // console.log(table.data)
             var nrofactura =await axios("{{setting('admin.url')}}api/pos/nro_factura")
             var midata = JSON.stringify({
                 'id':table.data.id,
@@ -1358,10 +1365,8 @@
                 'cliente_id' : cliente_id,
                 'fecha_compra' : table.data.created_at,
                 'monto_compra' : table.data.total
-
             })
             var table=await axios("{{setting('admin.url')}}api/pos/convertir_a_factura/"+midata)
-
             location.reload();
         }
 
@@ -1369,6 +1374,10 @@
                 $('#search_key').on('change', async function() {
                     // $('.js-example-basic-single').select2();
                     switch (this.value) {
+                        case 'libro_venta':
+                            $('#modal_libro').modal();
+                            MonthYear()
+                            break;
                         case 'cliente_id':
                             $('#s').find('option').remove().end();
                             $.ajax({
@@ -1619,6 +1628,146 @@
                     }
                 });
 
+                async function ExportarListaFacturas() {
+                    var mes= $('#mes_reporte').val()
+                    var year=$('#year_reporte').val()
+                    var inicio=1;
+                    var final=0;
+
+                    if((mes==1)||(mes==3)||(mes==5)||(mes==7)||(mes==8)||(mes==10)||(mes==12)){
+                        final=31
+                    }
+                    else if((mes==4)||(mes==6)||(mes==9)||(mes==11)){
+                        final=30
+                    }
+                    else{
+                        if ((((year % 4) == 0) && ((year % 100) != 0)) || (((year % 100) == 0) && ((year % 400) == 0))) {
+                            final = 29
+                        } else {
+                            final = 28
+                        }
+                    }
+                    if(mes<10){
+                        var fecha_inicio_text=year+'-0'+mes+'-01'
+                        var fecha_final_text=year+'-0'+mes+'-'+final
+                    }
+                    else{
+                        var fecha_inicio_text=year+'-'+mes+'-01'
+                        var fecha_final_text=year+'-'+mes+'-'+final
+                    }
+                    location.href="{{ route('excel.ventas', ['2022-06-01', '2022-06-30']) }}"
+                }
+
+                async function GenerarListaFacturas() {
+                    $('#table_libro tbody tr').remove();
+                    var mes= $('#mes_reporte').val()
+                    var year=$('#year_reporte').val()
+                    var inicio=1;
+                    var final=0;
+
+                    if((mes==1)||(mes==3)||(mes==5)||(mes==7)||(mes==8)||(mes==10)||(mes==12)){
+                        final=31
+                    }
+                    else if((mes==4)||(mes==6)||(mes==9)||(mes==11)){
+                        final=30
+                    }
+                    else{
+                        if ((((year % 4) == 0) && ((year % 100) != 0)) || (((year % 100) == 0) && ((year % 400) == 0))) {
+                            final = 29
+                        } else {
+                            final = 28
+                        }
+                    }
+                    if(mes<10){
+                        var fecha_inicio_text=year+'-0'+mes+'-01'
+                        var fecha_final_text=year+'-0'+mes+'-'+final
+                    }
+                    else{
+                        var fecha_inicio_text=year+'-'+mes+'-01'
+                        var fecha_final_text=year+'-'+mes+'-'+final
+                    }
+                    var midata= {
+                        var1:fecha_inicio_text,
+                        var2:fecha_final_text
+                    }
+                    var table= await axios.post("{{setting('admin.url')}}api/reporte/ventas/facturas", midata)
+                    var dosificacion= await axios("{{setting('admin.url')}}api/dosificacion/activa")
+                    if(table.data.length!=0){
+                        //console.log("hola")
+                        for (let index = 0; index < table.data.length; index++) {
+                            $('#table_libro').append("<tr><td>"+(index+1)+"</td><td>"+table.data[index].fecha+"</td><td>"+table.data[index].nro_factura+"</td><td>"+dosificacion.data.nro_autorizacion+"</td><td>"+table.data[index].cliente.ci_nit+"</td><td>"+table.data[index].cliente.display+"</td><td>"+(table.data[index].subtotal+table.data[index].adicional)+"</td><td>"+table.data[index].descuento+"</td><td>"+table.data[index].total+"</td><td>"+parseFloat(table.data[index].total*0.13).toFixed(2)+"</td><td>"+table.data[index].codigo_control+"</td></tr>");
+                        }
+                    }
+                    else{
+                        toastr.error("No hay Facturas Ingresadas el Mes: "+$('#mes_reporte :selected').text()+" del Año: "+$('#year_reporte :selected').text())
+                    }
+
+
+
+
+                    console.log(fecha_inicio_text)
+                    console.log(fecha_final_text)
+
+                }
+                async function MonthYear() {
+                    $('#mes_reporte').append($('<option>', {
+                            value: 1,
+                            text: "Enero"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 2,
+                            text: "Febrero"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 3,
+                            text: "Marzo"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 4,
+                            text: "Abril"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 5,
+                            text: "Mayo"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 6,
+                            text: "Junio"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 7,
+                            text: "Julio"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 8,
+                            text: "Agosto"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 9,
+                            text: "Septiembre"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 10,
+                            text: "Octubre"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 11,
+                            text: "Noviembre"
+                    }));
+                    $('#mes_reporte').append($('<option>', {
+                            value: 12,
+                            text: "Diciembre"
+                    }));
+
+                    for (let index = 0; index < 2; index++) {
+                        $('#year_reporte').append($('<option>', {
+                            value: (index+2022),
+                            text: (index+2022)
+                        }));
+                    }
+
+                }
+
                 async function TipoPedidos() {
                     var option_id=$('#tipo_ventas').val()
                     var micaja = JSON.parse(localStorage.getItem('micaja'));
@@ -1631,7 +1780,7 @@
                     //location.href='/admin/ventas/imprimir/opcion/'+data
 
                     var table= await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
-                    if(table.data){
+                    if((table.data) || (option_id==4)){
                         const myWindow = window.open( "{{ setting('admin.url') }}admin/ventas/imprimir/opcion/"+data, "Recibo o Factura", "width=600,height=900")
                         setTimeout(function() {myWindow.close()}, {{ setting('impresion.tiempo_cierre') }})
                     }
@@ -1641,6 +1790,7 @@
 
 
                 }
+
                 async function Opciones() {
                     $('#tipo_ventas').find('option').remove().end();
                     var table= await axios.get("{{setting('admin.url')}}api/pos/options")
@@ -1654,6 +1804,10 @@
                             text: table.data[index].title
                         }));
                     }
+                    $('#tipo_ventas').append($('<option>', {
+                            value: 4,
+                            text: "Todas"
+                    }));
                 }
 
                 async function Cajas() {
@@ -1755,9 +1909,9 @@
                         }));
                     }
                 }
+
                 $('#sucursalpensionado').on('change', function() {
                     Pensionados();
-
                 });
 
                 async function Pensionados(){
@@ -1825,7 +1979,6 @@
                             text: table.data[index].name
                         }));
                     }
-                    // cliente_consulta()
                 }
 
                 $('#sucursal_consulta').on('change', function() {
@@ -1987,50 +2140,6 @@
                 }
 
 
-            // async function DesactivarPensionados(){
-            //     var table=await axios.get("{{ setting('admin.url') }}api/pos/pensionados");
-            //     for(let index=0;index < table.data.length;index++){
-            //         var aux= parseInt(CalculoDiasRestantes(table.data[index].fecha_final));
-            //         if(aux<0){
-            //         var actualizar= await axios("{{ setting('admin.url') }}api/pos/pensionados/actualizar/"+table.data[index].id);
-            //         }
-            //     }
-            // }
-
-            // function CalculoDiasRestantes(fecha_final){
-            //     var today=new Date();
-            //     var fechaInicio =   today.toISOString().split('T')[0];
-            //     var fechaFin    = fecha_final;
-            //     var fi=fechaInicio.toString();
-            //     var ff=fechaFin.toString();
-            //     var fechai = new Date(fi).getTime();
-            //     var fechaf    = new Date(ff).getTime();
-            //     var diff = fechaf - fechai;
-            //     return (diff/(1000*60*60*24));
-            // }
-
-            //reportes
-            // async function mireport() {
-            //     var midata1 = $("#date1").val()
-            //     var midata2 = $("#date2").val()
-            //     var caja_id = $("#caja_id").val()
-            //     var register_id = $("#register_id").val()
-            //     var midata = JSON.stringify({
-            //         date1: midata1,
-            //         date2: midata2,
-            //         caja_id: caja_id,
-            //         register_id: register_id
-            //     })
-            //     var ventas = await axios("{{ setting('admin.url') }}api/pos/ventas/fechas/editor/"+midata)
-            //     $('#report_table tbody tr').remove();
-            //     $('#report_table').append("<tr><td>Total Bs: </td><td> "+ventas.data.total+"</td></tr>");
-            //     $('#report_table').append("<tr><td>Cantidad: </td><td> "+ventas.data.cantidad+"</td></tr>");
-            //     $('#report_table').append("<tr><td>Pasarelas: </td><td> "+ventas.data.pasarelas+"</td></tr>");
-            //     $('#report_table').append("<tr><td>Impuestos: </td><td> "+ventas.data.impuestos+"</td></tr>");
-            //     $('#report_table').append("<tr><td>Delivery: </td><td> "+ventas.data.delivery+"</td></tr>");
-            //     $('#report_table').append("<tr><td>Estados: </td><td> "+ventas.data.estados+"</td></tr>");
-
-            // }
             $('#caja_id').on('change', async function() {
                 var midata1 = $("#date1").val()
                 var midata2 = $("#date2").val()
@@ -2040,6 +2149,7 @@
                     date2: midata2,
                     caja_id: caja_id
                 })
+                console.log(midata1)
                 var ventas = await axios("{{ setting('admin.url') }}api/pos/ventas/fechas/caja/"+midata)
                 $('#report_table tbody tr').remove();
                 if (ventas.data) {

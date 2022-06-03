@@ -10,6 +10,8 @@ const socket = io("https://socket.loginweb.dev");
 const JSONdb = require('simple-json-db');
 const categorias = new JSONdb('json/categorias.json');
 const productos = new JSONdb('json/productos.json');
+const carts = new JSONdb('json/carts.json');
+const pasarelas = new JSONdb('json/pasarelas.json');
 
 require('dotenv').config({ path: '../../.env' })
 
@@ -156,15 +158,10 @@ client.on('message', async msg => {
                 list += '*PRECIO* .- '+miresponse.data.precio+' \n'
                 list += '*STOCK* .- '+miresponse.data.stock+' \n'
                 list += '--------------------------'+' \n'
-                list += '*F* .- VER MI CARRITO \n'
+                // list += '*F* .- VER MI CARRITO \n'
+                list += '*ADD* .- AÑADIR A CARRITO \n'
                 list += '*B* .- TODOS LOS PRODUCTOS \n'
                 list += '*0* .- VOLVER A MENU PRINCIPAL'
-                var midata = {
-                    product_id: miresponse.data.id,
-                    product_name: miresponse.data.name,
-                    chatbot_id: msg.from,
-                    precio: miresponse.data.precio
-                }
                 var midata2 = {
                     phone: msg.from,
                     message: list
@@ -173,13 +170,9 @@ client.on('message', async msg => {
                     if (response.id.fromMe) {console.log("text fue enviado!")
                     }
                 })
-                await axios.post(process.env.APP_URL+'api/chatbot/cart/add', midata)
                 await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata2)
                 socket.emit("chatbot", msg.from)
-                client.sendMessage(msg.from, '🛒 1 - Producto Agregado a tu Carrito 🛒 \n Vuelve a consultar el mismo producto para agregar una cantidad mas.').then((response) => {
-                    if (response.id.fromMe) {console.log("text fue enviado!")
-                    }
-                })
+                carts.set(msg.from, miresponse.data.id)
                 break;
         case (msg.body === 'C') || (msg.body === 'c'):
             var miresponse = await axios(process.env.APP_URL+'api/pos/cupones')
@@ -219,7 +212,7 @@ client.on('message', async msg => {
                 break;
         case (msg.body === 'E') || (msg.body === 'e'):
             var list = '*INGRESA UN CRITERIO DE BUSQUEDA* \n'
-            list += 'con el siguiente formato: (*s-mi busqueda*)'
+            list += 'con el siguiente formato: *$mi busqueda o $producto1* ..'
             let media3 = MessageMedia.fromFilePath('imgs/search.gif')
             client.sendMessage(msg.from, media3, {caption: list}).then((response) => {
                 if (response.id.fromMe) {
@@ -233,8 +226,8 @@ client.on('message', async msg => {
             await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
             socket.emit("chatbot", msg.from)
             break;
-        case (msg.body.substring(0, 2) === 's-') || (msg.body.substring(0, 2) === 'S-'):
-            var misearch = msg.body.substring(2, 99)
+        case (msg.body.substring(0, 1) === '$'):
+            var misearch = msg.body.substring(1, 99)
             var miresponse = await axios.post(process.env.APP_URL+'api/chatbot/search', {misearch: misearch})
             var list = miresponse.data.length+' *Resultados de la busqueda :* "'+misearch+'" \n'
             list += '------------------------------------------ \n'
@@ -291,9 +284,10 @@ client.on('message', async msg => {
                 list += '*TOTAL* .- '+total+' Bs. \n'
                 list += '------------------------------------------ \n'
                 list += '*G* .- Enviar pedido \n'
+                list += '------------------------------------------ \n'
                 list += '*H* .- Vaciar Carrito \n'
                 list += '*0* .- MENU PRINCIPAL \n'
-                list += '*Vuelve a consultar el mismo producto para agregar una cantidad mas.*'
+                // list += '*Vuelve a consultar el mismo producto para agregar una cantidad mas.*'
 
                 client.sendMessage(msg.from, list).then((response) => {
                     if (response.id.fromMe) {
@@ -308,13 +302,31 @@ client.on('message', async msg => {
                 })
             }
             break;
-        case (msg.body === 'G') || (msg.body === 'g'):
+        case pasarelas.has(msg.body.toUpperCase()):
+            var pago_id = msg.body.substring(1, 99)
             var mediag = MessageMedia.fromFilePath('imgs/gracias.gif')
             var midata = {
-                chatbot_id: msg.from
+                chatbot_id: msg.from,
+                pago_id: pago_id
             }
             var miventa = await axios.post(process.env.APP_URL+'api/chatbot/venta/save', midata)
             client.sendMessage(msg.from, mediag, {caption: '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉'}).then((response) => {
+                if (response.id.fromMe) {
+                    console.log("text fue enviado!");
+                }
+            })
+            break;
+        case (msg.body === 'G') || (msg.body === 'g'):
+            var pagos = await axios(process.env.APP_URL+'api/chatbot/pasarelas/get')
+            var list = '*PUEDES PAGAR POR ESTOS METODOS*\n'
+            list += '------------------------------------------ \n'
+            for (let index = 0; index < pagos.data.length; index++) {
+                list += '*C'+pagos.data[index].id+'* .- '+pagos.data[index].title+'\n'
+                pasarelas.set('C'+pagos.data[index].id, pagos.data[index].id)
+            }
+            list += '------------------------------------------ \n'
+            list += 'Genial ✌ como quieres pagar tu pedido ? envia *c3 o c1* .. para confirmar tu pedido.'
+            client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
                 }
@@ -332,9 +344,26 @@ client.on('message', async msg => {
             })
             break;
         case (msg.body === 'ADD') || (msg.body === 'add'):
-            var list = 'Item agregado correctamente \n'
-            list += '*F* .- Mi CARRITO \n'
-            client.sendMessage(msg.from, list).then((response) => {
+            client.sendMessage(msg.from, 'Genial ✌, Ingresa una cantidad para agragar a tu carrito\ncon el formato: *+1 o +2 ..*').then((response) => {
+                if (response.id.fromMe) {
+                    console.log("text fue enviado!");
+                }
+            })
+            break;
+        case (msg.body.substring(0, 1) === '+'):
+            var cant = msg.body.substring(1, 99)
+            var product_id = carts.get(msg.from)
+            // console.log(cant)
+            var product = await axios(process.env.APP_URL+'api/pos/producto/'+product_id)
+            var midata = {
+                product_id: product.data.id,
+                product_name: product.data.name,
+                chatbot_id: msg.from,
+                precio: product.data.precio,
+                cantidad: cant
+            }
+            await axios.post(process.env.APP_URL+'api/chatbot/cart/add', midata)
+            client.sendMessage(msg.from, 'Producto agregado a tu carrito ✌\n*F* .- VER MI CARRITO').then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
                 }

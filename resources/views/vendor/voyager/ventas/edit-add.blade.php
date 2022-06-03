@@ -1555,55 +1555,84 @@
     }
 
     // cargar asientos
-    function cargar_asientos() {
+    async function cargar_asientos() {
         $("#asiento_list tbody tr").remove();
         var mitable = "";
         var editor = '{{ Auth::user()->id; }}';
+        var usuario= await axios("{{setting('admin.url')}}api/pos/usuario/"+editor)
         var total_banipay_ingresos=0;
         var total_banipay_egresos=0;
         var total_efectivo_ingresos=0;
-        var total_efectivo_egreso=0;
         var total_efectivo_egresos=0;
+        var total_tarjeta_ingresos=0
+        var total_tarjeta_egresos=0
+        var total_qr_ingresos=0
+        var total_qr_egresos=0
         var micaja = JSON.parse(localStorage.getItem('micaja'));
-        var midata = JSON.stringify({caja_id: micaja.caja_id, editor_id: editor});
-        var urli = "{{ setting('admin.url') }}api/pos/asientos/caja/editor/"+midata;
-        $.ajax({
-            url: urli,
-            dataType: "json",
-            success: function (response) {
-                if (response.length == 0 ) {
+        var midata = {caja_id: micaja.caja_id, editor_id: editor};
+        var response= await axios.post("{{ setting('admin.url') }}api/pos/asientos/caja/editor", midata)
+        // console.log(response.data)
+                if (response.data.length==0 ) {
                     toastr.error('Sin Resultados.');
                 } else {
-                    console.log(response)
-                    for (let index = 0; index < response.length; index++) {
-                        // if (response[index].pago == 0) {
-                        //     var pagotext="En Linea";
-                        //     if(response[index].type=="Ingresos"){
-                        //         total_banipay_ingresos+=response[index].monto;
-                        //     }
-                        //     else{
-                        //         total_banipay_egresos+=response[index].monto;
-                        //     }
-                        // }
-                        // if (response[index].pago == 1){
-                        //     var pagotext="En Efectivo";
-                        //     if(response[index].type=="Ingresos"){
-                        //         total_efectivo_ingresos+=response[index].monto;
-                        //     }
-                        //     else{
-                        //         total_efectivo_egresos+=response[index].monto;
-                        //     }
-                        // }
-                        mitable = mitable + "<tr><td>"+response[index].type+"</td><td>"+response[index].pago.title+"</td><td>"+response[index].monto+"</td><td>"+response[index].concepto+"</td><td>"+response[index].published+"</td></tr>";
+
+                    for (let index = 0; index < response.data.length; index++) {
+                        if (response.data[index].pago.id == 2) {
+                            var pagotext="Banipay";
+                            if(response.data[index].type=="Ingresos"){
+                                total_banipay_ingresos+=response.data[index].monto;
+                            }
+                            else{
+                                total_banipay_egresos+=response.data[index].monto;
+                            }
+                        }
+                        if (response.data[index].pago.id == 1){
+                            var pagotext="En Efectivo";
+                            if(response.data[index].type=="Ingresos"){
+                                total_efectivo_ingresos+=response.data[index].monto;
+                            }
+                            else{
+                                total_efectivo_egresos+=response.data[index].monto;
+                            }
+                        }
+                        if (response.data[index].pago.id == 6){
+                            var pagotext="Tarjeta Crédito / Débito";
+                            if(response.data[index].type=="Ingresos"){
+                                total_tarjeta_ingresos+=response.data[index].monto;
+                            }
+                            else{
+                                total_tarjeta_egresos+=response.data[index].monto;
+                            }
+                        }
+                        if (response.data[index].pago.id == 7){
+                            var pagotext="QR o Transferencia";
+                            if(response.data[index].type=="Ingresos"){
+                                total_qr_ingresos+=response.data[index].monto;
+                            }
+                            else{
+                                total_qr_egresos+=response.data[index].monto;
+                            }
+                        }
+                        mitable = mitable + "<tr><td>"+response.data[index].type+"</td><td>"+response.data[index].pago.title+"</td><td>"+response.data[index].monto+"</td><td>"+response.data[index].concepto+"</td><td>"+response.data[index].published+"</td></tr>";
                     }
                     $('#asiento_list').append(mitable);
                     if('{{setting('ventas.fila_totales')}}'){
-                        // $('#asiento_list').append("<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-                        // $('#asiento_list').append("<tr><td></td><td><h4>Total Efectivo: <h4></td><td><h4>"+(total_efectivo_ingresos-total_efectivo_egresos)+"</h4></td><td></td><td><h4>Total Banipay: </h4></td><td><h4>"+(total_banipay_ingresos-total_banipay_egresos)+"</h4></td></tr>");
+                        if('{{setting('ventas.totales_admin')}}'){
+                            if(usuario.data.role_id==1){
+                                $('#asiento_list').append("<tr><td></td><td></td><td></td><td></td><td></td></tr>");
+                                $('#asiento_list').append("<tr><td><h4>Total Efectivo: "+(total_efectivo_ingresos-total_efectivo_egresos)+"<h4></td><td><h4>Total Tarjeta: "+(total_tarjeta_ingresos-total_tarjeta_egresos)+"<h4></td><td></td><td><h4>Total QR o Transferencia: "+(total_qr_ingresos-total_qr_egresos)+"<h4></td><td><h4>Total Banipay: "+(total_banipay_ingresos-total_banipay_egresos)+"</h4></td></tr>");
+                            }
+
+                        }
+                        else{
+                            $('#asiento_list').append("<tr><td></td><td></td><td></td><td></td><td></td></tr>");
+                            $('#asiento_list').append("<tr><td><h4>Total Efectivo: "+(total_efectivo_ingresos-total_efectivo_egresos)+"<h4></td><td><h4>Total Tarjeta: "+(total_tarjeta_ingresos-total_tarjeta_egresos)+"<h4></td><td></td><td><h4>Total QR o Transferencia: "+(total_qr_ingresos-total_qr_egresos)+"<h4></td><td><h4>Total Banipay: "+(total_banipay_ingresos-total_banipay_egresos)+"</h4></td></tr>");
+                        }
+
+
                     }
                 }
-            }
-        });
+
     }
 
     //SAVE ASIENTOS
@@ -1848,6 +1877,7 @@
     async function venta_caja() {
         $('#productos_caja tbody').empty();
         var user_id = '{{ Auth::user()->id }}';
+        var usuario= await axios("{{setting('admin.url')}}api/pos/usuario/"+user_id)
         var micaja = JSON.parse(localStorage.getItem('micaja'));
         var misventas = await axios("{{ setting('admin.url') }}api/pos/ventas/caja/"+$("input[name='caja_id']").val()+"/"+user_id);
         var total_efectivo=0;
@@ -1856,10 +1886,10 @@
         var total_qr=0;
         for (let index = 0; index < misventas.data.length; index++) {
 
-            var detalle_venta= await axios.get("{{setting('admin.url')}}api/pedido/detalle/"+misventas.data[index].id)
+            var  detalle_venta= misventas.data[index].detalle_venta
             var nombres=""
-            for (let j = 0; j < detalle_venta.data.length; j++) {
-                nombres= nombres +detalle_venta.data[j].cantidad+" "+detalle_venta.data[j].name+"<br>"
+            for (let j = 0; j < detalle_venta.length; j++) {
+                nombres= nombres +detalle_venta[j].cantidad+" "+detalle_venta[j].name+"<br>"
             }
             if(misventas.data[index].pasarela.id==6){
                 total_tarjeta+=misventas.data[index].total;
@@ -1878,8 +1908,18 @@
             }
         }
         if('{{setting('ventas.fila_totales')}}'){
-            $("#productos_caja").append("<tr><td colpsan='10'><hr></td></tr>")
-            $("#productos_caja").append("<tr><td><h4>Importe Inicial: </h4></td><td><h4>"+micaja.importe+"</h4></td><td><h4>Total Efectivo: </h4></td><td><h4>"+total_efectivo+"</h4></td><td><h4>Total Tarjeta: </h4></td><td><h4>"+total_tarjeta+"</h4></td><td><h4>Total QR: </h4></td><td><h4>"+total_qr+"</h4></td><td><h4>Total Banipay: </h4></td><td><h4>"+total_banipay+"</h4></td></tr>");
+            if('{{setting('ventas.totales_admin')}}'){
+                if(usuario.data.role_id==1){
+                    $("#productos_caja").append("<tr><td colpsan='10'><hr></td></tr>")
+                    $("#productos_caja").append("<tr><td><h4>Importe Inicial: </h4></td><td><h4>"+micaja.importe+"</h4></td><td><h4>Total Efectivo: </h4></td><td><h4>"+total_efectivo+"</h4></td><td><h4>Total Tarjeta: </h4></td><td><h4>"+total_tarjeta+"</h4></td><td><h4>Total QR: </h4></td><td><h4>"+total_qr+"</h4></td><td><h4>Total Banipay: </h4></td><td><h4>"+total_banipay+"</h4></td></tr>");
+                }
+
+            }
+            else{
+                $("#productos_caja").append("<tr><td colpsan='10'><hr></td></tr>")
+                $("#productos_caja").append("<tr><td><h4>Importe Inicial: </h4></td><td><h4>"+micaja.importe+"</h4></td><td><h4>Total Efectivo: </h4></td><td><h4>"+total_efectivo+"</h4></td><td><h4>Total Tarjeta: </h4></td><td><h4>"+total_tarjeta+"</h4></td><td><h4>Total QR: </h4></td><td><h4>"+total_qr+"</h4></td><td><h4>Total Banipay: </h4></td><td><h4>"+total_banipay+"</h4></td></tr>");
+            }
+
         }
     }
 
