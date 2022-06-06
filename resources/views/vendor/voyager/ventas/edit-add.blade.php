@@ -1332,7 +1332,7 @@
             var micaja = JSON.parse(localStorage.getItem('micaja'));
             $("input[name='caja_id']").val(micaja.caja_id);
             $('input[name="sucursal_id"]').val(micaja.sucursal_id);
-            $("#info_caja").html("<h4>"+micaja.title+" - "+micaja.sucursal+" - "+micaja.importe+" Bs. - <a href='#' onclick='reset()'>Reset</a> <span class='badge badge-dark'> FATCOM v3.0 </span></h4>");
+            $("#info_caja").html("<h4>"+micaja.title+" - "+micaja.sucursal+" - "+micaja.importe+" Bs. - <a href='#' onclick='reset()'>Reset</a> <span class='badge badge-dark'> FATCOM v3.0.1 </span></h4>");
         }else{
             $("#micaja").modal();
         }

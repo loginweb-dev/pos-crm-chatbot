@@ -1097,7 +1097,8 @@
                             <table class="table" id="report_list">
                                 <thead>
                                     <th>id</th>
-                                    <th>name</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
                                 </thead>
                                 <tbody></tbody>
                             </table>
@@ -1267,10 +1268,16 @@
                 'last_name':apellidos,
                 'ci_nit':ci_nit
             })
-            var table=await axios("{{setting('admin.url')}}api/pos/update_datos_cliente/"+midata)
-            if(table.data){
-                toastr.success('Cliente Actualizado')
+            if((nombres!="Cliente")&&(apellidos!="Generico")){
+                var table=await axios("{{setting('admin.url')}}api/pos/update_datos_cliente/"+midata)
+                if(table.data){
+                    toastr.success('Cliente Actualizado')
+                }
             }
+            else{
+                toastr.error("El Cliente Generico ya existe y no se puede facturar a ese nombre")
+            }
+
         }
 
         $('#cliente_busqueda').keyup(async function (e) {
@@ -1315,34 +1322,79 @@
             }
         });
 
-        async function savecliente() {
-            var first = $('#first_name').val();
-            var last = $('#last_name').val();
-            var phone = $('#phone').val();
-            var nit = $('#nit').val();
-            var display = $('#display').val();
-            var email = $('#email').val();
-            var midata = JSON.stringify({first_name: first, last_name: last, phone: phone, nit: nit, display: display, email: email});
-            var table= await axios("{{ setting('admin.url') }}api/pos/savacliente/"+midata)
-            if(table.data){
-                toastr.success('Cliente Creado');
-                $('#first_name_conversion').val(table.data.first_name)
-                $('#last_name_conversion').val(table.data.last_name)
-                $('#ci_nit_conversion').val(table.data.ci_nit)
-                $('#cliente_id_conversion').val(table.data.id)
+        // async function savecliente() {
+        //     var first = $('#first_name').val();
+        //     var last = $('#last_name').val();
+        //     var phone = $('#phone').val();
+        //     var nit = $('#nit').val();
+        //     var display = $('#display').val();
+        //     var email = $('#email').val();
+        //     var midata = JSON.stringify({first_name: first, last_name: last, phone: phone, nit: nit, display: display, email: email});
+        //     var table= await axios("{{ setting('admin.url') }}api/pos/savacliente/"+midata)
+        //     if(table.data){
+        //         toastr.success('Cliente Creado');
+        //         $('#first_name_conversion').val(table.data.first_name)
+        //         $('#last_name_conversion').val(table.data.last_name)
+        //         $('#ci_nit_conversion').val(table.data.ci_nit)
+        //         $('#cliente_id_conversion').val(table.data.id)
 
-            }
+        //     }
+        // }
+        async function savecliente() {
+            var first = $('#first_name').val()
+            var last = $('#last_name').val()
+            var phone = $('#phone').val()
+            var nit = $('#nit').val()
+            var display = $('#display').val()
+            var email = $('#email').val()
+            var midata ={
+                first_name: first,
+                last_name: last,
+                phone: phone,
+                nit: nit,
+                display: display,
+                email: email
+            };
+            var newcliente = await axios.post("{{ setting('admin.url') }}api/pos/cliente/save", midata).
+                catch(function (error) {
+                    // console.log(error.toJSON());
+                    $('#first_name').val('')
+                    $('#last_name').val('')
+                    $('#display').val('')
+                    $('#email').val('')
+                    toastr.error('Error en el registro')
+                    return false
+                });
+            toastr.success('Cliente registrad@: '+newcliente.data.display)
+            $('#first_name_conversion').val(newcliente.data.first_name)
+            $('#last_name_conversion').val(newcliente.data.last_name)
+            $('#ci_nit_conversion').val(newcliente.data.ci_nit)
+            $('#cliente_id_conversion').val(newcliente.data.id)
+            $('#first_name').val('')
+            $('#last_name').val('')
+            $('#display').val('')
+            $('#email').val('')
         }
 
         // cliente_get
         async function cliente_get(id) {
             var table= await axios("{{ setting('admin.url') }}api/pos/cliente/"+id)
-            if(table.data){
+            if((table.data)&&(table.data.default!=1)){
                 toastr.success('Cliente Seleccionado');
+                $("#first_name_conversion").attr("readonly", false)
+                $("#last_name_conversion").attr("readonly", false)
+                $("#ci_nit_conversion").attr("readonly", false)
+
                 $('#first_name_conversion').val(table.data.first_name)
                 $('#last_name_conversion').val(table.data.last_name)
                 $('#ci_nit_conversion').val(table.data.ci_nit)
                 $('#cliente_id_conversion').val(table.data.id)
+            }
+            if(table.data.default){
+                toastr.error("No puede convertir a una factura con Cliente Genérico")
+                // $("#first_name_conversion").attr("readonly", true)
+                // $("#last_name_conversion").attr("readonly", true)
+                // $("#ci_nit_conversion").attr("readonly", true)
             }
         }
 
@@ -1360,7 +1412,17 @@
         });
 
          async function CargarClienteVenta(data){
+            micliente()
             var table= await axios("{{setting('admin.url')}}api/pos/cliente/"+data.cliente_id)
+            if(table.data.default){
+                $("#first_name_conversion").attr("readonly", true)
+                $("#last_name_conversion").attr("readonly", true)
+                $("#ci_nit_conversion").attr("readonly", true)
+                toastr.error("Seleccione un cliente o vaya a crearlo")
+            }
+            else{
+
+            }
             $('#first_name_conversion').val(table.data.first_name)
             $('#last_name_conversion').val(table.data.last_name)
             $('#ci_nit_conversion').val(table.data.ci_nit)
@@ -1641,6 +1703,11 @@
                             break
                     }
                 });
+
+                async function micliente() {
+                    var miphone = Math.floor(Math.random() * 1000000000);
+                    $('#phone').val(miphone)
+                }
 
                 async function ExportarListaFacturas() {
                     var mes= $('#mes_reporte').val()
@@ -2178,9 +2245,9 @@
                 console.log(midata2)
                 var ventas_list = await axios.post("{{ setting('admin.url') }}api/pos/ventas/fechas/caja/list", midata2)
                 $('#report_list tbody tr').remove();
-                console.log(ventas_list.data.length)
+                console.log(ventas_list.data)
                 for (let index = 0; index < ventas_list.data.length; index++) {
-                    $("#report_list").append("<tr><td>"+ventas_list.data[index].id+"</td><td>"+ventas_list.data[index].name+"</td></tr>");
+                    $("#report_list").append("<tr><td>"+ventas_list.data[index].id+"</td><td>"+ventas_list.data[index].fecha+"</td><td>"+ventas_list.data[index].total+"</td></tr>");
                 }
             });
 

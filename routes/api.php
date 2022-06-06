@@ -1344,7 +1344,7 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 
 Route::post('pos/ventas/fechas/caja/list', function(Request $request){
     if ($request->caja_id === 'all') {
-        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->get();
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->with('productos')->get();
     } else {
         return Venta::whereBetween('created_at', [$request->date1, $request->date2])->where('caja_id', $request->caja_id)->get();
     }
