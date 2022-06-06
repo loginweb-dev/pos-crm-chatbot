@@ -1062,7 +1062,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                   <h4 class="modal-title">Reportes</h4>
+                   <h4 class="modal-title">Reportes por Fechas</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -1083,9 +1083,26 @@
                             <select name="register_id" id="register_id" class="form-control"></select>
                         </div>
                     </div>
-                    <table class="table table-responsive" id="report_table">
-                        <tbody></tbody>
-                    </table>
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#home2">Resumen</a></li>
+                        <li><a data-toggle="tab" href="#menu1">Listado</a></li>
+                      </ul>
+                      <div class="tab-content">
+                        <div id="home2" class="tab-pane fade in active">
+                            <table class="table table-responsive" id="report_table">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="menu1" class="tab-pane fade">
+                            <table class="table" id="report_list">
+                                <thead>
+                                    <th>id</th>
+                                    <th>name</th>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                      </div>
                 </div>
             </div>
         </div>
@@ -1112,7 +1129,7 @@
                         <button type="button" class="btn btn-sm btn-primary" onclick="GenerarListaFacturas()" >Generar</button>
                         <button type="button" class="btn btn-sm btn-dark" onclick="ExportarListaFacturas()" >Exportar</button>
                     </div>
-                    <div class="table-responsive">
+                    {{-- <div class="table-responsive"> --}}
                         <table class="table" id="table_libro">
                             <thead>
                                 <th>Número</th>
@@ -1129,7 +1146,7 @@
                             </thead>
                             <tbody></tbody>
                         </table>
-                    </div>
+                    {{-- </div> --}}
                 </div>
             </div>
         </div>
@@ -1616,8 +1633,8 @@
                             sucursal_consulta();
                         break
                         case 'caja_id':
-                        $('#s').find('option').remove().end();
-                                Cajas();
+                            $('#s').find('option').remove().end();
+                            Cajas();
                         break
                         default:
                             //Declaraciones ejecutadas cuando ninguno de los valores coincide con el valor de la expresión
@@ -1630,7 +1647,6 @@
                     var year=$('#year_reporte').val()
                     var inicio=1;
                     var final=0;
-
                     if((mes==1)||(mes==3)||(mes==5)||(mes==7)||(mes==8)||(mes==10)||(mes==12)){
                         final=31
                     }
@@ -1652,7 +1668,13 @@
                         var fecha_inicio_text=year+'-'+mes+'-01'
                         var fecha_final_text=year+'-'+mes+'-'+final
                     }
-                    location.href="{{ route('excel.ventas', ['2022-05-01', '2022-05-31']) }}"
+                    var var1=fecha_inicio_text
+                    var var2=fecha_final_text
+                    console.log(fecha_inicio_text)
+                    var ruta="{{ route('excel.ventas', ['var1', 'var2']) }}"
+                    ruta = ruta.replace("var1", fecha_inicio_text)
+                    ruta = ruta.replace("var2", fecha_final_text)
+                    location.href=ruta
                 }
 
                 async function GenerarListaFacturas() {
@@ -1661,7 +1683,6 @@
                     var year=$('#year_reporte').val()
                     var inicio=1;
                     var final=0;
-
                     if((mes==1)||(mes==3)||(mes==5)||(mes==7)||(mes==8)||(mes==10)||(mes==12)){
                         final=31
                     }
@@ -1698,13 +1719,6 @@
                     else{
                         toastr.error("No hay Facturas Ingresadas el Mes: "+$('#mes_reporte :selected').text()+" del Año: "+$('#year_reporte :selected').text())
                     }
-
-
-
-
-                    console.log(fecha_inicio_text)
-                    console.log(fecha_final_text)
-
                 }
                 async function MonthYear() {
                     $('#mes_reporte').append($('<option>', {
@@ -1762,7 +1776,6 @@
                             text: (index+2022)
                         }));
                     }
-
                 }
 
                 async function TipoPedidos() {
@@ -1773,9 +1786,6 @@
                         'sucursal_id':micaja.sucursal_id,
                         'option_id':option_id
                     })
-                    //var impresion=await axios("{{setting('admin.url')}}admin/ventas/imprimir/opcion/"+data)
-                    //location.href='/admin/ventas/imprimir/opcion/'+data
-
                     var table= await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
                     if((table.data) || (option_id==4)){
                         const myWindow = window.open( "{{ setting('admin.url') }}admin/ventas/imprimir/opcion/"+data, "Recibo o Factura", "width=600,height=900")
@@ -1819,6 +1829,7 @@
                             text: table.data[index].title
                         }));
                     }
+
 
                 }
 
@@ -2146,7 +2157,7 @@
                     date2: midata2,
                     caja_id: caja_id
                 })
-                console.log(midata1)
+                // console.log(midata1)
                 var ventas = await axios("{{ setting('admin.url') }}api/pos/ventas/fechas/caja/"+midata)
                 $('#report_table tbody tr').remove();
                 if (ventas.data) {
@@ -2158,6 +2169,18 @@
                     $('#report_table').append("<tr><td>Estados: </td><td> "+makeTableHTML(ventas.data.estados)+"</td></tr>");
                 } else {
                     toastr.error('Ingresa fechas validas')
+                }
+                var midata2 = {
+                    date1: midata1,
+                    date2: midata2,
+                    caja_id: caja_id
+                }
+                console.log(midata2)
+                var ventas_list = await axios.post("{{ setting('admin.url') }}api/pos/ventas/fechas/caja/list", midata2)
+                $('#report_list tbody tr').remove();
+                console.log(ventas_list.data.length)
+                for (let index = 0; index < ventas_list.data.length; index++) {
+                    $("#report_list").append("<tr><td>"+ventas_list.data[index].id+"</td><td>"+ventas_list.data[index].name+"</td></tr>");
                 }
             });
 

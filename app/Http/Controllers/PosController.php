@@ -107,12 +107,12 @@ class PosController extends Controller
 
 
     public function import_users(){
-        Excel::import(new UsersImport, 'users.xlsx');
+        Excel::import(new UsersImport, 'imports/users.xlsx');
         return redirect('/admin/users')->with('success', 'All good!');
 
     }
     public function import_clientes(){
-        Excel::import(new ClienteImport, 'clientes.xlsx');
+        Excel::import(new ClienteImport, 'imports/clientes.xlsx');
         return redirect('/admin/clientes')->with('success', 'All good!');
     }
     public function producto_detalle(){
@@ -122,11 +122,11 @@ class PosController extends Controller
         return $pdf->stream();
     }
     public function import_products(){
-        Excel::import(new ProductsImport, 'products.xlsx');
+        Excel::import(new ProductsImport, 'imports/products.xlsx');
         return redirect('/admin/productos')->with('success', 'All good!');
     }
     public function import_ventas(){
-        Excel::import(new VentaImport, 'ventas.xlsx');
+        Excel::import(new VentaImport, 'imports/ventas.xlsx');
         return redirect('/admin/ventas')->with('success', 'All good!');
 
     }

@@ -10,14 +10,17 @@ const socket = io("https://socket.loginweb.dev");
 const JSONdb = require('simple-json-db');
 const categorias = new JSONdb('json/categorias.json');
 const productos = new JSONdb('json/productos.json');
+const cupones = new JSONdb('json/cupones.json');
 const carts = new JSONdb('json/carts.json');
 const pasarelas = new JSONdb('json/pasarelas.json');
+const sucursales = new JSONdb('json/sucursales.json');
 
 require('dotenv').config({ path: '../../.env' })
 
 const app = express();
 app.use(cors())
 app.use(express.json())
+
 
 const client = new Client({
     authStrategy: new LocalAuth({
@@ -58,14 +61,16 @@ client.on('message', async msg => {
     socket.emit("chatbot", msg.from)
     switch (true) {
         case (msg.body === 'hola') || (msg.body === 'HOLA') || (msg.body === 'Hola') || (msg.body === 'Buenas')|| (msg.body === 'buenas') || (msg.body === 'BUENAS') || (msg.body === '0'):
-            var list = '*Hola*, soy el 🤖chatbot🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
+            var list = '*Hola*, soy el 🤖CHATBOT🤖 de la empresa de DESARROLLO EN SOFTWARE: *'+process.env.APP_NAME+'* \n'
             list += '*MENU PRINCIPAL* \n'
+            list += '----------------------------------'+' \n'
             list += '*A* .- TODAS LAS CATEGORIAS \n'
             list += '*B* .- TODOS LOS PRODUCTOS \n'
             list += '*C* .- CUPONES \n'
             list += '*D* .- SUCURSALES \n'
             list += '*E* .- BUSCAR UN PRODUCTO \n'
-            list += '*F* .- VER MI CARRITO \n \n'
+            list += '*F* .- VER MI CARRITO \n'
+            list += '----------------------------------'+' \n'
             list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
@@ -81,12 +86,14 @@ client.on('message', async msg => {
             break;
         case (msg.body === 'A') || (msg.body === 'a'):
             var miresponse = await axios(process.env.APP_URL+'api/chatbot/categorias')
-            var list = '*TODAS CATEGORIAS* \n'
+            var list = '*TODAS LAS CATEGORIAS* \n'
+            list += '----------------------------------'+' \n'
             for (let index = 0; index < miresponse.data.length; index++) {
                 list += '*A'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+' - ('+miresponse.data[index].productos.length+')\n'
                 categorias.set('A'+miresponse.data[index].id, miresponse.data[index].id);
             }
-            list += '\n*ENVIA UNA OPCION DEL MENU*'
+            list += '----------------------------------'+' \n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -102,11 +109,12 @@ client.on('message', async msg => {
         case categorias.has(msg.body.toUpperCase()):
             var miresponse = await axios(process.env.APP_URL+'api/filtros/'+categorias.get(msg.body.toUpperCase()))
             var list = '*PRODUCTOS POR CATEGORIA* \n'
+            list += '----------------------------------'+' \n'
             for (let index = 0; index < miresponse.data.length; index++) {
-                list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+' - '+miresponse.data[index].precio+' Bs.\n'
-                // productos.set('B'+miresponse.data[index].id, miresponse.data[index].id)
+                list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+' - *'+miresponse.data[index].precio+' Bs.)*\n'
             }
             list += '*B* .- TODOS LOS PRODUCTOS \n'
+            list += '----------------------------------'+' \n'
             list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
@@ -122,12 +130,14 @@ client.on('message', async msg => {
             break;
         case (msg.body === 'B') || (msg.body === 'b'):
             var miresponse = await axios(process.env.APP_URL+'api/chatbot/productos')
-            var list = '*PRODUCTOS* \n'
+            var list = '*TODOS LOS PRODUCTOS* \n'
+            list += '--------------------------------------------\n'
             for (let index = 0; index < miresponse.data.length; index++) {
-                list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+' - '+miresponse.data[index].precio+' Bs.\n'
+                list += '*B'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+' - ('+miresponse.data[index].precio+' Bs.)\n'
                 productos.set('B'+miresponse.data[index].id, miresponse.data[index].id)
             }
-            list += '\n*ENVIA UNA OPCION DEL MENU*'
+            list += '--------------------------------------------\n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -150,17 +160,16 @@ client.on('message', async msg => {
                 }
                 var categoria = miresponse.data.categoria ? miresponse.data.categoria.name : 'categoria no registrada'
                 var marca = miresponse.data.marca ? miresponse.data.marca.name : 'marca no registrada'
-                var list = '*CODIGO* B'+miresponse.data.id+' \n'
-                list += '*NOMBRE* .- '+miresponse.data.name+' \n'
-                list += '*DETALLE* .- '+miresponse.data.description+' \n'
+                var list = '*CODIGO* B'+miresponse.data.id+'\n'
+                list += '*NOMBRE* .- '+miresponse.data.name+'\n'
+                list += '*DETALLE* .- '+miresponse.data.description+'\n'
                 list += '*CATEGORIA* .- '+categoria+' \n'
                 list += '*MARCA* .- '+marca+' \n'
-                list += '*PRECIO* .- '+miresponse.data.precio+' \n'
-                list += '*STOCK* .- '+miresponse.data.stock+' \n'
-                list += '--------------------------'+' \n'
-                // list += '*F* .- VER MI CARRITO \n'
-                list += '*ADD* .- AÑADIR A CARRITO \n'
-                list += '*B* .- TODOS LOS PRODUCTOS \n'
+                list += '*PRECIO* .- '+miresponse.data.precio+' Bs.\n'
+                list += '*STOCK* .- '+miresponse.data.stock+'\n'
+                list += '--------------------------'+'\n'
+                list += '*ADD* .- AÑADIR A CARRITO\n'
+                list += '*B* .- TODOS LOS PRODUCTOS\n'
                 list += '*0* .- VOLVER A MENU PRINCIPAL'
                 var midata2 = {
                     phone: msg.from,
@@ -176,10 +185,14 @@ client.on('message', async msg => {
                 break;
         case (msg.body === 'C') || (msg.body === 'c'):
             var miresponse = await axios(process.env.APP_URL+'api/pos/cupones')
-            var list = '*CUPONES* \n'
+            var list = '*TODOS LOS CUPONES* \n'
+            list += '------------------------------------'+'\n'
             for (let index = 0; index < miresponse.data.length; index++) {
-                list += miresponse.data[index].id+' .- '+miresponse.data[index].title+'\n'
+                list += '*C'+miresponse.data[index].id+'* .- '+miresponse.data[index].title+'\n'
+                cupones.set('C'+miresponse.data[index].id, miresponse.data[index].id)
             }
+            list += '------------------------------------'+'\n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
             client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
@@ -194,10 +207,14 @@ client.on('message', async msg => {
             break;
         case (msg.body === 'D') || (msg.body === 'd'):
                 var miresponse = await axios(process.env.APP_URL+'api/pos/sucursales')
-                var list = '*SUCURSALES* \n'
+                var list = '*TODAS NUESTRAS SUCURSALES*\n'
+                list += '------------------------------------'+'\n'
                 for (let index = 0; index < miresponse.data.length; index++) {
-                    list += miresponse.data[index].id+'.-'+miresponse.data[index].name+'\n'
+                    list += '*D'+miresponse.data[index].id+'* .- '+miresponse.data[index].name+'\n'
+                    sucursales.set('D'+miresponse.data[index].id, miresponse.data[index].id)
                 }
+                list += '------------------------------------'+'\n'
+                list += '*ENVIA UNA OPCION DEL MENU*'
                 client.sendMessage(msg.from, list).then((response) => {
                     if (response.id.fromMe) {
                         console.log("text fue enviado!");
@@ -287,19 +304,29 @@ client.on('message', async msg => {
                 list += '------------------------------------------ \n'
                 list += '*H* .- Vaciar Carrito \n'
                 list += '*0* .- MENU PRINCIPAL \n'
-                // list += '*Vuelve a consultar el mismo producto para agregar una cantidad mas.*'
-
                 client.sendMessage(msg.from, list).then((response) => {
                     if (response.id.fromMe) {
                         console.log("text fue enviado!");
                     }
                 })
+                var miout = {
+                    phone: msg.from,
+                    message: list
+                }
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+                socket.emit("chatbot", msg.from)
             } else {
                 client.sendMessage(msg.from, '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL').then((response) => {
                     if (response.id.fromMe) {
                         console.log("text fue enviado!");
                     }
                 })
+                var miout = {
+                    phone: msg.from,
+                    message: '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL'
+                }
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+                socket.emit("chatbot", msg.from)
             }
             break;
         case pasarelas.has(msg.body.toUpperCase()):
@@ -315,22 +342,49 @@ client.on('message', async msg => {
                     console.log("text fue enviado!");
                 }
             })
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉')
+            socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'G') || (msg.body === 'g'):
-            var pagos = await axios(process.env.APP_URL+'api/chatbot/pasarelas/get')
-            var list = '*PUEDES PAGAR POR ESTOS METODOS*\n'
-            list += '------------------------------------------ \n'
-            for (let index = 0; index < pagos.data.length; index++) {
-                list += '*C'+pagos.data[index].id+'* .- '+pagos.data[index].title+'\n'
-                pasarelas.set('C'+pagos.data[index].id, pagos.data[index].id)
+            var midata = {
+                chatbot_id: msg.from
             }
-            list += '------------------------------------------ \n'
-            list += 'Genial ✌ como quieres pagar tu pedido ? envia *c3 o c1* .. para confirmar tu pedido.'
-            client.sendMessage(msg.from, list).then((response) => {
-                if (response.id.fromMe) {
-                    console.log("text fue enviado!");
+            var micart = await axios.post(process.env.APP_URL+'api/chatbot/cart/get', midata)
+            if (micart.data.length != 0)
+            {
+                var pagos = await axios(process.env.APP_URL+'api/chatbot/pasarelas/get')
+                var list = '*PUEDES PAGAR POR ESTOS METODOS*\n'
+                list += '------------------------------------------ \n'
+                for (let index = 0; index < pagos.data.length; index++) {
+                    list += '*P'+pagos.data[index].id+'* .- '+pagos.data[index].title+'\n'
+                    pasarelas.set('P'+pagos.data[index].id, pagos.data[index].id)
                 }
-            })
+                list += '------------------------------------------ \n'
+                list += 'Genial ✌ como quieres pagar tu pedido ? envia *c3 o c1* .. para confirmar tu pedido.'
+                var miout = {
+                    phone: msg.from,
+                    message: list
+                }
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+                socket.emit("chatbot", msg.from)
+                client.sendMessage(msg.from, list).then((response) => {
+                    if (response.id.fromMe) {
+                        console.log("text fue enviado!");
+                    }
+                })
+            } else {
+                client.sendMessage(msg.from, '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL').then((response) => {
+                    if (response.id.fromMe) {
+                        console.log("text fue enviado!");
+                    }
+                })
+                var miout = {
+                    phone: msg.from,
+                    message: '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL'
+                }
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+                socket.emit("chatbot", msg.from)
+            }
             break;
         case (msg.body === 'H') || (msg.body === 'h'):
             var midata = {
@@ -342,6 +396,12 @@ client.on('message', async msg => {
                     console.log("text fue enviado!");
                 }
             })
+            var miout = {
+                phone: msg.from,
+                message: '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL'
+            }
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+            socket.emit("chatbot", msg.from)
             break;
         case (msg.body === 'ADD') || (msg.body === 'add'):
             client.sendMessage(msg.from, 'Genial ✌, Ingresa una cantidad para agragar a tu carrito\ncon el formato: *+1 o +2 ..*').then((response) => {
@@ -349,11 +409,16 @@ client.on('message', async msg => {
                     console.log("text fue enviado!");
                 }
             })
+            var miout = {
+                phone: msg.from,
+                message: 'Genial ✌, Ingresa una cantidad para agragar a tu carrito\ncon el formato: *+1 o +2 ..*'
+            }
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+            socket.emit("chatbot", msg.from)
             break;
         case (msg.body.substring(0, 1) === '+'):
             var cant = msg.body.substring(1, 99)
             var product_id = carts.get(msg.from)
-            // console.log(cant)
             var product = await axios(process.env.APP_URL+'api/pos/producto/'+product_id)
             var midata = {
                 product_id: product.data.id,
@@ -363,34 +428,46 @@ client.on('message', async msg => {
                 cantidad: cant
             }
             await axios.post(process.env.APP_URL+'api/chatbot/cart/add', midata)
-            client.sendMessage(msg.from, 'Producto agregado a tu carrito ✌\n*F* .- VER MI CARRITO').then((response) => {
+            client.sendMessage(msg.from, '🎉 Producto agregado a tu carrito 🎉\n*F* .- VER MI CARRITO').then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
                 }
             })
+
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🎉 Producto agregado a tu carrito 🎉\n*F* .- VER MI CARRITO')
+            socket.emit("chatbot", msg.from)
             break;
         default:
-            var mediadefault = MessageMedia.fromFilePath('imgs/chatbot.png')
-            var list = '*Hola*, soy el 🤖chatbot🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
-            list += '*MENU PRINCIPAL* \n'
-            list += '*A* .- TODAS LAS CATEGORIAS \n'
-            list += '*B* .- TODOS LOS PRODUCTOS \n'
-            list += '*C* .- CUPONES \n'
-            list += '*D* .- SUCURSALES \n'
-            list += '*E* .- BUSCAR UN PRODUCTO \n'
-            list += '*F* .- VER MI CARRITO \n \n'
-            list += '*ENVIA UNA OPCION DEL MENU*'
-            client.sendMessage(msg.from, mediadefault, {caption: list}).then((response) => {
-                if (response.id.fromMe) {
-                    console.log("text fue enviado!");
+            var chatstatus = await axios.post(process.env.APP_URL+'api/chatbot/cliente/control/get', {chatbot_id: msg.from})
+            if (chatstatus.data.chatbot_status) {
+                // client.sendMessage(msg.from, 'Esta en charla con un HUMANO').then((response) => {
+                //     if (response.id.fromMe) {
+                //         console.log("text fue enviado!");
+                //     }
+                // })
+            } else {
+                var mediadefault = MessageMedia.fromFilePath('imgs/chatbot.png')
+                var list = '*Hola*, soy el 🤖CHATBOT🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
+                list += '*MENU PRINCIPAL* \n'
+                list += '*A* .- TODAS LAS CATEGORIAS \n'
+                list += '*B* .- TODOS LOS PRODUCTOS \n'
+                list += '*C* .- CUPONES \n'
+                list += '*D* .- SUCURSALES \n'
+                list += '*E* .- BUSCAR UN PRODUCTO \n'
+                list += '*F* .- VER MI CARRITO \n \n'
+                list += '*ENVIA UNA OPCION DEL MENU*'
+                client.sendMessage(msg.from, mediadefault, {caption: list}).then((response) => {
+                    if (response.id.fromMe) {
+                        console.log("text fue enviado!");
+                    }
+                })
+                var midata = {
+                    phone: msg.from,
+                    message: list
                 }
-            })
-            var midata = {
-                phone: msg.from,
-                message: list
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', list)
+                socket.emit("chatbot", msg.from)
             }
-            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midata)
-            socket.emit("chatbot", msg.from)
             break;
     }
 });

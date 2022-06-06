@@ -64,7 +64,8 @@
                   <div class="input_msg_write">
                         <input type="text" id="client_phone" placeholder="phone" hidden>
                         <input id="mimessage" type="text" class="write_msg" placeholder="Escribe el mensaje" />
-                        <button class="msg_send_btn" type="button" onclick="message_send()"><i class="voyager-rocket" aria-hidden="true"></i></button>
+                        <button class="msg_option_btn" type="button" onclick="mysmg()"><i class="voyager-helm" aria-hidden="true"></i></button>
+                        <button class="msg_send_btn" type="button" onclick="message_send()"><i class="voyager-paper-plane" aria-hidden="true"></i></button>
                   </div>
                 </div>
               </div>
@@ -92,6 +93,25 @@
             </div>
         </div>
     </div>
+
+    <div class="modal modal-primary fade" tabindex="-1" id="cliente_msg" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-helm"></i> Mensajes Personalizados </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="miemojis"></div>
+                    <textarea name="" id="newmysmg" cols="" rows="10" class="form-control"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-dark pull-right" type="button" onclick="message_send2()"><i class="voyager-paper-plane" aria-hidden="true"></i> Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal modal-primary fade" tabindex="-1" id="cliente_modal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -117,7 +137,6 @@
             </div>
         </div>
     </div>
-
 @stop
 
 @section('css')
@@ -251,24 +270,100 @@
         }
 
         .type_msg {border-top: 1px solid #c4c4c4;position: relative;}
+
         .msg_send_btn {
-        background: #05728f none repeat scroll 0 0;
-        border: medium none;
-        border-radius: 50%;
-        color: #fff;
-        cursor: pointer;
-        font-size: 17px;
-        height: 33px;
-        position: absolute;
-        right: 0;
-        top: 11px;
-        width: 33px;
+            background: #05728f none repeat scroll 0 0;
+            border: medium none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            font-size: 17px;
+            height: 33px;
+            position: absolute;
+            right: 0;
+            top: 11px;
+            width: 33px; 
         }
+
+        .msg_option_btn {
+            background: #2B333A none repeat scroll 0 0;
+            border: medium none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            font-size: 17px;
+            height: 33px;
+            position: absolute;
+            right: 40px;
+            top: 11px;
+            width: 33px;
+        }
+
 
         .messaging { padding: 0 0 50px 0;}
         .msg_history {
         height: 700px;
         overflow-y: auto;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
         }
     </style>
 @stop
@@ -317,6 +412,42 @@
                 $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change');
             });
             list_inbox()
+            // $(".checkbox_class1").change(function() {
+            //     console.log(this.value)
+            //     console.log(this.checked)
+            //     if(this.checked) {
+            //         //Do stuff
+            //     }
+            // });
+
+            // fetch("./emojis.json")
+            // .then(response => {
+            //     return response.json();
+            // })
+            // .then(jsondata => console.log(JSON.parse(jsondata)));
+
+            fetch('emojis.json').then(response => {
+                return response.json();
+            }).then(data => {
+                // Work with JSON data here
+                console.log(data);
+            }).catch(err => {
+                // Do something for an error here
+                console.log(err);
+            });
+
+            fetch('https://pos.loginweb.dev/chatbot/emojis.json')
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                console.log(myJson.length);
+                var miemoji = ''
+                for (let index = 0; index < 200; index++) {
+                    miemoji += "<a href='#' onclick=addemoji('"+myJson[index].emoji+"')> "+myJson[index].emoji+" </a>"
+                }
+                $("#miemojis").html(miemoji)
+            });
         });
 
         var deleteFormAction;
@@ -374,23 +505,50 @@
         }
 
         async function message_send() {
-            var phone = $("#client_phone").val()
             var message = $("#mimessage").val()
-            var midata = {
-                phone: phone,
-                message: message
+            if (message === '') {
+                toastr.error('Escribe un mensaje')
+            } else {
+                var phone = $("#client_phone").val()
+                var midata = {
+                    phone: phone,
+                    message: message
+                }
+                toastr.success('Mensaje enviado a: '+phone)
+                await axios.post("{{ setting('admin.url') }}api/chatbot/save/out", midata)
+                var datapost = {
+                    phone: phone,
+                    type: 'text',
+                    message: message
+                }
+                await axios.post("https://chatbot.loginweb.dev/chat", datapost)
+                chat_set(phone)
             }
-            toastr.success('Mensaje enviado a: '+phone)
-            await axios.post("{{ setting('admin.url') }}api/chatbot/save/out", midata)
-
-            var datapost = {
-                phone: phone,
-                type: 'text',
-                message: message
-            }
-            await axios.post("https://chatbot.loginweb.dev/chat", datapost)
-            chat_set(phone)
         }
+
+        async function message_send2() {
+            var message = $("#newmysmg").val()
+            if (message === '') {
+                toastr.error('Escribe un mensaje')
+            } else {
+                var phone = $("#client_phone").val()
+                var midata = {
+                    phone: phone,
+                    message: message
+                }
+                toastr.success('Mensaje enviado a: '+phone)
+                await axios.post("{{ setting('admin.url') }}api/chatbot/save/out", midata)
+                var datapost = {
+                    phone: phone,
+                    type: 'text',
+                    message: message
+                }
+                await axios.post("https://chatbot.loginweb.dev/chat", datapost)
+                chat_set(phone)
+                $("#newmysmg").val('')
+            }
+        }
+
 
         $("#mimessage").keyup(function(e)
         {
@@ -408,7 +566,11 @@
                 var aux_chat = await axios("{{ setting('admin.url') }}api/chatbots/"+miinbox.data[index].phone)
                 var aux_cliente = await axios("{{ setting('admin.url') }}api/chatbot/cliente/get/"+miinbox.data[index].phone)
                 if (aux_cliente.data) {
-                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display}</div>`
+                    if (aux_cliente.data.chatbot_status) {
+                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}') checked><span class='slider round'></span></label></div>`
+                    } else {
+                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}')><span class='slider round'></span></label></div>`
+                    }
                 } else {
                     listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
                 }
@@ -439,6 +601,29 @@
             await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/relacion", {cliente_id: cliente_id, chatbot_id: chatbot_id})
             toastr.info('Chat Realacionado')
             $('#cliente_modal').modal('toggle');
+        }
+
+       async function cliente_change(id) {
+            if ($('#'+id).is(":checked"))
+            {
+                console.log('SI')
+                await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/control", {id: id, chatbot_status: true})
+                toastr.info('Ahora tu tienes el control del chat')
+            }else{
+                console.log('NO')
+                await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/control", {id: id, chatbot_status: false})
+                toastr.info('Ahora el CHATBOT tiene el control')
+            }
+        }
+
+        async function mysmg() {
+            $('#cliente_msg').modal('show');
+        }
+
+        function addemoji(emoji) {
+            var msgactual = $("#newmysmg").val()
+            var addmysmg = msgactual + emoji
+            $("#newmysmg").val(addmysmg)
         }
     </script>
 @stop

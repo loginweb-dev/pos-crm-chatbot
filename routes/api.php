@@ -1265,7 +1265,6 @@ Route::get('pos/ventas/fechas/editor/{midata}',function($midata){
     }
 });
 
-
 Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
     $midata2=json_decode($midata);
     if ($midata2->caja_id == 'all') {
@@ -1343,6 +1342,13 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
     }
 });
 
+Route::post('pos/ventas/fechas/caja/list', function(Request $request){
+    if ($request->caja_id === 'all') {
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->get();
+    } else {
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->where('caja_id', $request->caja_id)->get();
+    }
+});
 
 //-------------------- CHATBOT ------------------------------------------
 //-----------------------------------------------------------------
@@ -1476,7 +1482,7 @@ Route::post('chatbot/venta/save', function (Request $request) {
 
 //categoria
 Route::get('chatbot/categorias', function () {
-    return  Categoria::orderBy('order', 'asc')->with('productos')->get();
+    return Categoria::where('ecommerce', true)->orderBy('order', 'asc')->with('productos')->get();
 });
 
 Route::get('ventas/opcion/{data}',function($data){
@@ -1490,6 +1496,23 @@ Route::get('chatbot/pasarelas/get',function(){
 
 });
 
+Route::post('chatbot/cliente/control', function (Request $request) {
+    $cliente = Cliente::find($request->id);
+    $cliente->chatbot_status = $request->chatbot_status;
+    $cliente->save();
+    return true;
+});
+
+Route::post('chatbot/cliente/control/get', function (Request $request) {
+    return Cliente::where('chatbot_id', $request->chatbot_id)->first();
+    // if ($cliente) {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
+});
+
+//   JCHAVEZ ----------
 Route::post('reporte/ventas/facturas',function(Request $request){
     return Venta::whereBetween('created_at', [$request->var1, $request->var2])->where('factura', 'Factura')->with('cliente')->get();
 
