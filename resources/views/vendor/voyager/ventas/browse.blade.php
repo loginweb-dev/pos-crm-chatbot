@@ -54,6 +54,7 @@
                                                 <option value="credito">Cobro Créditos</option>
                                                 <option value="reportes">Reportes por Fechas</option>
                                                 <option value="pedidos">Cant. Platos</option>
+                                                <option value="agrupadas">Ventas Agrupadas</option>
                                                 @if(setting('empresa.type_negocio')=="Restaurante")
                                                     <option value="pensionado_kardex"> Kardex Pensionados </option>
                                                 @endif
@@ -669,6 +670,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal modal-primary fade" tabindex="-1" id="modal_pedidos" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -681,17 +683,15 @@
                         <div class="col-sm-6">
                             <select name="" id="tipo_ventas" class="form-control"></select>
                         </div>
-
                         <div class="col-sm-6">
                             <button type="button" class="btn btn-primary" onclick="tipo_pedidos()"><i class="voyager-eye"></i> Ver </button>
                             <button type="button" class="btn btn-dark" onclick="TipoPedidos()"><i class="voyager-search"></i> Imprimir</button>
                         </div>
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <small>debe tener una caja abierta, para realizar una consulta</small>
-                        </div>
-                        
+                        </div> --}}
                     </div>
-
+                    <small>debe tener una caja abierta, para realizar una consulta</small>
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#home2">Resumen</a></li>
                         <li><a data-toggle="tab" href="#menu1">Listado</a></li>
@@ -715,7 +715,7 @@
                                     <th>PRODUCTO</th>
                                     <th>CANTIDAD</th>
                                     <th>CLIENTE</th>
-                                    <th>SUBTOTAL</th>
+                                    <th>TIPO</th>
                                 </thead>
                                 <tbody></tbody>
                             </table>
@@ -970,8 +970,6 @@
         </div><!-- /.modal-dialog -->
     </div>
 
-
-
     {{-- //graficos --}}
     <div class="modal modal-primary fade" tabindex="-1" id="modal_reportes" role="dialog">
         <div class="modal-dialog">
@@ -1064,6 +1062,29 @@
                             <tbody></tbody>
                         </table>
                     {{-- </div> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+        
+    <div class="modal modal-primary fade" tabindex="-1" id="modal_agrupadas" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                   <h4 class="modal-title">Pedidos Agrupados</h4>
+                </div>
+                <div class="modal-body">
+                 <table class="table" id="table_group">
+                     <thead>
+                         <tr>
+                             <th>Opciones</th>
+                             <th>Cantidad</th>
+                         </tr>
+                     </thead>
+                     <tbody></tbody>
+                 </table>
                 </div>
             </div>
         </div>
@@ -1535,7 +1556,14 @@
                         case 'pedidos':
                                 $('#modal_pedidos').modal();
                                 Opciones();
-
+                            break
+                        case 'agrupadas':
+                            $('#modal_agrupadas').modal();
+                            var agroup = await axios("{{setting('admin.url')}}api/ventas/group")
+                            console.log(agroup.data)
+                            for (let index = 0; index < agroup.data.length; index++) {
+                                $("#table_group").append("<tr></tr>")
+                            }
                             break
                         case 'pensionado_kardex':
                             LimpiarKardex();
@@ -1545,7 +1573,6 @@
                         case 'reportes':
                             $('#modal_reportes').modal();
                             $('#register_id').find('option').remove().end();
-
                             $.ajax({
                                 url: "{{setting('admin.url')}}api/pos/cajeros",
                                 dataType: "json",
@@ -1764,6 +1791,8 @@
 
                 async function tipo_pedidos() {
                     $('#cantidad_platos_table tbody tr').remove();
+                    $('#platos_cliente_table tbody tr').remove();
+
                     var option_id=$('#tipo_ventas').val()
                     var micaja = JSON.parse(localStorage.getItem('micaja'));
                     var ventas=[]
@@ -1777,6 +1806,13 @@
                         'sucursal_id':micaja.sucursal_id,
                         'option_id':option_id
                     }
+                    var subtotal_plato=0
+                    var total_plato=0
+
+                    var total_mesa=0
+                    var total_para_llevar=0
+                    var total_a_domicilio=0
+
                     var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
                     if((table.data) || (option_id==4)){
                         var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
@@ -1785,11 +1821,52 @@
                             stock= table2.data[index].stock ? table2.data[index].stock : ""
                             $('#cantidad_platos_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table2.data[index].cant+"</td><td>"+table2.data[index].precio+"</td><td>"+table2.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
                         }
-                        //var table3= await axios.post("{{setting('admin.url')}}api/ventas/listado/clientes", data2)
+                        var table3= await axios.post("{{setting('admin.url')}}api/ventas/lista/detalle", data2)
                         //console.log(table3.data)
-                        // for (let index = 0; index < array.length; index++) {
-                        //     $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
-                        // }
+                        for (let index = 0; index < table2.data.length; index++) {
+                            for (let index2 = 0; index2 < table3.data.length; index2++) {
+
+                                for (let index3 = 0; index3 < table3.data[index2].detalle_venta.length; index3++) {
+                                    //console.log("Hola")
+
+                                    if (table2.data[index].name==table3.data[index2].detalle_venta[index3].name) {
+                                        //console.log(table2.data[index].name)
+                                         $('#platos_cliente_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table3.data[index2].detalle_venta[index3].cantidad+"</td><td>"+table3.data[index2].cliente.display+"</td><td>"+table3.data[index2].option.title+"</td></tr>")
+                                         subtotal_plato+=table3.data[index2].detalle_venta[index3].cantidad
+                                         if (table3.data[index2].option.id==1) {
+                                            total_mesa+=table3.data[index2].detalle_venta[index3].cantidad
+                                         }
+                                         if (table3.data[index2].option.id==2) {
+                                            total_para_llevar+=table3.data[index2].detalle_venta[index3].cantidad
+                                         }
+                                         if (table3.data[index2].option.id==3) {
+                                            total_a_domicilio+=table3.data[index2].detalle_venta[index3].cantidad
+                                         }
+                                        //  if ((index2+1)==table3.data.length) {
+                                        if (subtotal_plato==table2.data[index].cant) {
+                                            total_plato+=subtotal_plato
+                                            console.log("Hola")
+                                            if ((option_id==4)) {
+                                                $('#platos_cliente_table').append("<tr><td><h5>Para la Mesa: </h5></td><td><h5>"+total_mesa+"</h5></td><td></td><td></td></tr>")
+                                                $('#platos_cliente_table').append("<tr><td><h5>Para Llevar (Recoger): </h5></td><td><h5>"+total_para_llevar+"</h5></td><td></td><td></td></tr>")
+                                                $('#platos_cliente_table').append("<tr><td><h5>A Domicilio (Delivery): </h5></td><td><h5>"+total_a_domicilio+"</h5></td><td></td><td></td></tr>")
+                                            }
+                                            
+                                            $('#platos_cliente_table').append("<tr><td><h5>SUBTOTAL: "+table2.data[index].name+"  </h5></td><td><h5>"+subtotal_plato+"</h5></td><td></td><td></td></tr>")
+                                         }
+                                    }
+                                }
+                            }
+                            if((index+1)==table2.data.length){
+                                        $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
+                            }
+                            subtotal_plato=0
+                            total_mesa=0
+                            total_para_llevar=0
+                            total_a_domicilio=0
+
+                            // $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
+                        }
                     }
                     else{
                         toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())

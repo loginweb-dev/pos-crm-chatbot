@@ -1691,3 +1691,21 @@ Route::post('ventas/listado/clientes', function(Request $request){
         }
     return $comida;
 });
+
+
+// agroup
+Route::get('ventas/group', function(){
+    return Venta::where('caja_status', false)->with('option', 'detalle_venta', 'cliente')->get();
+});
+
+Route::post('ventas/lista/detalle', function(Request $request){
+    $ventas=[];
+    if ($request->option_id==4) {
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->with('cliente','detalle_venta', 'option')->get();
+    }
+    else{
+        $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->with('cliente','detalle_venta', 'option')->get();
+    }
+
+    return $ventas;
+});

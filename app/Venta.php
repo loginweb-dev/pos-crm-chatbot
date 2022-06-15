@@ -82,7 +82,10 @@ class Venta extends Model
     {
         return $this->belongsTo(Sucursale::class, 'sucursal_id');
     }
-
+	public function option()
+    {
+        return $this->belongsTo(Option::class, 'option_id');
+    }
     public function detalle_venta()
     {
         return $this->hasMany(DetalleVenta::class);
