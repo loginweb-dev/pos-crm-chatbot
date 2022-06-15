@@ -1529,8 +1529,6 @@ Route::post('ventas/platos/cantidades', function(Request $request){
         public $subtotal;
         public $stock;
     }
-    //$platos[] = new stdClass;
-
     $ventas=[];
         if ($request->option_id==4) {
                 $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->get();
@@ -1538,11 +1536,9 @@ Route::post('ventas/platos/cantidades', function(Request $request){
         else{
             $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->get();
         }
-
         $index=0;
         $prod=[];
         $producto=[];
-
         foreach ($ventas as $item){
                 $detalle=App\DetalleVenta::where('venta_id',$item->id)->get();
             foreach ($detalle as $item2){
@@ -1551,7 +1547,6 @@ Route::post('ventas/platos/cantidades', function(Request $request){
                     $index+=1;
             }
         }
-
         $cant=array_count_values($producto);
         $i=0;
         $aux=0;
@@ -1573,19 +1568,14 @@ Route::post('ventas/platos/cantidades', function(Request $request){
             $platos[$contador]->cant=$aux;
             $platos[$contador]->precio=$prod[$i]->precio;
             $platos[$contador]->subtotal=($prod[$i]->precio)*$aux;
-            
-            //$prod[$i]->name
-            //$aux
-            //$prod[$i]->precio
-            //(($prod[$i]->precio)*$aux)
-                if (setting('ventas.stock_platos_totales')){
-                        $producto_completo=App\Producto::find($prod[$i]->producto_id);
-                        //$producto_completo->stock
-                        $platos[$contador]->stock=$producto_completo->stock;
-                }
-                $contador+=1;
-                $i+=1;
-                $aux=0;
+            if (setting('ventas.stock_platos_totales')){
+                    $producto_completo=App\Producto::find($prod[$i]->producto_id);
+                    //$producto_completo->stock
+                    $platos[$contador]->stock=$producto_completo->stock;
+            }
+            $contador+=1;
+            $i+=1;
+            $aux=0;
 
         }
 
@@ -1683,11 +1673,47 @@ Route::post('ventas/listado/clientes', function(Request $request){
                     $comida[$index2]->cliente=$item2->venta->cliente->display;
                     $comida[$index2]->precio=$item->precio;
                     $comida[$index2]->total=$item->total;
-                    $comida[$index2]->$total_platos=$platos[$index3]->name;
+                    $comida[$index2]->$total_platos=$platos[$index3]->cant;
                 }
                 $index2+=1;
             }
             $index3+=1;
         }
     return $comida;
+});
+
+Route::post('ventas/detalle/lista', function(Request $request){
+    $ventas=[];
+    if ($request->option_id==4) {
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->get();
+    }
+    else{
+        $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->get();
+    }
+
+    $index=0;
+    $prod=[];
+    $producto=[];
+
+    foreach ($ventas as $item){
+            $detalle=App\DetalleVenta::where('venta_id',$item->id)->with('venta')->get();
+        foreach ($detalle as $item2){
+                $producto[$index]=$item2->producto_id;
+                $prod[$index]=$item2;
+                $index+=1;
+        }
+    }
+    return $prod;
+});
+
+Route::post('ventas/lista/detalle', function(Request $request){
+    $ventas=[];
+    if ($request->option_id==4) {
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->with('cliente','detalle_venta', 'option')->get();
+    }
+    else{
+        $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->with('cliente','detalle_venta', 'option')->get();
+    }
+
+    return $ventas;
 });

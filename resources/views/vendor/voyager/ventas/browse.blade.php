@@ -686,12 +686,12 @@
                             <button type="button" class="btn btn-primary" onclick="tipo_pedidos()"><i class="voyager-eye"></i> Ver </button>
                             <button type="button" class="btn btn-dark" onclick="TipoPedidos()"><i class="voyager-search"></i> Imprimir</button>
                         </div>
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <small>debe tener una caja abierta, para realizar una consulta</small>
-                        </div>
+                        </div> --}}
                         
                     </div>
-
+                    <small>debe tener una caja abierta, para realizar una consulta</small>
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#home2">Resumen</a></li>
                         <li><a data-toggle="tab" href="#menu1">Listado</a></li>
@@ -704,7 +704,7 @@
                                     <th>CANT</th>
                                     <th>PRECIO</th>
                                     <th>SUBTOTAL</th>
-                                    <th>STOCK RESTANTE</th>
+                                    <th>RESTANT</th>
                                 </thead>
                                 <tbody></tbody>
                             </table>
@@ -1777,16 +1777,18 @@
                         'sucursal_id':micaja.sucursal_id,
                         'option_id':option_id
                     }
-                    var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
+                   var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
+                    
                     if((table.data) || (option_id==4)){
                         var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
                         var stock=0
+                        console.log(table2.data)
                         for (let index = 0; index < table2.data.length; index++) {
                             stock= table2.data[index].stock ? table2.data[index].stock : ""
                             $('#cantidad_platos_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table2.data[index].cant+"</td><td>"+table2.data[index].precio+"</td><td>"+table2.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
                         }
-                        //var table3= await axios.post("{{setting('admin.url')}}api/ventas/listado/clientes", data2)
-                        //console.log(table3.data)
+                         var table3= await axios.post("{{setting('admin.url')}}api/ventas/lista/detalle", data2)
+                         console.log(table3.data)
                         // for (let index = 0; index < array.length; index++) {
                         //     $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
                         // }
