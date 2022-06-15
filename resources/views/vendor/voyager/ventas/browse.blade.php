@@ -690,6 +690,10 @@
                         {{-- <div class="col-sm-12">
                             <small>debe tener una caja abierta, para realizar una consulta</small>
                         </div> --}}
+<<<<<<< HEAD
+=======
+                        
+>>>>>>> 149f3389a6db03233fb698240a7e2d8afa70efeb
                     </div>
                     <small>debe tener una caja abierta, para realizar una consulta</small>
                     <ul class="nav nav-tabs">
@@ -704,7 +708,7 @@
                                     <th>CANT</th>
                                     <th>PRECIO</th>
                                     <th>SUBTOTAL</th>
-                                    <th>STOCK RESTANTE</th>
+                                    <th>RESTANT</th>
                                 </thead>
                                 <tbody></tbody>
                             </table>
@@ -1817,6 +1821,7 @@
                     if((table.data) || (option_id==4)){
                         var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
                         var stock=0
+                        console.log(table2.data)
                         for (let index = 0; index < table2.data.length; index++) {
                             stock= table2.data[index].stock ? table2.data[index].stock : ""
                             $('#cantidad_platos_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table2.data[index].cant+"</td><td>"+table2.data[index].precio+"</td><td>"+table2.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
