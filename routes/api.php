@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use TCG\Voyager\Models\User;
-
 use App\Caja;
 use App\Mensajero;
 use App\Producto;
@@ -1344,7 +1343,7 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 
 Route::post('pos/ventas/fechas/caja/list', function(Request $request){
     if ($request->caja_id === 'all') {
-        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->with('productos')->get();
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->get();
     } else {
         return Venta::whereBetween('created_at', [$request->date1, $request->date2])->where('caja_id', $request->caja_id)->get();
     }
@@ -1522,3 +1521,173 @@ Route::get('dosificacion/activa',function(){
     return $dosificacion;
 });
 
+Route::post('ventas/platos/cantidades', function(Request $request){
+    class CantPlatos{
+        public $name;
+        public $cant;
+        public $precio;
+        public $subtotal;
+        public $stock;
+    }
+    //$platos[] = new stdClass;
+
+    $ventas=[];
+        if ($request->option_id==4) {
+                $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->get();
+        }
+        else{
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->get();
+        }
+
+        $index=0;
+        $prod=[];
+        $producto=[];
+
+        foreach ($ventas as $item){
+                $detalle=App\DetalleVenta::where('venta_id',$item->id)->get();
+            foreach ($detalle as $item2){
+                    $producto[$index]=$item2->producto_id;
+                    $prod[$index]=$item2;
+                    $index+=1;
+            }
+        }
+
+        $cant=array_count_values($producto);
+        $i=0;
+        $aux=0;
+        $total_venta=0;
+        $contador=0;
+        foreach ($cant as $item){
+            foreach ($prod as $item2){
+
+                if (($prod[$i]->producto_id)==($item2->producto_id)){
+                        $aux+=$item2->cantidad;
+                }
+
+            }
+        
+                $total_venta+=(($prod[$i]->precio)*$aux);
+            
+            $platos[$contador] = new CantPlatos();
+            $platos[$contador]->name=$prod[$i]->name;
+            $platos[$contador]->cant=$aux;
+            $platos[$contador]->precio=$prod[$i]->precio;
+            $platos[$contador]->subtotal=($prod[$i]->precio)*$aux;
+            
+            //$prod[$i]->name
+            //$aux
+            //$prod[$i]->precio
+            //(($prod[$i]->precio)*$aux)
+                if (setting('ventas.stock_platos_totales')){
+                        $producto_completo=App\Producto::find($prod[$i]->producto_id);
+                        //$producto_completo->stock
+                        $platos[$contador]->stock=$producto_completo->stock;
+                }
+                $contador+=1;
+                $i+=1;
+                $aux=0;
+
+        }
+
+    return $platos;
+});
+
+Route::post('ventas/listado/clientes', function(Request $request){
+    class CantPlatos{
+        public $name;
+        public $cant;
+        public $precio;
+        public $subtotal;
+        public $stock;
+        public $producto_id;
+    }
+    //$platos[] = new stdClass;
+
+    $ventas=[];
+        if ($request->option_id==4) {
+                $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->get();
+        }
+        else{
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->get();
+        }
+
+        $index=0;
+        $prod=[];
+        $producto=[];
+
+        foreach ($ventas as $item){
+                $detalle=App\DetalleVenta::where('venta_id',$item->id)->with('venta')->get();
+            foreach ($detalle as $item2){
+                    $producto[$index]=$item2->producto_id;
+                    $prod[$index]=$item2;
+                    $index+=1;
+            }
+        }
+
+        $cant=array_count_values($producto);
+        $i=0;
+        $aux=0;
+        $total_venta=0;
+        $contador=0;
+        foreach ($cant as $item){
+            foreach ($prod as $item2){
+
+                if (($prod[$i]->producto_id)==($item2->producto_id)){
+                        $aux+=$item2->cantidad;
+                }
+
+            }
+        
+                $total_venta+=(($prod[$i]->precio)*$aux);
+            
+            $platos[$contador] = new CantPlatos();
+
+            $platos[$contador]->producto_id=$prod[$i]->producto_id;
+
+            $platos[$contador]->name=$prod[$i]->name;
+            $platos[$contador]->cant=$aux;
+            $platos[$contador]->precio=$prod[$i]->precio;
+            $platos[$contador]->subtotal=($prod[$i]->precio)*$aux;
+            
+            //$prod[$i]->name
+            //$aux
+            //$prod[$i]->precio
+            //(($prod[$i]->precio)*$aux)
+                if (setting('ventas.stock_platos_totales')){
+                        $producto_completo=App\Producto::find($prod[$i]->producto_id);
+                        //$producto_completo->stock
+                        $platos[$contador]->stock=$producto_completo->stock;
+                }
+                $contador+=1;
+                $i+=1;
+                $aux=0;
+
+        }
+        class DetalleVentaPlatos{
+            public $name;
+            public $cantidad;
+            public $cliente;
+            public $precio;
+            public $total;
+            public $total_platos;
+        }
+        $index2=0;
+        $index3=0;
+        foreach ($platos as $item) {
+            $cant_platos=0;
+            foreach ($prod as $item2) {
+                if ($item->name == $item2->name) {
+                    $comida[$index2] = new DetalleVentaPlatos();
+                    $comida[$index2]->name=$item->name;
+                    $comida[$index2]->cantidad=$item->cantidad;
+                    $comida[$index2]->cliente=$item2->venta->cliente->display;
+                    $comida[$index2]->precio=$item->precio;
+                    $comida[$index2]->total=$item->total;
+                    $comida[$index2]->$total_platos=$platos[$index3]->name;
+                }
+                $index2+=1;
+            }
+            $index3+=1;
+        }
+    return $comida;
+});

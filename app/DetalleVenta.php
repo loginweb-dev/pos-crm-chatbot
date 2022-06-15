@@ -19,5 +19,8 @@ class DetalleVenta extends Model
 		'extra_name',
 		'observacion'
 	];
-
+	public function venta()
+	{
+		return $this->belongsTo(Venta::class, 'venta_id');
+	}	
 }

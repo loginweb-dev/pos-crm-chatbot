@@ -12,6 +12,7 @@
 @section('page_title', __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular'))
 
     @switch($dataType->getTranslatedAttribute('slug'))
+
         @case('cocinas')
 
             @break

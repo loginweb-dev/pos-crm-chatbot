@@ -5,7 +5,7 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-sm-12 text-center">
-                <h2>Mi Carrito</h2>
+                <h2><u>Mi Carrito</u></h2>
             </div>
 
             <div class="col-sm-12 col-md-8 offset-md-2">
@@ -21,18 +21,18 @@
                                     <strong>Extras</strong>
                                 </th>
                                 <th class="font-weight-bold">
-                                    <strong>Observación</strong>
+                                    <strong>Mensaje</strong>
                                 </th>
                                 <th class="font-weight-bold">
                                     <strong>Precio</strong>
                                 </th>
                                 <th class="font-weight-bold">
-                                    <strong>Cantidad</strong>
+                                    <strong>Cant</strong>
                                 </th>
                                 <th class="font-weight-bold">
                                     <strong>STotal</strong>
                                 </th>
-                                <th></th>
+                                <th>Quitar</th>
                             </tr>
                         </thead>
                         <tbody>

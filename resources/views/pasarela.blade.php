@@ -21,10 +21,15 @@
             </div>
 
             <div class="col-sm-8">
-                <div class="form-group">
-                    <label for="">Telefono *</label>
-                    <input type="number" class="form-control" id="telefono" placeholder="escribe tu whatsapp">
-                </div>
+                <label for="">Telefono *</label>
+                <div class="form-inline">
+                
+                    <div class="form-group">
+                      <input type="number" class="form-control" id="telefono" placeholder="escribe tu whatsapp">
+                    </div>
+                    <a href="#" onclick="get_cliente(null)" class="btn btn-sm"><i class="fa fa-search"></i> Go!</a>
+                  </div>
+                  <small>luego de escribir tu telefono, dale click en Go!</small>
                 <div class="form-group">
                     <label for="">Nombres</label>
                     <input type="text" class="form-control" id="nombres" placeholder="escribe tu nombre">
@@ -37,10 +42,10 @@
                     <label for="">Carnet o NIT</label>
                     <input type="text" id="ci_nit" class="form-control" placeholder="escribe tu carnet o nit">
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="">Detalle de tu direccion *</label>
                     <input type="text" class="form-control" id="direccion" placeholder="escribe tu direccion">
-                </div>
+                </div> --}}
                 {{-- <div class="form-group">
                     <label for="">Mueve el marcador para mejorar tu ubicacion</label>
                     <div id="map"></div>
@@ -113,11 +118,11 @@
 @endsection
 
 @section('javascript')
-<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBacu367x_GAuwEOzKrjbQSyYqHCwWJpsc&v=weekly" defer></script>
+{{-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBacu367x_GAuwEOzKrjbQSyYqHCwWJpsc&v=weekly" defer></script> --}}
 
     <script>
-        const socket = io('https://socket.loginweb.dev')
+        // const socket = io('https://socket.loginweb.dev')
         $('document').ready(function () {
             pagototal(null)
             var miuser = JSON.parse(localStorage.getItem('miuser'))
@@ -186,7 +191,7 @@
 
         async function save_pedido() {
             //validacion
-            if ($('#telefono').val() == '' || $('#direccion').val() == '' || $('#observacion').val() == '') {
+            if ($('#telefono').val() == '' || $('#observacion').val() == '') {
                 toastr.error('Todos los Campos (*) son obligatorios')
             } else {
                 // query client
@@ -206,6 +211,7 @@
                     pension= await axios.get("{{setting('admin.url')}}api/pos/pensionado/cliente/"+micliente.data.id);
                     if(pension.data){
                         pension = pension.data.id
+                        $("#total").val(0)
                     }
                     else{
                         toastr.error("Pensión no Encontrada o Inactiva");
@@ -213,15 +219,15 @@
                 }
 
                 // query location client
-                var location = {
-                    'cliente_id': micliente.data.id,
-                    'latitud': $('#latitud').val(),
-                    'longitud': $('#longitud').val(),
-                    'direccion': $('#direccion').val()
-                }
+                // var location = {
+                //     'cliente_id': micliente.data.id,
+                //     'latitud': $('#latitud').val(),
+                //     'longitud': $('#longitud').val(),
+                //     'direccion': $('#direccion').val()
+                // }
 
-                // console.log(location);
-                var milocation = await axios.get("{{ setting('admin.url') }}api/location/"+JSON.stringify(location))
+                // // console.log(location);
+                // var milocation = await axios.get("{{ setting('admin.url') }}api/location/"+JSON.stringify(location))
 
                 var register_id={{setting('ventas.cliente_pag_id')}};
 
@@ -249,7 +255,7 @@
                     'descuento': $('#descuento').val(),
                     'observacion': $('#observacion').val(),
                     'cupon_id': $('#micupon_id').val(),
-                    'location': milocation.data.id,
+                    'location': 1,
                     'credito':"Contado",
                     'register_id':register_id,
                     'delivery_id':delivery_id
@@ -267,7 +273,7 @@
                         break;
                     case '7': // Contra Reembolso
                         break;
-                    case '8': // BaniPay
+                    case '9': // BaniPay
                         var micart2 = []
                         for (let index = 0; index < micart.length; index++) {
                             micart2.push({"concept": micart[index].name, "quantity": micart[index].cant, "unitPrice": micart[index].precio})
@@ -290,15 +296,14 @@
                 }
 
                 //Notifications
+                toastr.success('Gracias por su preferencia..')
                 localStorage.setItem('mipedido', JSON.stringify(newpedido.data))
-                var minoti = "Venta Registrada con ID:"+newpedido.data.id
-                socket.emit("{{ setting('notificaciones.venta') }}", minoti);
-                // console.log(JSON.stringify(newpedido.data))
-                var phone = micliente.data.phone
-                var miurl= "{{ setting('admin.url').'page/pedido' }}"
-                var message = "Gracias por tu preferencia 🙂, Para ver tu compra completa, dirigite a siguiente link 🔎"
-                var chatbot = await axios.get("{{ setting('notificaciones.url_chatbot') }}?phone="+phone+"&type=text"+"&message="+message)
-                var chatbot2 = await axios.get("{{ setting('notificaciones.url_chatbot') }}?phone="+phone+"&type=text"+"&message="+miurl)
+                // var minoti = "Venta Registrada con ID:"+newpedido.data.id
+                // var phone = micliente.data.phone
+                // var miurl= "{{ setting('admin.url').'page/pedido' }}"
+                // var message = "Gracias por tu preferencia 🙂, Para ver tu compra completa, dirigite a siguiente link 🔎"
+                // var chatbot = await axios.get("{{ setting('notificaciones.url_chatbot') }}?phone="+phone+"&type=text"+"&message="+message)
+                // var chatbot2 = await axios.get("{{ setting('notificaciones.url_chatbot') }}?phone="+phone+"&type=text"+"&message="+miurl)
                 redireccionar();
              }
         }
@@ -308,26 +313,45 @@
             location.href = "{{ route('pages', 'pedido') }}";
         }
 
+        $('#telefono').on('keydown', async function (e) {
+            var code = (event.keyCode ? event.keyCode : event.which);
+            // console.log(code)
+            if(code=== 9){
+                get_cliente(this.value)
+            }
+        });
         $('#telefono').on('keypress', async function (e) {
-            if(e.which === 13){
-                var miuser = await axios.get("{{ setting('admin.url') }}api/consulta/"+this.value)
-                console.log(miuser.data)
+            var code = (event.keyCode ? event.keyCode : event.which);
+            if(code === 13){
+                get_cliente(this.value)
+            }
+        });
+
+        async function get_cliente(phone){
+            var miphone = (phone==null) ? $("#telefono").val() : phone
+            // console.log(miphone)
+            var miuser = await axios.get("{{ setting('admin.url') }}api/consulta/"+miphone)
+                // console.log(miuser.data)
                 if (miuser.data.message) {
                     $('#nombres').val('')
                     $('#apellidos').val('')
                     $('#ci_nit').val('')
+                    $('#telefono').attr('readonly', true)
                     toastr.error('Cliente NO encontrado')
+                    toastr.info('Rellena todos los campos')
                 } else {
                     $('#nombres').val(miuser.data.first_name)
+                    $('#nombres').attr('readonly', true)
                     $('#apellidos').val(miuser.data.last_name)
+                    $('#apellidos').attr('readonly', true)
                     $('#telefono').val(miuser.data.phone)
+                    $('#telefono').attr('readonly', true)
                     $('#ci_nit').val(miuser.data.ci_nit)
+                    $('#ci_nit').attr('readonly', true)
                     toastr.success('Cliente Encontrado')
                     localStorage.setItem('miuser', JSON.stringify(miuser.data));
                 }
-            }
-        });
-
+        }
         $('#miopciones').on('change', async function (e) {
             toastr.success('Delivery Actualizado')
             var options = await axios("{{ setting('admin.url') }}api/option/"+this.value)

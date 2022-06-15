@@ -2,10 +2,10 @@
 
 @section('content')
 <br>
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-3">
     <div class="row">
         <div class="col-sm-12 text-center">
-            <h2>Menu del Dia</h2>
+            <h2><u>Menu del Dia</u></h2 >
         </div>
         @php
             $catalogo = App\Catalogo::latest()->first();
@@ -29,7 +29,7 @@
                         <small>{{ $product->categoria->name }}</small><br>
                         <a class="pt-5"><strong>{{ $product->name }}</strong></a>
                         <h6 class="h6-responsive font-weight-bold dark-grey-text"><strong>{{ $product->precio }} Bs.</strong></h6>
-                        <a href="#" onclick="addproduct('{{ $product->id }}')" class="btn btn-sm">Agregar a Carrito</a>
+                        <a href="#" onclick="addproduct('{{ $product->id }}')" class="btn btn-sm"><i class="fas fa-cart-arrow-down"></i> Agregar</a>
                     </div>
                 </div>
             </div>
@@ -37,4 +37,5 @@
 
     </div>
 </div>
+<br>
 @endsection

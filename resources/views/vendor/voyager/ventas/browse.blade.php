@@ -76,6 +76,7 @@
                                 @endif
                             </form>
                         @endif
+                       
                         <div class="table-responsive">
                             <table id="dataTable" class="table table-hover">
                                 <thead>
@@ -88,6 +89,7 @@
                                         <th class="actions text-right dt-not-orderable">{{ __('voyager::generic.actions') }}</th>
                                         @foreach($dataType->browseRows as $row)
                                             <th>
+                                                
                                                 @if ($isServerSide && in_array($row->field, $sortableColumns))
                                                     <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
                                                 @endif
@@ -104,12 +106,13 @@
                                                 @endif
                                             </th>
                                         @endforeach
-
+                                      
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($dataTypeContent as $data)
-                                        @if($data->register_id == Auth::user()->id )
+                                    
+                                        @if(($data->register_id == Auth::user()->id) || ($data->register_id == setting('ventas.cliente_pag_id')))
                                             <tr>
                                                 @if($showCheckboxColumn)
                                                     <td>
@@ -123,10 +126,6 @@
                                                             @include('voyager::bread.partials.actions', ['action' => $action])
                                                         @endif
                                                     @endforeach
-                                                    @if ($data->factura == "Recibo")
-                                                        <a onclick="CargarClienteVenta({{$data}})" class="btn btn-sm btn-warning pull-right" data-toggle="modal" data-target="#modal_recibo_a_factura" ><i class="voyager-helm"></i><span class="hidden-xs hidden-sm">Factura</span></a>
-
-                                                    @endif
                                                 </td>
 
                                                 @foreach($dataType->browseRows as $row)
@@ -683,27 +682,45 @@
                             <select name="" id="tipo_ventas" class="form-control"></select>
                         </div>
 
-                        <div class="col-sm-7">
-                            <button type="button" class="btn btn-dark pull-right" onclick="TipoPedidos()"><i class="voyager-search"></i> Imprimir</button>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-primary" onclick="tipo_pedidos()"><i class="voyager-eye"></i> Ver </button>
+                            <button type="button" class="btn btn-dark" onclick="TipoPedidos()"><i class="voyager-search"></i> Imprimir</button>
                         </div>
-                        {{-- <div class="col-sm-12">
-                            <table class="table" id="table_deudas">
-                                <thead>
-                                    <tr>
-                                        <th>Venta</th>
-                                        <th>Cliente</th>
-                                        <th>Pasarela</th>
-                                        <th>Delivery</th>
-                                        <th>Subtotal</th>
-                                        <th>Creado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div> --}}
+                        <div class="col-sm-12">
+                            <small>debe tener una caja abierta, para realizar una consulta</small>
+                        </div>
+                        
                     </div>
 
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#home2">Resumen</a></li>
+                        <li><a data-toggle="tab" href="#menu1">Listado</a></li>
+                      </ul>
+                      <div class="tab-content">
+                        <div id="home2" class="tab-pane fade in active">
+                            <table class="table table-responsive" id="cantidad_platos_table">
+                                <thead>
+                                    <th>PRODUCTO</th>
+                                    <th>CANT</th>
+                                    <th>PRECIO</th>
+                                    <th>SUBTOTAL</th>
+                                    <th>STOCK RESTANTE</th>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="menu1" class="tab-pane fade">
+                            <table class="table" id="platos_cliente_table">
+                                <thead>
+                                    <th>PRODUCTO</th>
+                                    <th>CANTIDAD</th>
+                                    <th>CLIENTE</th>
+                                    <th>SUBTOTAL</th>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -953,108 +970,7 @@
         </div><!-- /.modal-dialog -->
     </div>
 
-    <div class="modal modal-primary fade" tabindex="-1" id="modal_recibo_a_factura" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <center><h4>Convertir Recibo a Factura</h4></center>
-                </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#principal" aria-controls="principal" role="tab" data-toggle="tab">Datos Actuales</a></li>
-                        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Buscar</a></li>
-                        <li role="presentation"><a href="#create" aria-controls="create" role="tab" data-toggle="tab">Crear</a></li>
 
-                    </ul>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="principal">
-                            <input type="hidden" class="form-control" id="id_venta_conversion" >
-                            <input type="hidden" class="form-control" id="cliente_id_conversion" >
-                            <div class="col-sm-6">
-                                <label for="first_name_conversion">Nombre</label>
-                                <input type="text" class="form-control" placeholder="Nombres" id="first_name_conversion"  >
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="last_name_conversion">Apellido</label>
-                                <input type="text" class="form-control" placeholder="Apellidos" id="last_name_conversion"  >
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="ci_nit_conversion">NIT o CI</label>
-                                <input type="text" class="form-control" placeholder="NIT o CI" id="ci_nit_conversion"  >
-                            </div>
-                            <div class="col-sm-6">
-                                <button type="button" class="btn btn-dark" id="" onclick="ActualizarCliente()">Actualizar Cliente</button>
-                            </div><br>
-
-                            <div class="col-sm-7">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                            </div>
-                            <div class="col-sm-5">
-                                <button type="button" class="btn btn-primary" id="" onclick="modal_conversion()">Convertir a Factura</button>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="profile">
-                            <div class="form-group col-sm-6">
-                                <label for="">Buscar Cliente por Nombre</label>
-                                <input type="text" class="form-control" placeholder="Criterio de Busquedas.." id="cliente_busqueda">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="">Buscar Cliente por CI</label>
-                                <input type="text" class="form-control" placeholder="Criterio de Busquedas.." id="cliente_busqueda_ci">
-                            </div>
-                            <br>
-                            <table class="table" id="cliente_list">
-                                <thead>
-                                    <th>#</th>
-                                    <th>Cliente</th>
-                                    <th>CI - NIT</th>
-                                    <th>Opciones</th>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="create">
-                            <div class="form-group col-sm-6">
-                                <label for="">Nombres</label>
-                                <input class="form-control" type="text" placeholder="Nombres" id="first_name">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="">Apellidos</label>
-                                <input class="form-control" type="text" placeholder="Apellidos" id="last_name">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="">Telefono</label>
-                                <input class="form-control" type="text" placeholder="Telefono" id="phone" value="0">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="">NIT</label>
-                                    <input class="form-control" type="text" placeholder="Carnet o NIT" id="nit" value="0">
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="">Display</label>
-                                <input class="form-control" type="text" placeholder="Display" id="display" hidden>
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="">Correo</label>
-                                <input class="form-control" type="text" placeholder="Email" id="email" hidden>
-                            </div>
-                            <div class="form-group col-sm-6">
-                            </div>
-                            <div class="form-group col-sm-3">
-                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                            </div>
-                            <div class="form-group col-sm-3">
-                                <button type="button" class="btn btn-sm btn-primary" onclick="savecliente()" >Agregar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                </div>
-            </div>
-        </div>
-    </div>
 
     {{-- //graficos --}}
     <div class="modal modal-primary fade" tabindex="-1" id="modal_reportes" role="dialog">
@@ -1103,7 +1019,7 @@
                                 <tbody></tbody>
                             </table>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1411,24 +1327,7 @@
             $('#email').val($('#first_name').val()+'.'+this.value+'@loginweb.dev');
         });
 
-         async function CargarClienteVenta(data){
-            micliente()
-            var table= await axios("{{setting('admin.url')}}api/pos/cliente/"+data.cliente_id)
-            if(table.data.default){
-                $("#first_name_conversion").attr("readonly", true)
-                $("#last_name_conversion").attr("readonly", true)
-                $("#ci_nit_conversion").attr("readonly", true)
-                toastr.error("Seleccione un cliente o vaya a crearlo")
-            }
-            else{
-
-            }
-            $('#first_name_conversion').val(table.data.first_name)
-            $('#last_name_conversion').val(table.data.last_name)
-            $('#ci_nit_conversion').val(table.data.ci_nit)
-            $('#id_venta_conversion').val(data.id)
-            $('#cliente_id_conversion').val(data.cliente_id)
-        }
+  
 
         async function modal_conversion() {
             var id=$('#id_venta_conversion').val()
@@ -1861,9 +1760,50 @@
                     else{
                         toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())
                     }
-
-
                 }
+
+                async function tipo_pedidos() {
+                    $('#cantidad_platos_table tbody tr').remove();
+                    var option_id=$('#tipo_ventas').val()
+                    var micaja = JSON.parse(localStorage.getItem('micaja'));
+                    var ventas=[]
+                    var data= JSON.stringify({
+                        'user_id':micaja.user_id,
+                        'sucursal_id':micaja.sucursal_id,
+                        'option_id':option_id
+                    })
+                    var data2= {
+                        'user_id':micaja.user_id,
+                        'sucursal_id':micaja.sucursal_id,
+                        'option_id':option_id
+                    }
+                    var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
+                    if((table.data) || (option_id==4)){
+                        var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
+                        var stock=0
+                        for (let index = 0; index < table2.data.length; index++) {
+                            stock= table2.data[index].stock ? table2.data[index].stock : ""
+                            $('#cantidad_platos_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table2.data[index].cant+"</td><td>"+table2.data[index].precio+"</td><td>"+table2.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
+                        }
+                        //var table3= await axios.post("{{setting('admin.url')}}api/ventas/listado/clientes", data2)
+                        //console.log(table3.data)
+                        // for (let index = 0; index < array.length; index++) {
+                        //     $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
+                        // }
+                    }
+                    else{
+                        toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())
+                    }
+
+
+                    //platos_cliente_table
+                }
+
+                // $("#tipo_ventas").on("change", function(){
+                //     console.log(this.value)
+                // })
+
+                
 
                 async function Opciones() {
                     $('#tipo_ventas').find('option').remove().end();
@@ -1880,7 +1820,7 @@
                     }
                     $('#tipo_ventas').append($('<option>', {
                             value: 4,
-                            text: "Todas"
+                            text: "Todos"
                     }));
                 }
 

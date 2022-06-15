@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         Voyager::addAction(\App\Actions\CierreCaja::class);
         //
         Voyager::addAction(\App\Actions\VentaDetalle::class);
-        Voyager::addAction(\App\Actions\VentaRecibo::class);
+        // Voyager::addAction(\App\Actions\VentaRecibo::class);
 
         Voyager::addAction(\App\Actions\ProductionDetalle::class);
         // Voyager::addAction(\App\Actions\ProductionRecibo::class);

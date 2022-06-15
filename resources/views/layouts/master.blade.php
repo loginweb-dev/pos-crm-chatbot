@@ -29,6 +29,9 @@
             width: 100%;
             text-align: center;
         }
+        nav a{
+            color: {{ setting('site.color') }};
+        } 
     </style>
 </head>
 
@@ -37,7 +40,7 @@
         <ul id="slide-out" class="side-nav custom-scrollbar">
         <li>
             <div class="logo-wrapper waves-light">
-            <a href="/"><img src="{{ setting('admin.url').'storage/'.setting('site.banner') }}" class="img-fluid flex-center"></a>
+                <a href="/"><img src="{{ setting('admin.url').'storage/'.setting('site.banner') }}" class="img-fluid flex-center"></a>
             </div>
         </li>
         <li>
@@ -47,7 +50,7 @@
             @endphp
             @foreach ($menus as $item)
                 <li>
-                <a href="{{ route('pages', $item->url) }}" class="collapsible-header waves-effect"><i class="fas fa-plus"></i>
+                    <a style="color: {{ setting('site.color') }}" href="{{ route('pages', $item->url) }}" class="collapsible-header waves-effect"><i class="fas fa-plus"></i>
                 {{ $item->title }}</a>
                 </li>
             @endforeach
@@ -61,7 +64,7 @@
                 <div class="float-left mr-2">
                 <a href="#" data-activates="slide-out" class="button-collapse"><i class="fas fa-bars"></i></a>
                 </div>
-                <a class="navbar-brand mx-auto font-weight-bold" href="/"><strong>{{ setting('site.title') }}</strong></a>
+                <a class="navbar-brand mx-auto font-weight-bold" href="/page/catalogo"><strong>{{ setting('site.title') }}</strong></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4"
                 aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
                 </button>
@@ -93,7 +96,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
 
-    <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
+    {{-- <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script> --}}
 
     <script type="text/javascript">
         new WOW().init();
@@ -142,7 +145,7 @@
                 }
             }
             if(mirep){
-                toastr.success("Cantidad Actualizada del Item: "+id)
+                toastr.success("Cantidad Actualizada")
                 updatecant(id)
             }else{
                 var product = await axios ("{{ setting('admin.url') }}api/pos/producto/"+id)

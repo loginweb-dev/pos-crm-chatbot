@@ -5,14 +5,26 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
         <title>Recibo de venta</title>
-        <style>
+        <style type="text/css">
+            /* @charset "utf-8"; */
             table, th, td {
                 width: 100%;
                 border: 0px solid black;
             }
-            @page { size: {{setting('impresion.size')}} font-size: {{ setting('impresion.text_principal') }} }
+            @page {
+                size: {{setting('impresion.size')}} 
+                font-size: {{ setting('impresion.text_principal') }} 
+            }
+            body{
+
+            }
+           
+       
         </style>
+       
+       
     </head>
     <body>
         <table>
@@ -29,10 +41,12 @@
             <tr>
                 <!-- consulta para saber si es factura o recibo -->
                 <td colspan="3" align="center">
-                    <h2>TICKET # {{ $ventas->ticket }}<br>
+                    <h2>
+                        VENTA # {{ $ventas->id }} <br>
+                        TICKET # {{ $ventas->ticket }}<br>
                      <span style="padding:2px 2px; background-color:black;color:white;font-weight:bold;">{{ strtoupper($option->title) }}</span>
                     </h2>
-                    <hr>
+                    
                 </td>
             </tr>
             {{-- // Cliente --}}
@@ -57,7 +71,7 @@
                     <table>
                         <tr>
                             <td><strong>PRODUCTO</strong></td>
-                            <td><strong>SABORES</strong></td>
+                            <td><strong>DETALLE</strong></td>
                             {{-- <td><strong>OBS</strong></td> --}}
                             <th><strong>CANT</strong></th>
                             <td><strong>PRECIO</strong></td>
@@ -104,15 +118,18 @@
             </tr>
 
             <tr>
-                <td colspan="2"><b>Atendido por : </b> {{ Auth::user()->name }} - <b>TICKET# {{$ventas->ticket}}</b></td>
+                <td colspan="2"><b>Atendido por : </b> {{ Auth::user()->name }} </td>
                 <td><b>Hora : {{ date('H:i:s') }}</b></td>
             </tr>
+            {{-- <tr>
+                <td colspan="2"><b>Venta : <b> {{$ventas->id}} </b></td></td>
+            </tr> --}}
             <tr>
                 <td colspan="3">Gracias por su preferencia, vuelva pronto.</td>
             </tr>
         </table>
 
-        <div class="saltopagina" style="display:block; page-break-before:always;"></div>
+        <div class="saltopagina" style="page-break-before: always;"></div>
 
         @if(setting('ventas.cocina'))
             <table>
@@ -131,7 +148,7 @@
                         <table>
                             <tr>
                                 <td><strong>PRODUCTO</strong></td>
-                                <td><strong>SABORES</strong></td>
+                                <td><strong>DETALLE</strong></td>
                                 {{-- <td><strong>OBS</strong></td> --}}
                                 <th><strong>CANT</strong></th>
                                 <td><strong>PRECIO</strong></td>

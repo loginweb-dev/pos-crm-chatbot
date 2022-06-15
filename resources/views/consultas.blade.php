@@ -11,6 +11,7 @@
             <label><div id="micliente"></div></label>
         </div>
         <div class="col-sm-12 col-md-8 offset-md-2">
+            <small><< Desliza horizontal, para ver mas >></small>
             <table class="table table-responsive" id="mipedidos">
                 <thead>
                     <tr>
@@ -40,19 +41,21 @@
           {{-- <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button> --}}
         </div>
         <div class="modal-body">
+            
             <table class="table table-responsive" id="midetalle">
                 <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Precio</th>
                         <th>Cantidad</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody> </tbody>
             </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-sm" data-dismiss="modal">Cerrar</button>
           {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
         </div>
       </div>
@@ -90,7 +93,7 @@
                     if (banipay.data) {
                         $("#mipedidos").append("<tr><td>Codigo:"+pedidos.data[index].id+"<br>Ticket:"+pedidos.data[index].ticket+"</td><td>"+pedidos.data[index].published+"</td><td>"+pedidos.data[index].estado.title+"</td><td>"+pedidos.data[index].pasarela.title+"<br><a href='{{ setting('banipay.url_base') }}"+urlbaipay+"' target='_blank' class='btn btn-sm btn-dark'>Pagar</a></td><td>"+pedidos.data[index].delivery.name+"</td><td>"+pedidos.data[index].cupon.title+"</td><td>"+pedidos.data[index].total+" Bs.</td><td><button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#midetalle_modal' onclick=detalle('"+pedidos.data[index].id+"')>Productos</button></td></tr>")
                     } else {
-                        $("#mipedidos").append("<tr><td>Codigo:"+pedidos.data[index].id+"<br>Ticket:"+pedidos.data[index].ticket+"</td><td>"+pedidos.data[index].published+"</td><td>"+pedidos.data[index].estado.title+"</td><td>"+pedidos.data[index].pasarela.title+"</td><td>"+pedidos.data[index].delivery.name+"</td><td>"+pedidos.data[index].cupon.title+"</td><td>"+pedidos.data[index].total+" Bs.</td><td><button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#midetalle_modal' onclick=detalle('"+pedidos.data[index].id+"')>Productos</button></td></tr>")
+                        $("#mipedidos").append("<tr><td>Codigo:"+pedidos.data[index].id+"<br>Ticket:"+pedidos.data[index].ticket+"</td><td>"+pedidos.data[index].published+"</td><td>"+pedidos.data[index].estado.title+"</td><td>"+pedidos.data[index].pasarela.title+"</td><td>"+pedidos.data[index].delivery.name+"</td><td>"+pedidos.data[index].cupon.title+"</td><td>"+pedidos.data[index].total+" Bs.</td><td><button type='button' class='btn btn-sm' data-toggle='modal' data-target='#midetalle_modal' onclick=detalle('"+pedidos.data[index].id+"')>Productos</button></td></tr>")
                     }
                 }
             }
@@ -117,7 +120,7 @@
             var misearch = ''
             $("#midetalle tbody tr").remove();
             for (let index = 0; index < productos.data.length; index++) {
-                $('#midetalle').append("<tr><td>"+productos.data[index].name+"</td><td>"+productos.data[index].precio+"</td><td>"+productos.data[index].cantidad+"</td></tr>")
+                $('#midetalle').append("<tr><td>"+productos.data[index].name+"</td><td>"+productos.data[index].precio+"</td><td>"+productos.data[index].cantidad+"</td><td>"+productos.data[index].precio * productos.data[index].cantidad+"</td></tr>")
             }
 
         }

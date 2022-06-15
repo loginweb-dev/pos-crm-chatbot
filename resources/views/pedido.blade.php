@@ -5,7 +5,7 @@
 <div class="container-fluid mt-5">
     <div class="row">
         <div class="col-sm-12 text-center">
-            <h2>Gracias por tu Compra</h2>
+            <h2><u>Gracias por tu Compra</u></h2>
         </div>
 
         <div class="col-sm-12 col-md-8 offset-md-2">
@@ -28,7 +28,7 @@
                 </tr>
                 <tr class="text-center">
                     <td colspan="2">
-                        <a href="{{ route('pages', 'consultas') }}" class="btn btn-sm btn-primary">Ver todas mi compras</a>
+                        <a href="{{ route('pages', 'consultas') }}" class="btn btn-sm"><i class="fas fa-cart-arrow-down"></i> Ver todos mis pedidos </a>
                     </td>
                 </tr>
             </table>
@@ -43,7 +43,7 @@
         $("#mireload").attr("hidden",true);
         var mipedido = JSON.parse(localStorage.getItem('mipedido'))
         $("#id").html(mipedido.id)
-        $("#fecha").html(mipedido.created_at)
+        $("#fecha").html(mipedido.published)
         $("#total").html(mipedido.total+' Bs.')
         $("#observacion").html(mipedido.observacion)
     });
