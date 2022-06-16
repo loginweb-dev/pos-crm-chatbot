@@ -1343,9 +1343,9 @@ Route::get('pos/ventas/fechas/caja/{midata}',function($midata){
 
 Route::post('pos/ventas/fechas/caja/list', function(Request $request){
     if ($request->caja_id === 'all') {
-        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->get();
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->with('estado', 'cliente', 'pasarela', 'detalle_venta')->get();
     } else {
-        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->where('caja_id', $request->caja_id)->get();
+        return Venta::whereBetween('created_at', [$request->date1, $request->date2])->where('caja_id', $request->caja_id)->with('estado', 'cliente', 'pasarela', 'detalle_venta')->get();
     }
 });
 
@@ -1685,7 +1685,7 @@ Route::post('ventas/listado/clientes', function(Request $request){
 
 // agroup
 Route::get('ventas/group', function(){
-    return Venta::where('caja_status', false)->with('option', 'detalle_venta', 'cliente')->get();
+    return Venta::where('caja_status', false)->with('option', 'detalle_venta', 'cliente', 'estado', 'pasarela')->get();
 });
 
 Route::post('ventas/lista/detalle', function(Request $request){

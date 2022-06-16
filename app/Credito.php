@@ -19,6 +19,10 @@ class Credito extends Model
     ];
 
     use SoftDeletes;
+    protected $appends=['published'];
+	public function getPublishedAttribute(){
+		return Carbon::createFromTimeStamp(strtotime($this->attributes['created_at']) )->diffForHumans();
+	}
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');

@@ -49,15 +49,15 @@
                                     <div class="col-4">
                                         <select id="search_key" name="key" style="width: 300px" class="">
                                                 <option value="id">Buscar por ID</option>
-                                                <option value="libro_venta">Libro de Ventas</option>
-                                                <option value="chofer_deudas">Deudas de Choferes</option>
-                                                <option value="credito">Cobro Créditos</option>
-                                                <option value="reportes">Reportes por Fechas</option>
-                                                <option value="pedidos">Cant. Platos</option>
+                                                {{-- <option value="libro_venta">Libro de Ventas</option> --}}
+                                                {{-- <option value="chofer_deudas">Deudas de Choferes</option> --}}
+                                                <option value="credito">Ventas a Créditos</option>
+                                                <option value="reportes">Ventas por Fechas</option>
+                                                {{-- <option value="pedidos">Cant. Platos</option> --}}
                                                 <option value="agrupadas">Ventas Agrupadas</option>
-                                                @if(setting('empresa.type_negocio')=="Restaurante")
+                                                {{-- @if(setting('empresa.type_negocio')=="Restaurante")
                                                     <option value="pensionado_kardex"> Kardex Pensionados </option>
-                                                @endif
+                                                @endif --}}
                                         </select>
                                     </div>
                                     <div class="col-2">
@@ -360,10 +360,10 @@
                                                         @endif
                                                         {{-- <a href="#" class="btn btn-sm btn-danger">Factura</a> --}}
                                                     @endforeach
-                                                    @if ($data->factura == "Recibo")
+                                                    {{-- @if ($data->factura == "Recibo")
                                                         <a onclick="CargarClienteVenta({{$data}})" class="btn btn-sm btn-warning pull-right" data-toggle="modal" data-target="#modal_recibo_a_factura" ><i class="voyager-helm"></i><span class="hidden-xs hidden-sm">Factura</span></a>
 
-                                                    @endif
+                                                    @endif --}}
                                                 </td>
                                                 @foreach($dataType->browseRows as $row)
 
@@ -690,10 +690,6 @@
                         {{-- <div class="col-sm-12">
                             <small>debe tener una caja abierta, para realizar una consulta</small>
                         </div> --}}
-<<<<<<< HEAD
-=======
-                        
->>>>>>> 149f3389a6db03233fb698240a7e2d8afa70efeb
                     </div>
                     <small>debe tener una caja abierta, para realizar una consulta</small>
                     <ul class="nav nav-tabs">
@@ -785,35 +781,57 @@
                    <h4>Ventas a Crédito</h4>
                 </div>
                 <div class="modal-body">
+                    <div id="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Créditos</a></li>
+                            <li role="presentation" ><a href="#historial" aria-controls="historial" role="tab" data-toggle="tab">Historial</a></li>
+                            <li role="presentation" ><a href="#cobro" aria-controls="cobro" role="tab" data-toggle="tab">Cobrar</a></li>
+                        </ul>
+                        <div class="tab-content">
 
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Créditos</a></li>
-                        <li role="presentation" ><a href="#historial" aria-controls="historial" role="tab" data-toggle="tab">Historial</a></li>
-                        <li role="presentation" ><a href="#cobro" aria-controls="cobro" role="tab" data-toggle="tab">Cobrar</a></li>
-                    </ul>
-                    <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="home">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <strong>Elija una Sucursal</strong>
+                                        <select name="" id="sucursal_consulta" class="form-control" data-width="100%"></select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Elija un Cliente</strong>
+                                        <select name="" id="cliente_consulta" class="form-control"></select>
+                                    </div>
+                                    <div class="col-sm-12 text-center">
+                                        <button type="button" class="btn btn-dark" onclick="ConsultarCredito()"> <i class="voyager-search"></i> Consultar</button>
+                                        <table class="table" id="table_consultas_cobros">
+                                            <thead>
+                                                <tr>
+                                                    <th>Venta</th>
+                                                    <th>Estado</th>
+                                                    <th>Cliente</th>
+                                                    <th>Deuda</th>
+                                                    <th>Creado</th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div role="tabpanel" class="tab-pane active" id="home">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    {{-- <strong>Elija una Sucursal</strong> --}}
-                                    <select name="" id="sucursal_consulta" class="form-control" data-width="100%"></select>
-                                </div>
-                                <div class="col-sm-6">
-                                    {{-- <strong>Elija un Cliente</strong> --}}
-                                    <select name="" id="cliente_consulta" class="form-control js-example-basic-single"></select>
-                                </div>
-                                <div class="col-sm-12 text-center">
-                                    <button type="button" class="btn btn-dark" onclick="ConsultarCredito()"> <i class="voyager-search"></i> Consultar</button>
-                                    <table class="table" id="table_consultas_cobros">
+                            <div role="tabpanel" class="tab-pane" id="historial">
+
+                                <div class="col-sm-12">
+                                    <table class="table" id="table_historial">
                                         <thead>
                                             <tr>
+                                                <th>ID</th>
                                                 <th>Venta</th>
-                                                <th>Estado</th>
                                                 <th>Cliente</th>
                                                 <th>Deuda</th>
+                                                <th>Cuota</th>
+                                                <th>Restante a Pagar</th>
                                                 <th>Creado</th>
-                                                <th>Acción</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -821,74 +839,52 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
+                            <div role="tabpanel" class="tab-pane" id="cobro">
+                                <div class="col-sm-12">
+                                    <table class="table" id="table_cobros">
+                                        <thead>
+                                            <tr>
+                                                <th>Venta</th>
+                                                <th>Cliente</th>
+                                                <th>Deuda Inicial</th>
+                                                <th>Restante a Pagar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
 
-                        <div role="tabpanel" class="tab-pane" id="historial">
-
-                            <div class="col-sm-12">
-                                <table class="table" id="table_historial">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Venta</th>
-                                            <th>Cliente</th>
-                                            <th>Deuda</th>
-                                            <th>Cuota</th>
-                                            <th>Restante a Pagar</th>
-                                            <th>Creado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                                    </table>
+                                    <div class="form-group col-md-4 text-center">
+                                        <form class="form-horizontal" role="form">
+                                            <label class="radio-inline"> <input type="radio" name="season" id="" value="1" checked> Pago En Efectivo </label>
+                                            <label class="radio-inline"> <input type="radio" name="season" id="" value="0"> Pago en Línea </label>
+                                        </form>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="">Cuota</label>
+                                        <input class="form-control" type="number" value="0" min="0" placeholder="Ingrese Monto" id="cuota_cobro">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <input class="form-control" type="hidden" placeholder="Ingrese Venta" id="venta_id">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <input class="form-control" type="hidden" placeholder="Ingrese Deuda" id="deuda">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <input class="form-control" type="hidden" placeholder="Ingrese Cliente" id="cliente_id">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <input class="form-control" type="hidden" placeholder="Ingrese texto Cliente" id="cliente_text">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <input class="form-control" type="hidden" placeholder="Ingrese Restante" id="restante">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-dark" onclick="ActualizarCredito()">Guardar</button>
+                                {{-- <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button> --}}
                             </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="cobro">
-                            <div class="col-sm-12">
-                                <table class="table" id="table_cobros">
-                                    <thead>
-                                        <tr>
-                                            <th>Venta</th>
-                                            <th>Cliente</th>
-                                            <th>Deuda Inicial</th>
-                                            <th>Restante a Pagar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-
-                                </table>
-                                <div class="form-group col-md-4 text-center">
-                                    <form class="form-horizontal" role="form">
-                                        <label class="radio-inline"> <input type="radio" name="season" id="" value="1" checked> Pago En Efectivo </label>
-                                        <label class="radio-inline"> <input type="radio" name="season" id="" value="0"> Pago en Línea </label>
-                                    </form>
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="">Cuota</label>
-                                    <input class="form-control" type="number" value="0" min="0" placeholder="Ingrese Monto" id="cuota_cobro">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input class="form-control" type="hidden" placeholder="Ingrese Venta" id="venta_id">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input class="form-control" type="hidden" placeholder="Ingrese Deuda" id="deuda">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input class="form-control" type="hidden" placeholder="Ingrese Cliente" id="cliente_id">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input class="form-control" type="hidden" placeholder="Ingrese texto Cliente" id="cliente_text">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input class="form-control" type="hidden" placeholder="Ingrese Restante" id="restante">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-dark" onclick="ActualizarCredito()">Guardar</button>
-                            {{-- <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button> --}}
                         </div>
                     </div>
-
                 </div>
                 <div class="modal-footer">
                 </div>
@@ -980,7 +976,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                   <h4 class="modal-title">Reportes por Fechas</h4>
+                   <h4 class="modal-title">Ventas por Fechas</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -992,30 +988,40 @@
                             <label for="">Fecha Final</label>
                             <input class="form-control" type="date" name="date2" id="date2">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <label for="">Cajas</label>
                             <select name="caja_id" id="caja_id" class="form-control"></select>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <label for="">Cajar@s</label>
                             <select name="register_id" id="register_id" class="form-control"></select>
                         </div>
+                        <div class="col-sm-4">
+                            <label for="">Sucursal</label>
+                            <select name="" id="" class="form-control"></select>
+                        </div>
                     </div>
+                    <small>el resumen y el listado se actualizaran cada vez de cambie: (Cajas, Cajer@s o Sucursales)</small>
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#home2">Resumen</a></li>
-                        <li><a data-toggle="tab" href="#menu1">Listado</a></li>
-                      </ul>
-                      <div class="tab-content">
-                        <div id="home2" class="tab-pane fade in active">
+                        <li class="active"><a data-toggle="tab" href="#home22">Resumen</a></li>
+                        <li><a data-toggle="tab" href="#menu11">Listado</a></li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <div id="home22" class="tab-pane fade in active">
                             <table class="table table-responsive" id="report_table">
                                 <tbody></tbody>
                             </table>
                         </div>
-                        <div id="menu1" class="tab-pane fade">
+                        <div id="menu11" class="tab-pane fade">
                             <table class="table" id="report_list">
                                 <thead>
                                     <th>id</th>
                                     <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Pasarela</th>
+                                    <th>Cliente</th>
+                                    <th>Productos</th>
                                     <th>Total</th>
                                 </thead>
                                 <tbody></tbody>
@@ -1077,18 +1083,35 @@
             <div class="modal-content">
                 <div class="modal-header">
                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                   <h4 class="modal-title">Pedidos Agrupados</h4>
+                   <h4 class="modal-title">Ventas Agrupadas</h4>
                 </div>
                 <div class="modal-body">
-                 <table class="table" id="table_group">
-                     <thead>
-                         <tr>
-                             <th>Opciones</th>
-                             <th>Cantidad</th>
-                         </tr>
-                     </thead>
-                     <tbody></tbody>
-                 </table>
+                    <small>solo se listaran las ventas activas (con cajas abiertas)</small>
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#mitabs1">Opciones</a></li>
+                        <li><a data-toggle="tab" href="#mitabs2">Productos</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="mitabs1" class="tab-pane fade in active">
+                            <div class="row">
+                                <div id="mititle"></div>
+                               <div class="col-sm-4">
+                                   <div id="group_uno"></div>
+                               </div>
+                               <div class="col-sm-4">
+                                   <div id="group_dos"></div>       
+                               </div>
+                               <div class="col-sm-4">
+                                   <div id="group_tres"></div>    
+                               </div>
+                            </div>  
+                        </div>
+                        <div id="mitabs2" class="tab-pane fade">
+                            <h2>en desarrollo</h2>
+                        </div>
+                    </div>
+
+                                          
                 </div>
             </div>
         </div>
@@ -1564,10 +1587,68 @@
                         case 'agrupadas':
                             $('#modal_agrupadas').modal();
                             var agroup = await axios("{{setting('admin.url')}}api/ventas/group")
-                            console.log(agroup.data)
+                            // console.log(agroup.data)
+                            var uno = ''
+                            var uno_count = 0
+                            var dos = ''
+                            var dos_count = 0
+                            var tres = ''
+                            var tres_count = 0
+                            var micount = 0
                             for (let index = 0; index < agroup.data.length; index++) {
-                                $("#table_group").append("<tr></tr>")
+                                switch (agroup.data[index].option_id) {
+                                    case 1:
+                                        uno +=  "<code>ID:"+agroup.data[index].id+" "+agroup.data[index].published+"</code><br>"     
+                                        uno += agroup.data[index].estado.title+"<br>"       
+                                        uno += agroup.data[index].pasarela.title+"<br>"                       
+                                        uno += agroup.data[index].cliente.display+"<br>"
+                                        uno += " -> Carrito<br>"
+                                        var miproducts = "<ul>"
+                                        for (let j = 0; j < agroup.data[index].detalle_venta.length; j++) {
+                                            miproducts += "<li>"+agroup.data[index].detalle_venta[j].cantidad+" - "+agroup.data[index].detalle_venta[j].name+"</li>"
+                                        }
+                                        miproducts += "</ul>"
+                                        uno += "<p>"+miproducts+"</p>"
+                                        uno_count++
+                                        break;
+                                    case 2:
+                                        dos += "<code>ID: "+agroup.data[index].id+" "+agroup.data[index].published+"</code><br>"    
+                                        dos += agroup.data[index].estado.title+"<br>"    
+                                        dos += agroup.data[index].pasarela.title+"<br>"  
+                                        dos += agroup.data[index].cliente.display+"<br>"
+                                        dos += " -> Carrito<br>"
+                                        var miproducts = "<ul>"
+                                        for (let j = 0; j < agroup.data[index].detalle_venta.length; j++) {
+                                            miproducts += "<li>"+agroup.data[index].detalle_venta[j].cantidad+" - "+agroup.data[index].detalle_venta[j].name+"</li>"
+                                        }
+                                        miproducts += "</ul>"
+                                        dos += "<p>"+miproducts+"</p>"        
+                                        dos_count++                                
+                                        break;       
+                                    case 3:
+                                        tres += "<code>ID: "+agroup.data[index].id+" "+agroup.data[index].published+"</code><br>"   
+                                        tres += agroup.data[index].estado.title+"<br>"     
+                                        tres += agroup.data[index].pasarela.title+"<br>"  
+                                        tres += agroup.data[index].cliente.display+"<br>"
+                                        tres += " -> Carrito<br>"
+                                        var miproducts = "<ul>"
+                                        for (let j = 0; j < agroup.data[index].detalle_venta.length; j++) {
+                                            miproducts += "<li>"+agroup.data[index].detalle_venta[j].cantidad+" - "+agroup.data[index].detalle_venta[j].name+"</li>"
+                                        }
+                                        miproducts += "</ul>"
+                                        tres += "<p>"+miproducts+"</p>"      
+                                        tres_count++                                  
+                                        break;                                 
+                                    default:
+                                        break;                                
+                                }
+                                micount++
+                                // console.log(micount)
                             }
+                            $("#group_uno").html(uno)
+                            $("#group_dos").html(dos)
+                            $("#group_tres").html(tres)
+                            $("#mititle").html("<table class='table'><tr><td>COMER AQUI: "+uno_count+"</td><td>A Domicilio : "+dos_count+"</td><td>Para llevar : "+tres_count+"</td></tr></table>")
                             break
                         case 'pensionado_kardex':
                             LimpiarKardex();
@@ -1620,8 +1701,8 @@
                             });
                         break
                         case 'credito':
-                            LimpiarCobroCreditos();
                             $('#modal_cobros').modal();
+                            LimpiarCobroCreditos();                            
                             sucursal_consulta();
                         break
                         case 'caja_id':
@@ -2073,7 +2154,8 @@
                         // const element = table.data[index];
                         $('#sucursal_consulta').append($('<option>', {
                             value: table.data[index].id,
-                            text: table.data[index].name
+                            text: table.data[index].name,
+                            // selected: true
                         }));
                     }
                 }
@@ -2087,7 +2169,7 @@
                     var table= await axios.get("{{setting('admin.url')}}api/pos/clientes");
                     $('#cliente_consulta').append($('<option>', {
                         value: null,
-                        text: 'Elige una Sucursal'
+                        text: 'Elige un Cliente'
                     }));
                     for (let index = 0; index < table.data.length; index++) {
                         if(table.data[index].default==0){
@@ -2101,7 +2183,9 @@
 
                 async function ConsultarCredito() {
                     $('#table_consultas_cobros tbody tr').remove();
-                    var venta= await axios.get("{{setting('admin.url')}}api/pos/ventas-creditos/"+$("#cliente_consulta").val()+"/"+$("#sucursal_consulta").val());
+                    var sucursal_id = $("#sucursal_consulta").val()
+                    var cliente_id = $("#cliente_consulta").val()
+                    var venta= await axios.get("{{setting('admin.url')}}api/pos/ventas-creditos/"+cliente_id+"/"+sucursal_id);
                     var midata="";
                     total=0;
                     if (venta.data.length == 0 ) {
@@ -2122,6 +2206,8 @@
 
                 async function DetalleCredito(id) {
                     $('#table_historial tbody tr').remove();
+                    // $( "#tabs" ).tabs({ active: 1 });
+                    $('.nav-tabs a[href="#historial"]').tab('show')
                     var credito= await axios.get("{{setting('admin.url')}}api/pos/creditos/cliente/"+id);
                     var midata="";
                     var pagar=0;
@@ -2135,7 +2221,7 @@
                     }
                     else{
                         for(let index=0;index<credito.data.length;index++){
-                            $('#table_historial').append("<tr><td>"+credito.data[index].id+"</td><td>"+id+"</td><td>"+credito.data[index].cliente.display+"</td><td>"+credito.data[index].deuda+"</td><td>"+credito.data[index].cuota+"</td><td>"+credito.data[index].restante+"</td><td>"+credito.data[index].created_at+"</td></tr>");
+                            $('#table_historial').append("<tr><td>"+credito.data[index].id+"</td><td>"+id+"</td><td>"+credito.data[index].cliente.display+"</td><td>"+credito.data[index].deuda+"</td><td>"+credito.data[index].cuota+"</td><td>"+credito.data[index].restante+"</td><td>"+credito.data[index].published+"</td></tr>");
                             pagar=credito.data[index].restante;
                             cliente=credito.data[index].cliente.id;
                             cliente_text=credito.data[index].cliente.display;
@@ -2143,7 +2229,7 @@
                             status=credito.data[index].status;
                         }
                         if(status==0){
-                            $('#table_historial').append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><a href='#cobro' aria-controls='cobro' role='tab' data-toggle='tab' class='btn btn-sm btn-primary' >Pagar Cuota</a></td></tr>");
+                            $('#table_historial').append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><a onclick='nexttabs()' href='#cobro' aria-controls='cobro' role='tab' data-toggle='tab' class='btn btn-sm btn-dark' >Pagar Cuota</a></td></tr>");
                             $('#table_cobros tbody tr').remove();
                             $('#table_cobros').append("<tr><td>"+id+"</td><td>"+cliente_text+"</td><td>"+deuda+"</td><td>"+pagar+"</td></tr>");
                             $('#venta_id').val(id);
@@ -2151,10 +2237,14 @@
                             $('#cliente_text').val(cliente_text);
                             $('#deuda').val(deuda);
                             $('#restante').val(pagar);
+                            
                         }
                     }
                 }
 
+                function nexttabs() {
+                    $('.nav-tabs a[href="#cobro"]').tab('show')
+                }
                 async function ActualizarCredito() {
                     $('#table_cobros tbody tr').remove();
                     if($('#cuota_cobro').val()==0){
@@ -2269,7 +2359,12 @@
                 $('#report_list tbody tr').remove();
                 console.log(ventas_list.data)
                 for (let index = 0; index < ventas_list.data.length; index++) {
-                    $("#report_list").append("<tr><td>"+ventas_list.data[index].id+"</td><td>"+ventas_list.data[index].fecha+"</td><td>"+ventas_list.data[index].total+"</td></tr>");
+                    var midetalle_venta = '<ul>'
+                    for (let j = 0; j < ventas_list.data[index].detalle_venta.length; j++) {
+                        midetalle_venta += "<li>"+ventas_list.data[index].detalle_venta[j].cantidad+" "+ventas_list.data[index].detalle_venta[j].name+"</li>"
+                    }
+                    midetalle_venta += "</ul>"
+                    $("#report_list").append("<tr><td>"+ventas_list.data[index].id+"</td><td>"+ventas_list.data[index].fecha+"</td><td>"+ventas_list.data[index].estado.title+"</td><td>"+ventas_list.data[index].pasarela.title+"</td><td>"+ventas_list.data[index].cliente.display+"</td><td>"+midetalle_venta+"</td><td>"+ventas_list.data[index].total+"</td></tr>");
                 }
             });
 
