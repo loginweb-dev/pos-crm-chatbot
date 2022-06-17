@@ -1902,30 +1902,28 @@
 
                     var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
                     if((table.data) || (option_id==4)){
+                        var platomayor=await axios.post("{{setting('admin.url')}}api/ventas/platos/idmayor", data2)
+                        //console.log(platomayor.data)
                         var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
                         // var stock=0
                          //console.log(table2.data)
                          var newlist = [];
                          var newlist2 = [];
-                         for (let index = 0; index < 12; index++) {
+                         for (let index = 0; index < ((platomayor.data)+1); index++) {
                             if (table2.data[index]) {
                                 newlist.push(index)
-                            } 
-                            else {
-                                //newlist.push(0)
-
                             }
                          }
+                        //console.log(newlist)
 
                          data3={
                             'user_id':micaja.user_id,
                             'sucursal_id':micaja.sucursal_id,
                             'option_id':option_id,
-                            'vector':newlist
+                            'vector':newlist,
                          }
                          var table4=await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades/segundo", data3)
                          //console.log(table4.data)
-                         //console.log(newlist)
 
                         for (let index = 0; index < table4.data.length; index++) {
                             stock= table4.data[index].stock ? table4.data[index].stock : ""
@@ -1971,15 +1969,12 @@
                                     }
                                 }
                             }
-                            // if((index+1)==table4.data.length){
-                            //             $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
-                            // }
+                           
                             subtotal_plato=0
                             total_mesa=0
                             total_para_llevar=0
                             total_a_domicilio=0
 
-                            // $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
                         }
                          $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
 
@@ -1987,14 +1982,8 @@
                     else{
                         toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())
                     }
-
-
-                    //platos_cliente_table
                 }
-                // $("#tipo_ventas").on("change", function(){
-                //     console.log(this.value)
-                // })
-
+                
                 
 
                 async function Opciones() {

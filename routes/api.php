@@ -1521,7 +1521,6 @@ Route::get('dosificacion/activa',function(){
     return $dosificacion;
 });
 
-
 Route::post('ventas/platos/cantidades', function(Request $request){
     $ventas=[];
         if ($request->option_id==4) {
@@ -1540,11 +1539,39 @@ Route::post('ventas/platos/cantidades', function(Request $request){
                     $prod[$index]=$item2;
                     $index+=1;
             }
-        }
+        }     
         $cant=array_count_values($producto);
-       
-
+        //$cant=array_count_values($request->prod);
     return $cant;
+});
+
+
+Route::post('ventas/platos/idmayor', function(Request $request){
+    $ventas=[];
+        if ($request->option_id==4) {
+                $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('caja_status', false)->get();
+        }
+        else{
+            $ventas=Venta::where('sucursal_id',$request->sucursal_id)->where('option_id',$request->option_id)->where('caja_status', false)->get();
+        }
+        $index=0;
+        $prod=[];
+        $producto=[];
+        foreach ($ventas as $item){
+                $detalle=App\DetalleVenta::where('venta_id',$item->id)->get();
+            foreach ($detalle as $item2){
+                    $producto[$index]=$item2->producto_id;
+                    $prod[$index]=$item2;
+                    $index+=1;
+            }
+        }
+        $prod_mayor=0;
+        foreach ($producto as $item) {
+            if($item>$prod_mayor){
+                $prod_mayor=$item;
+            }
+        }
+    return $prod_mayor;
 });
 
 Route::post("ventas/platos/cantidades/segundo", function(Request $request){
@@ -1595,14 +1622,18 @@ Route::post("ventas/platos/cantidades/segundo", function(Request $request){
                         }
                 }
                 //$total_venta+=(($item2->precio)*$aux);
+                $i+=1;
             }
                
             
             $contador+=1;
-            $i+=1;
+            $i=0;
             $aux=0;
 
         }
+
+       
+        
 
     return $platos;
 });

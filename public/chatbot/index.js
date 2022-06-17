@@ -5,7 +5,7 @@ const cors = require('cors')
 const { Client, MessageMedia, LocalAuth} = require("whatsapp-web.js");
 
 const { io } = require("socket.io-client");
-const socket = io("https://socket.loginweb.dev");
+const socket = io("https://socket.appxi.net");
 
 const JSONdb = require('simple-json-db');
 const categorias = new JSONdb('json/categorias.json');

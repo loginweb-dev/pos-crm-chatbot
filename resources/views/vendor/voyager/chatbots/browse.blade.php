@@ -374,9 +374,9 @@
         <script src="{{ voyager_asset('lib/js/dataTables.responsive.min.js') }}"></script>
     @endif
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
+    <script src="https://socket.appxi.net/socket.io/socket.io.js"></script>
     <script>
-        const socket = io('https://socket.loginweb.dev')
+        const socket = io('https://socket.appxi.net')
         socket.on('chatbot', (msg) =>{
             $("#client_phone").val(msg)
             list_inbox()
@@ -426,17 +426,17 @@
             // })
             // .then(jsondata => console.log(JSON.parse(jsondata)));
 
-            fetch('emojis.json').then(response => {
-                return response.json();
-            }).then(data => {
-                // Work with JSON data here
-                console.log(data);
-            }).catch(err => {
-                // Do something for an error here
-                console.log(err);
-            });
+            // fetch('emojis.json').then(response => {
+            //     return response.json();
+            // }).then(data => {
+            //     // Work with JSON data here
+            //     console.log(data);
+            // }).catch(err => {
+            //     // Do something for an error here
+            //     console.log(err);
+            // });
 
-            fetch('https://pos.loginweb.dev/chatbot/emojis.json')
+            fetch('https://demo.appxi.net/chatbot/emojis.json')
             .then((response) => {
                 return response.json();
             })
@@ -492,7 +492,7 @@
             var listchats = ''
             for (let index = 0; index < messages.data.length; index++) {
                 if (messages.data[index].type == 'input') {
-                    listchats = listchats + "<div class='incoming_msg'><div class='incoming_msg_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='received_msg'><div class='received_withd_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span></div></div></div>"
+                    listchats = listchats + "<div class='incoming_msg'><div class='incoming_msg_img'><img src='https://demo.appxi.net/storage/chatbots/cliente_avatar.png'></div><div class='received_msg'><div class='received_withd_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span></div></div></div>"
                 } else {
                     listchats = listchats + "<div class='outgoing_msg'><div class='sent_msg'><p>"+messages.data[index].message+"</p><span class='time_date'>"+messages.data[index].published+"</span> </div></div>"
                 }
@@ -521,7 +521,7 @@
                     type: 'text',
                     message: message
                 }
-                await axios.post("https://chatbot.loginweb.dev/chat", datapost)
+                await axios.post("https://chatbot.appxi.net/chat", datapost)
                 chat_set(phone)
             }
         }
@@ -543,7 +543,7 @@
                     type: 'text',
                     message: message
                 }
-                await axios.post("https://chatbot.loginweb.dev/chat", datapost)
+                await axios.post("https://chatbot.appxi.net/chat", datapost)
                 chat_set(phone)
                 $("#newmysmg").val('')
             }
@@ -567,12 +567,12 @@
                 var aux_cliente = await axios("{{ setting('admin.url') }}api/chatbot/cliente/get/"+miinbox.data[index].phone)
                 if (aux_cliente.data) {
                     if (aux_cliente.data.chatbot_status) {
-                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}') checked><span class='slider round'></span></label></div>`
+                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://demo.appxi.net/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}') checked><span class='slider round'></span></label></div>`
                     } else {
-                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}')><span class='slider round'></span></label></div>`
+                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://demo.appxi.net/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}')><span class='slider round'></span></label></div>`
                     }
                 } else {
-                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://pos.loginweb.dev/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
+                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='https://demo.appxi.net/storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
                 }
             }
             $("#miinbox").html(listchats)
