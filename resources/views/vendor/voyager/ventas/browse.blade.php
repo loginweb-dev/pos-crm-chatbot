@@ -53,7 +53,7 @@
                                                 {{-- <option value="chofer_deudas">Deudas de Choferes</option> --}}
                                                 <option value="credito">Ventas a Créditos</option>
                                                 <option value="reportes">Ventas por Fechas</option>
-                                                {{-- <option value="pedidos">Cant. Platos</option> --}}
+                                                <option value="pedidos">Cant. Platos</option>
                                                 <option value="agrupadas">Ventas Agrupadas</option>
                                                 {{-- @if(setting('empresa.type_negocio')=="Restaurante")
                                                     <option value="pensionado_kardex"> Kardex Pensionados </option>
@@ -1874,6 +1874,7 @@
                     }
                 }
 
+                
                 async function tipo_pedidos() {
                     $('#cantidad_platos_table tbody tr').remove();
                     $('#platos_cliente_table tbody tr').remove();
@@ -1893,6 +1894,7 @@
                     }
                     var subtotal_plato=0
                     var total_plato=0
+                    var total_dinero=0;
 
                     var total_mesa=0
                     var total_para_llevar=0
@@ -1901,23 +1903,49 @@
                     var table = await axios.get("{{setting('admin.url')}}api/ventas/opcion/"+data)
                     if((table.data) || (option_id==4)){
                         var table2 = await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades", data2)
-                        var stock=0
-                        console.log(table2.data)
-                        for (let index = 0; index < table2.data.length; index++) {
-                            stock= table2.data[index].stock ? table2.data[index].stock : ""
-                            $('#cantidad_platos_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table2.data[index].cant+"</td><td>"+table2.data[index].precio+"</td><td>"+table2.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
+                        // var stock=0
+                         //console.log(table2.data)
+                         var newlist = [];
+                         var newlist2 = [];
+                         for (let index = 0; index < 12; index++) {
+                            if (table2.data[index]) {
+                                newlist.push(index)
+                            } 
+                            else {
+                                //newlist.push(0)
+
+                            }
+                         }
+
+                         data3={
+                            'user_id':micaja.user_id,
+                            'sucursal_id':micaja.sucursal_id,
+                            'option_id':option_id,
+                            'vector':newlist
+                         }
+                         var table4=await axios.post("{{setting('admin.url')}}api/ventas/platos/cantidades/segundo", data3)
+                         //console.log(table4.data)
+                         //console.log(newlist)
+
+                        for (let index = 0; index < table4.data.length; index++) {
+                            stock= table4.data[index].stock ? table4.data[index].stock : ""
+                            $('#cantidad_platos_table').append("<tr><td>"+table4.data[index].name+"</td><td>"+table4.data[index].cant+"</td><td>"+table4.data[index].precio+"</td><td>"+table4.data[index].subtotal+"</td><td>"+stock+"</td></tr>")
+                            total_dinero+=table4.data[index].subtotal
+                            total_plato+=table4.data[index].cant
                         }
+                        $('#cantidad_platos_table').append("<tr><td><h5>Total Platos:</h5></td><td><h5>"+total_plato+"</h5></td><td><h5>Total Dinero:</h5></td><td><h5>"+total_dinero+"</h5></td><td></td></tr>")
+
                         var table3= await axios.post("{{setting('admin.url')}}api/ventas/lista/detalle", data2)
                         //console.log(table3.data)
-                        for (let index = 0; index < table2.data.length; index++) {
+                        for (let index = 0; index < table4.data.length; index++) {
                             for (let index2 = 0; index2 < table3.data.length; index2++) {
 
                                 for (let index3 = 0; index3 < table3.data[index2].detalle_venta.length; index3++) {
                                     //console.log("Hola")
 
-                                    if (table2.data[index].name==table3.data[index2].detalle_venta[index3].name) {
-                                        //console.log(table2.data[index].name)
-                                         $('#platos_cliente_table').append("<tr><td>"+table2.data[index].name+"</td><td>"+table3.data[index2].detalle_venta[index3].cantidad+"</td><td>"+table3.data[index2].cliente.display+"</td><td>"+table3.data[index2].option.title+"</td></tr>")
+                                    if (table4.data[index].name==table3.data[index2].detalle_venta[index3].name) {
+                                        //console.log(table4.data[index].name)
+                                         $('#platos_cliente_table').append("<tr><td>"+table4.data[index].name+"</td><td>"+table3.data[index2].detalle_venta[index3].cantidad+"</td><td>"+table3.data[index2].cliente.display+"</td><td>"+table3.data[index2].option.title+"</td></tr>")
                                          subtotal_plato+=table3.data[index2].detalle_venta[index3].cantidad
                                          if (table3.data[index2].option.id==1) {
                                             total_mesa+=table3.data[index2].detalle_venta[index3].cantidad
@@ -1929,23 +1957,23 @@
                                             total_a_domicilio+=table3.data[index2].detalle_venta[index3].cantidad
                                          }
                                         //  if ((index2+1)==table3.data.length) {
-                                        if (subtotal_plato==table2.data[index].cant) {
-                                            total_plato+=subtotal_plato
-                                            console.log("Hola")
+                                        if (subtotal_plato==table4.data[index].cant) {
+                                            //total_plato+=subtotal_plato
+                                            //console.log("Hola")
                                             if ((option_id==4)) {
-                                                $('#platos_cliente_table').append("<tr><td><h5>Para la Mesa: </h5></td><td><h5>"+total_mesa+"</h5></td><td></td><td></td></tr>")
-                                                $('#platos_cliente_table').append("<tr><td><h5>Para Llevar (Recoger): </h5></td><td><h5>"+total_para_llevar+"</h5></td><td></td><td></td></tr>")
+                                                $('#platos_cliente_table').append("<tr><td><h5>COMER AQUÍ: </h5></td><td><h5>"+total_mesa+"</h5></td><td></td><td></td></tr>")
+                                                $('#platos_cliente_table').append("<tr><td><h5>Recoger en Tienda: </h5></td><td><h5>"+total_para_llevar+"</h5></td><td></td><td></td></tr>")
                                                 $('#platos_cliente_table').append("<tr><td><h5>A Domicilio (Delivery): </h5></td><td><h5>"+total_a_domicilio+"</h5></td><td></td><td></td></tr>")
                                             }
                                             
-                                            $('#platos_cliente_table').append("<tr><td><h5>SUBTOTAL: "+table2.data[index].name+"  </h5></td><td><h5>"+subtotal_plato+"</h5></td><td></td><td></td></tr>")
+                                            $('#platos_cliente_table').append("<tr><td><h5>SUBTOTAL: "+table4.data[index].name+"  </h5></td><td><h5>"+subtotal_plato+"</h5></td><td></td><td></td></tr>")
                                          }
                                     }
                                 }
                             }
-                            if((index+1)==table2.data.length){
-                                        $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
-                            }
+                            // if((index+1)==table4.data.length){
+                            //             $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
+                            // }
                             subtotal_plato=0
                             total_mesa=0
                             total_para_llevar=0
@@ -1953,6 +1981,8 @@
 
                             // $('#platos_cliente_table').append("<tr><td></td><td></td><td></td><td></td></tr>")
                         }
+                         $('#platos_cliente_table').append("<tr><td><h4>Total Platos: </h4></td><td><h4>"+total_plato+"</h4></td><td></td><td></td></tr>")
+
                     }
                     else{
                         toastr.error("No hay ventas de tipo: "+$('#tipo_ventas :selected').text())
@@ -1961,7 +1991,6 @@
 
                     //platos_cliente_table
                 }
-
                 // $("#tipo_ventas").on("change", function(){
                 //     console.log(this.value)
                 // })
@@ -2285,8 +2314,9 @@
                             var type = "Ingresos";
                             var caja_id = micaja.caja_id;
                             var editor_id = '{{ Auth::user()->id }}';
-                            var midata = JSON.stringify({caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: concepto, pago:pago});
-                            var asiento= await axios("{{setting('admin.url')}}api/pos/asiento/save/"+midata);
+                            var midata = {caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: concepto, pago:pago};
+                            console.log(midata)
+                            var asiento= await axios.post("{{setting('admin.url')}}api/pos/asiento/save", midata);
                             if(asiento){
                                 toastr.success('Asiento registrado como: '+asiento.data.type);
                             }

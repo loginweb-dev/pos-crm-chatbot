@@ -1895,6 +1895,7 @@
         var editor_id = '{{ Auth::user()->id }}'
         var midata = {caja_id: caja_id, type: type, monto: monto, editor_id: editor_id, concepto: concepto, pago:pago}
         var miresponse = await axios.post("{{ setting('admin.url') }}api/pos/asiento/save/", midata)
+        console.log(miresponse.data)
         toastr.success('Asiento registrado como: '+miresponse.data.type)
         $('#modal_asientos').modal('hide')
     }
