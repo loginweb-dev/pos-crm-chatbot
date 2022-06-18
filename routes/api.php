@@ -1451,14 +1451,16 @@ Route::post('chatbot/venta/save', function (Request $request) {
         'caja_id' => 2,
         'sucursal_id' => 1,
         'status_id' => 1,
-        'option_id'=> 3,
+        'option_id'=> setting('ventas.pedido_domicilio_id'),
         'location'=> 1,
-        'delivery_id'=> 1,
+        'delivery_id'=> setting('ventas.delivery_negocio_id'),
         'pago_id' => $request->pago_id,
         'cupon_id'=> 1,
-        'register_id' => 23,
+        'register_id' => setting('ventas.cliente_pag_id'),
         'credito' => 'Contado',
-        'factura' => 'Recibo'
+        'factura' => 'Recibo',
+        'chofer_id'=>setting('ventas.chofer'),
+        'chatbot_id' => $request->chatbot_id
     ]);
     $mitotal = 0;
     foreach ($carts as $item) {

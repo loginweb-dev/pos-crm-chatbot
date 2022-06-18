@@ -93,10 +93,11 @@
     <script type="text/javascript" src="{{ asset('ecommerce1/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('ecommerce1/js/mdb.min.js') }}"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
 
-    {{-- <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://socket.appxi.net/socket.io/socket.io.js"></script>
 
     <script type="text/javascript">
         new WOW().init();

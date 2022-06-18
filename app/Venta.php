@@ -39,7 +39,8 @@ class Venta extends Model
         'pensionado_id',
         'status_credito',
         'codigo_control',
-        'nro_factura'
+        'nro_factura',
+		'chatbot_id',
 	];
 
 	protected $appends=['published', 'fecha'];

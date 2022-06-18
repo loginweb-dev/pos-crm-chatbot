@@ -330,20 +330,38 @@ client.on('message', async msg => {
             }
             break;
         case pasarelas.has(msg.body.toUpperCase()):
-            var pago_id = msg.body.substring(1, 99)
-            var mediag = MessageMedia.fromFilePath('imgs/gracias.gif')
             var midata = {
-                chatbot_id: msg.from,
-                pago_id: pago_id
+                chatbot_id: msg.from
             }
-            var miventa = await axios.post(process.env.APP_URL+'api/chatbot/venta/save', midata)
-            client.sendMessage(msg.from, mediag, {caption: '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉'}).then((response) => {
-                if (response.id.fromMe) {
-                    console.log("text fue enviado!");
+            var miresponse = await axios.post(process.env.APP_URL+'api/chatbot/cart/get', midata)
+            if (miresponse.data.length != 0) {
+                var pago_id = msg.body.substring(1, 99)
+                var mediag = MessageMedia.fromFilePath('imgs/gracias.gif')
+                var midata = {
+                    chatbot_id: msg.from,
+                    pago_id: pago_id
                 }
-            })
-            await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉')
-            socket.emit("chatbot", msg.from)
+                var miventa = await axios.post(process.env.APP_URL+'api/chatbot/venta/save', midata)
+                client.sendMessage(msg.from, mediag, {caption: '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉'}).then((response) => {
+                    if (response.id.fromMe) {
+                        console.log("text fue enviado!");
+                    }
+                })
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉')
+                socket.emit("chatbot", msg.from)
+                }else {
+                    client.sendMessage(msg.from, '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL').then((response) => {
+                        if (response.id.fromMe) {
+                            console.log("text fue enviado!");
+                        }
+                    })
+                    var miout = {
+                        phone: msg.from,
+                        message: '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL'
+                    }
+                    await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
+                    socket.emit("chatbot", msg.from)
+                }
             break;
         case (msg.body === 'G') || (msg.body === 'g'):
             var midata = {
@@ -476,22 +494,29 @@ app.get('/', async (req, res) => {
   });
 
   app.post('/chat', async (req, res) => {
-    // console.log(req.body.phone)
-    if (req.body.type == 'text') {
-        client.sendMessage(req.body.phone, req.body.message).then((response) => {
+    console.log(req.query)
+    console.log(req.body)
+    var type = req.body.type ? req.body.type : req.query.phone
+    var message = req.body.message ? req.body.message : req.query.message
+    var phone = req.body.phone ? req.body.phone : req.query.phone
+
+    //res.send(req.body.type)
+    if (type == 'text') {
+        client.sendMessage(phone, message).then((response) => {
             if (response.id.fromMe) {
                 console.log("text fue enviado!");
+                //res.send('text enviado');
             }
         })
-    }else if (req.body.type == 'galery') {
+    }else if (type == 'galery') {
         // const media = MessageMedia.fromFilePath(req.query.attachment);
         // client.sendMessage(req.query.phone, media, {caption: req.query.message}).then((response) => {
         //     if (response.id.fromMe) {
         //         console.log("galery fue enviado!");
         //     }
         // });
-    }else if (req.body.type == 'pin') {
-        client.sendMessage(req.body.phone, req.body.message).then((response) => {
+    }else if (type == 'pin') {
+        client.sendMessage(phone, message).then((response) => {
             if (response.id.fromMe) {
                 console.log("pin fue enviado!");
             }
