@@ -1398,6 +1398,10 @@ Route::post('chatbot/cliente/search', function (Request $request) {
     return Cliente::where('display', 'like', '%'.$request->criterio.'%')->get();
 });
 
+Route::post('chatbot/cliente/ventas', function (Request $request) {
+    return Venta::where('chatbot_id', $request->chatbot_id)->with('detalle_venta')->orderBy('created_at', 'desc')->get();
+});
+
 Route::post('chatbot/cliente/relacion', function (Request $request) {
     $cliente = Cliente::find($request->cliente_id);
     $cliente->chatbot_id = $request->chatbot_id;

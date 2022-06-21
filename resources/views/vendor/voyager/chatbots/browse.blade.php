@@ -137,6 +137,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal modal-primary fade" tabindex="-1" id="ventas_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-helm"></i> Ventas </h4>
+                </div>
+                <div class="modal-body">
+                    {{-- <input type="text" id="chatbot_id" hidden> --}}
+                    {{-- <input id="search_cliente" type="text" class="form-control" placeholder="buscar cliente"> --}}
+                    <table class="table" id="table_ventas">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Productos</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -205,7 +231,7 @@
         padding: 18px 16px 10px;
         }
 
-        .inbox_chat { height: 550px; overflow-y: scroll;}
+        .inbox_chat { height: 650px; overflow-y: scroll;}
 
         .active_chat{ background:#ebebeb;}
 
@@ -572,10 +598,10 @@
                     if (aux_cliente.data.chatbot_status) {
                         listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='{{setting('admin.url')}}storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}') checked><span class='slider round'></span></label></div>`
                     } else {
-                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='{{setting('admin.url')}}storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display} <label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}')><span class='slider round'></span></label></div>`
+                        listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='{{setting('admin.url')}}storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div>${aux_cliente.data.display}<br><a href='#' onclick='cliente_ventas("${miinbox.data[index].phone}")'>Ventas</a><br><label class='switch'><input id='${aux_cliente.data.id}' type='checkbox' onclick=cliente_change('${aux_cliente.data.id}')><span class='slider round'></span></label></div>`
                     }
                 } else {
-                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='{{setting('admin.url')}}storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
+                    listchats = listchats + `<div class='chat_list'><div class='chat_people'><a href='#' onclick='chat_set("${miinbox.data[index].phone}")'><div class='chat_img'><img src='{{setting('admin.url')}}storage/chatbots/cliente_avatar.png'></div><div class='chat_ib'><h5>${miinbox.data[index].phone}<span class='chat_date'>${aux_chat.data.published}</span></h5></div></a></div><a href='#' onclick='cliente_ventas("${miinbox.data[index].phone}")'>Ventas</a><br><a href='#' onclick='cliente_relacion("${miinbox.data[index].phone}")'>Relacionar Cliente<a></div>`
                 }
             }
             $("#miinbox").html(listchats)
@@ -585,6 +611,23 @@
             $('#chatbot_id').val(chatbot_id);
             $('#cliente_modal').modal('show');
         }
+        async function cliente_ventas(chatbot_id) {
+            $('#chatbot_id').val(chatbot_id);
+            $('#ventas_modal').modal('show');
+            $('#table_ventas tbody tr').remove();
+            var ventas = await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/ventas", {chatbot_id: chatbot_id})
+            // console.log(clientes.data)
+            for (let index = 0; index < ventas.data.length; index++) {
+                var productos = '<ul>'
+                    for (let j = 0; j < ventas.data[index].detalle_venta.length; j++) {
+                        productos += '<li>'+ventas.data[index].detalle_venta[j].cantidad+' - '+ventas.data[index].detalle_venta[j].name+'</li>'
+                    }
+                productos += '</ul>'
+                var miurl = "{{ route('voyager.detalle-ventas.index', ['key' => 'venta_id', 'filter' => 'equals', 's' => 'replace_id' ]) }}"
+                miurl = miurl.replace('replace_id', ventas.data[index].id)
+                $('#table_ventas').append("<tr><td>"+ventas.data[index].id+"</td><td>"+ventas.data[index].published+"</td><td>"+productos+"</td><td><a href='"+miurl+"' class='btn btn-xs btn-dark' target='_blank'>Detalles</a></td></tr>")
+            }
+        }
 
         $("#search_cliente").keyup(async function(e)
         {
@@ -592,7 +635,7 @@
             {
                 $('#table_cliente tbody tr').remove();
                 var clientes = await axios.post("{{ setting('admin.url') }}api/chatbot/cliente/search", {criterio: this.value})
-                console.log(clientes.data)
+                // console.log(clientes.data)
                 for (let index = 0; index < clientes.data.length; index++) {
                     $('#table_cliente').append("<tr><td>"+clientes.data[index].id+"</td><td>"+clientes.data[index].display+"</td><td>"+clientes.data[index].published+"</td><td><a href='#' class='btn btn-xs btn-dark' onclick='cliente_set("+clientes.data[index].id+", "+clientes.data[index].id+")'>OK</a></td></tr>")
                 }
@@ -628,5 +671,12 @@
             var addmysmg = msgactual + emoji
             $("#newmysmg").val(addmysmg)
         }
+
+        $("#misearch").keypress(function (e) { 
+            if (e.keyCode == 13) {
+                console.log(this.value)
+            }
+            
+        })
     </script>
 @stop

@@ -4,6 +4,7 @@
 /public/chatbot/node_modules
 /public/chatbot/.wwebjs_auth
 /public/chatbot/json/
+/public/chatbot/package-lock.json
 /storage/*.key
 /vendor
 .env

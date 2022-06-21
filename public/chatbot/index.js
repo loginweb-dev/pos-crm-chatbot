@@ -342,12 +342,17 @@ client.on('message', async msg => {
                     pago_id: pago_id
                 }
                 var miventa = await axios.post(process.env.APP_URL+'api/chatbot/venta/save', midata)
-                client.sendMessage(msg.from, mediag, {caption: '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉'}).then((response) => {
+                var list = '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉'
+                client.sendMessage(msg.from, mediag, {caption: list}).then((response) => {
                     if (response.id.fromMe) {
                         console.log("text fue enviado!");
                     }
                 })
-                await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🕦 *Pedido #'+miventa.data.id+' Enviado* 🕦 \n Se te notificara el proceso de tu pedido, por esta mismo medio. \n 🎉 *GRACIAS POR TU PREFERENCIA* 🎉')
+                var miout = {
+                    phone: msg.from,
+                    message: list
+                }
+                await axios.post(process.env.APP_URL+'api/chatbot/save/out', miout)
                 socket.emit("chatbot", msg.from)
                 }else {
                     client.sendMessage(msg.from, '❌ *Tu carrito esta vacio* ❌ \n *0* .- MENU PRINCIPAL').then((response) => {
@@ -446,13 +451,23 @@ client.on('message', async msg => {
                 cantidad: cant
             }
             await axios.post(process.env.APP_URL+'api/chatbot/cart/add', midata)
-            client.sendMessage(msg.from, '🎉 Producto agregado a tu carrito 🎉\n*F* .- VER MI CARRITO').then((response) => {
+            var list = '🎉 Producto agregado a tu carrito 🎉\n'
+            list += '------------------------------------------\n'
+            list += '*F* .- VER MI CARRITO\n'
+            list += '*G* .- Enviar pedido\n'
+            list += '*0* .- MENU PRINCIPAL\n'
+            list += '------------------------------------------\n'
+            list += '*ENVIA UNA OPCION DEL MENU*'
+            client.sendMessage(msg.from, list).then((response) => {
                 if (response.id.fromMe) {
                     console.log("text fue enviado!");
                 }
             })
-
-            await axios.post(process.env.APP_URL+'api/chatbot/save/out', '🎉 Producto agregado a tu carrito 🎉\n*F* .- VER MI CARRITO')
+            var midb = {
+                phone: msg.from,
+                message: list
+            }
+            await axios.post(process.env.APP_URL+'api/chatbot/save/out', midb)
             socket.emit("chatbot", msg.from)
             break;
         default:
@@ -467,12 +482,14 @@ client.on('message', async msg => {
                 var mediadefault = MessageMedia.fromFilePath('imgs/chatbot.png')
                 var list = '*Hola*, soy el 🤖CHATBOT🤖 de la tienda en linea: '+process.env.APP_NAME+' \n'
                 list += '*MENU PRINCIPAL* \n'
+                list += '------------------------------------------ \n'
                 list += '*A* .- TODAS LAS CATEGORIAS \n'
                 list += '*B* .- TODOS LOS PRODUCTOS \n'
                 list += '*C* .- CUPONES \n'
                 list += '*D* .- SUCURSALES \n'
                 list += '*E* .- BUSCAR UN PRODUCTO \n'
                 list += '*F* .- VER MI CARRITO \n \n'
+                list += '------------------------------------------ \n'
                 list += '*ENVIA UNA OPCION DEL MENU*'
                 client.sendMessage(msg.from, mediadefault, {caption: list}).then((response) => {
                     if (response.id.fromMe) {
