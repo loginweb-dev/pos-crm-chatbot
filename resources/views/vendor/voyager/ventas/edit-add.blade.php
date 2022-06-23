@@ -501,14 +501,21 @@
                                             <thead>
                                                 <tr>
                                                     <th>Accion</th>
+                                                    @if(setting("empresa.type_negocio")=="Ferreteria")
+                                                    <th>SKU</th>
+                                                    @endif
                                                     <th>Categoria</th>
+                                                    @if(setting("empresa.type_negocio")=="Farmacia")
                                                     <th>N. Comercial</th>
+                                                    @endif
                                                     <th>N. Genérico</th>
                                                     <th>Etiqueta</th>
                                                     <th>Stock</th>
-                                                    <th>Vencimiento</th>
                                                     <th>Precio</th>
+                                                    @if(setting("empresa.type_negocio")=="Farmacia")
+                                                    <th>Vencimiento</th>
                                                     <th>Laboratorio</th>
+                                                    @endif
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -1549,12 +1556,19 @@
             var miresult = await axios.post("{{setting('admin.url')}}api/producto/search", midata)
             $("#mitableresult tbody tr").remove()
             $("#miresult").attr("hidden", false)
-            for(let index=0; index < miresult.data.length; index++){
-                var img = miresult.data[index].image ? miresult.data[index].image : "{{ setting('productos.imagen_default') }}"
-                var nombre_genérico= miresult.data[index].title ? miresult.data[index].title : " "
-                var vencimiento = miresult.data[index].vencimiento ? miresult.data[index].vencimiento : " "
-                var laboratorio= miresult.data[index].laboratorio_id ? miresult.data[index].laboratorio.name : " "
-                $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td></tr>")
+            if('{{setting('empresa.type_negocio')}}'=='Ferreteria'){
+                for(let index=0; index < miresult.data.length; index++){
+                $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].sku+"</td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+miresult.data[index].precio+"</td></tr>")
+                }
+            }
+            else{
+                for(let index=0; index < miresult.data.length; index++){
+                    var img = miresult.data[index].image ? miresult.data[index].image : "{{ setting('productos.imagen_default') }}"
+                    var nombre_genérico= miresult.data[index].title ? miresult.data[index].title : " "
+                    var vencimiento = miresult.data[index].vencimiento ? miresult.data[index].vencimiento : " "
+                    var laboratorio= miresult.data[index].laboratorio_id ? miresult.data[index].laboratorio.name : " "
+                    $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td></tr>")
+                }
             }
         }
     });

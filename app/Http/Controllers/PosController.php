@@ -43,13 +43,14 @@ class PosController extends Controller
         $option=Option::find($ventas->option_id);
         $literal = NumerosEnLetras::convertir($ventas->total,'Bolivianos',true);
 
-        //logica para direccionar a recibo o factura ventas.factura
+        //logica para direccionar a recibo, factura, o proforma
         if ($ventas->factura == 'Recibo') {
             $vista = view('ventas.recibo', compact('ventas' ,'detalle_ventas', 'cliente','sucursal','option', 'literal'));
             $pdf = \App::make('dompdf.wrapper');
             $pdf->loadHTML($vista)->setPaper('legal');
             return $pdf->stream();
-        } else {
+        } 
+        else if($ventas->factura == 'Factura') {
             $dosificacion=Dosificacione::where('activa',1)->first();
 
             //QR
@@ -58,6 +59,12 @@ class PosController extends Controller
 
             $codigoQR = QrCode::format('png')->size(250)->generate($texto_qr);
             $vista = view('ventas.factura', compact('ventas' ,'detalle_ventas', 'cliente','sucursal','option', 'literal', 'codigoQR', 'dosificacion'));
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($vista)->setPaper('legal');
+            return $pdf->stream();
+        }
+        else {
+            $vista = view('ventas.proforma', compact('ventas' ,'detalle_ventas', 'cliente','sucursal','option', 'literal'));
             $pdf = \App::make('dompdf.wrapper');
             $pdf->loadHTML($vista)->setPaper('legal');
             return $pdf->stream();

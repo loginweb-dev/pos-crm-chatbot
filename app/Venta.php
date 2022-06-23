@@ -41,6 +41,7 @@ class Venta extends Model
         'codigo_control',
         'nro_factura',
 		'chatbot_id',
+		'proforma'
 	];
 
 	protected $appends=['published', 'fecha'];

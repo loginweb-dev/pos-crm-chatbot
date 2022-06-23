@@ -28,19 +28,33 @@ class ProductsImport implements ToModel
         // ]);
 
         //$fecha=date('Y-m-d', strtotime($row[6]));
-        $fecha= $row[6] ? date('Y-m-d', $row[6]) : null;
+
+
+        //$fecha= $row[6] ? date('Y-m-d', $row[6]) : null;
         //echo $fecha;
+        // return new Producto([
+        //     'name'     => $row[0],
+        //     'title'    => $row[1],
+        //     'etiqueta' => $row[2],
+        //     'precio' => $row[3],
+        //     'laboratorio_id'=> $row[4],
+        //     'precio_compra'=> $row[5],
+        //     'vencimiento'=> $fecha,
+        //     'stock'=> $row[7],
+        //     'categoria_id'=> $row[8],
+        //     'sucursal_id'=>1
+        // ]);
+
         return new Producto([
-            'name'     => $row[0],
-            'title'    => $row[1],
-            'etiqueta' => $row[2],
-            'precio' => $row[3],
-            'laboratorio_id'=> $row[4],
-            'precio_compra'=> $row[5],
-            'vencimiento'=> $fecha,
-            'stock'=> $row[7],
-            'categoria_id'=> $row[8],
-            'sucursal_id'=>1
+            'sku'     => $row[0],
+            'name'    => $row[1],
+            'stock' => $row[2],
+            'precio_compra' => $row[3],
+            'categoria_id'=> $row[4],
+            'precio'=> $row[5],
+            'sucursal_id'=>$row[6],
+            'etiqueta'=>$row[7]
         ]);
+
     }
 }
