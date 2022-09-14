@@ -48,6 +48,7 @@
                                 <div id="search-input">
                                     <div class="col-4">
                                         <select id="search_key" name="key" style="width: 200px" class="">
+                                            <option value="id"> ID </option>
                                                 <option value="name"> N. COMERCIAL </option>
                                                 <option value="title"> N. GENERICO </option>
                                                 <option value="etiqueta"> ETIQUETAS </option>
@@ -60,6 +61,7 @@
                                         <select id="filter" name="filter">
                                                 {{-- <option value="equals"> = </option> --}}
                                                 <option value="contains">LIKE</option>
+
                                         </select>
                                     </div>
                                     <div class="col-6">
@@ -322,8 +324,10 @@
                                     <tr>
                                         <th>Cantidad Productos</th>
                                         <th>Total Stock * Cantidad Productos</th>
-                                        <th>Promedio de Ganancia por Producto</th>
-                                        <th><b>Capital en Productos</b></th>
+                                        {{-- <th>Promedio de Ganancia por Producto</th> --}}
+                                        <th><b>Capital en Productos Compras</b></th>
+                                        <th><b>Capital en Productos Ventas</b></th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -645,15 +649,25 @@
             var num_total_stock_productos=0;
             var promedio_prod=0;
             var capital=0;
+            var capital_venta=0;
             for(let index=0;index<table.data.length;index++){
                 if(table.data[index].stock!=null){
-                    promedio_prod+=(table.data[index].precio-table.data[index].precio_compra);
+                    // promedio_prod+=(table.data[index].precio-table.data[index].precio_compra);
                     capital+=(table.data[index].precio_compra*table.data[index].stock);
+                    capital_venta+=(table.data[index].precio*table.data[index].stock);
                     num_total_stock_productos+=table.data[index].stock;
+                    // if (table.data[index].precio_compra>100) {
+                    //     console.log("ID"+table.data[index].id)
+                    //     console.log("Precio"+table.data[index].precio_compra)
+                    // }
+                    
+                    // console.log(table.data[index].precio_compra)
+                    // console.log(table.data[index].stock)
+                    // console.log(capital)
                 }
             }
-            promedio_prod=promedio_prod/num_productos;
-            $('#table-capital-productos').append("<tr><td><h5>"+num_productos+"</h5></td><td><h5>"+num_total_stock_productos+"</h5></td><td><h5>"+promedio_prod.toFixed(2)+"</h5></td><td><h4>"+capital+"</h4></td></tr>");
+            // promedio_prod=promedio_prod/num_productos;
+            $('#table-capital-productos').append("<tr><td><h5>"+num_productos+"</h5></td><td><h5>"+num_total_stock_productos+"</h5></td><td><h4>"+capital.toFixed(2)+"</h4></td><td><h4>"+capital_venta.toFixed(2)+"</h4></td></tr>");
         }
 
         $('#categoria_id').on('change', async function() {
@@ -664,7 +678,9 @@
                 var categoria = table.data[index].categoria ? table.data[index].categoria.name : 'Sin categoria'
                 var laboratorio = table.data[index].laboratorio ? table.data[index].laboratorio.name : 'Sin laboratorio'
                 total +=table.data[index].stock * table.data[index].precio
-                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td>{{ route('voyager.productos.edit', "+table.data[index].id+") }}</td></tr>")
+                var miedit = "{{ route('voyager.productos.edit', 'miid') }}"
+                miedit = miedit.replace('miid', table.data[index].id)
+                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td><a href='"+miedit+"' class='btn btn-warning'>Editar</td></tr>")
             }
             $("#text_filtros").html("<h6> Cantidad (stock): "+table.data.length+" - Total(stock*p.venta): "+total+"</h6>")
         });
@@ -677,7 +693,9 @@
                 var categoria = table.data[index].categoria ? table.data[index].categoria.name : 'Sin categoria'
                 var laboratorio = table.data[index].laboratorio ? table.data[index].laboratorio.name : 'Sin laboratorio'
                 total +=table.data[index].stock * table.data[index].precio
-                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td>{{ route('voyager.productos.edit', "+table.data[index].id+") }}</td></tr>")
+                var miedit = "{{ route('voyager.productos.edit', 'miid') }}"
+                miedit = miedit.replace('miid', table.data[index].id)
+                $('#filtros_productos').append("<tr><td>"+table.data[index].id+"</td><td>"+table.data[index].name+"</td><td>"+table.data[index].stock+"</td><td>"+table.data[index].precio+"</td><td>"+table.data[index].precio_compra+"</td><td>"+table.data[index].vencimiento+"</td><td>"+categoria+"</td><td>"+laboratorio+"</td><td><a href='"+miedit+"' class='btn btn-warning'>Editar</td></tr>")
             }
             $("#text_filtros").html("<h6> Cantidad (stock): "+table.data.length+" - Total(stock*p.venta): "+total+"</h6>")
         });

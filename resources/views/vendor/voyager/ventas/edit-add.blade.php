@@ -1567,7 +1567,7 @@
                     var nombre_genérico= miresult.data[index].title ? miresult.data[index].title : " "
                     var vencimiento = miresult.data[index].vencimiento ? miresult.data[index].vencimiento : " "
                     var laboratorio= miresult.data[index].laboratorio_id ? miresult.data[index].laboratorio.name : " "
-                    $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+vencimiento+"</td><td>"+miresult.data[index].precio+"</td><td>"+laboratorio+"</td></tr>")
+                    $('#mitableresult').append("<tr><td><a class='btn btn-sm btn-dark' onclick='addproduct("+miresult.data[index].id+")'>Agregar</a></td><td>"+miresult.data[index].categoria.name+"</td><td>"+miresult.data[index].name+"</td><td>"+nombre_genérico+"</td><td>"+miresult.data[index].etiqueta+"</td><td>"+miresult.data[index].stock+"</td><td>"+miresult.data[index].precio+"</td><td>"+vencimiento+"</td><td>"+laboratorio+"</td></tr>")
                 }
             }
         }
